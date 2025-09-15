@@ -103,11 +103,13 @@ export class BarangayMap extends Scene {
     }
 
     create() {
-        // Create tile textures first
-        this.createTileTextures();
+        // Create background image
+        this.createBackground();
 
-        // Create tile-based map
-        this.createTileMap();
+        // Note: Tile textures and tile map are disabled since we're using background image
+
+        // Create collision areas for buildings (since we're not using tiles)
+        this.createCollisionAreas();
 
         // Create player with collision
         this.createPlayer();
@@ -128,6 +130,17 @@ export class BarangayMap extends Scene {
         this.cameras.main.startFollow(this.player);
         this.cameras.main.setZoom(1);
 
+        // Debug camera and scene info
+        console.log(
+            "Camera position:",
+            this.cameras.main.x,
+            this.cameras.main.y
+        );
+        console.log("Camera bounds:", this.cameras.main.getBounds());
+        console.log("Camera zoom:", this.cameras.main.zoom);
+        console.log("Scene visible:", this.scene.isVisible());
+        console.log("Scene active:", this.scene.isActive());
+
         // Set up input
         this.cursors = this.input.keyboard.createCursorKeys();
         this.wasd = this.input.keyboard.addKeys("W,S,A,D");
@@ -138,6 +151,177 @@ export class BarangayMap extends Scene {
         );
 
         EventBus.emit("current-scene-ready", this);
+    }
+
+    createBackground() {
+        console.log("Creating background...");
+        console.log(
+            "Barangay background texture exists:",
+            this.textures.exists("barangay-bg")
+        );
+        console.log(
+            "Barangay background root texture exists:",
+            this.textures.exists("barangay-bg-root")
+        );
+
+        // If textures don't exist, load them directly
+        if (!this.textures.exists("barangay-bg-root")) {
+            console.log("Textures not loaded, loading them now...");
+            this.load.image("barangay-bg-root", "barangay-background.png");
+            this.load.start();
+
+            this.load.once("complete", () => {
+                console.log("Textures loaded, creating background...");
+                this.createBackgroundImage();
+            });
+        } else {
+            // Wait a bit for textures to be fully loaded
+            this.time.delayedCall(100, () => {
+                this.createBackgroundImage();
+            });
+        }
+    }
+
+    createBackgroundImage() {
+        console.log("Creating background image after delay...");
+        console.log(
+            "Barangay background root texture exists now:",
+            this.textures.exists("barangay-bg-root")
+        );
+
+        // Create background image as the main visual element
+        if (this.textures.exists("barangay-bg-root")) {
+            console.log("Using root barangay background image...");
+            console.log(
+                "Texture details:",
+                this.textures.get("barangay-bg-root")
+            );
+            console.log(
+                "barangay-bg-root texture source:",
+                this.textures.get("barangay-bg-root").source
+            );
+            console.log(
+                "barangay-bg-root texture width/height:",
+                this.textures.get("barangay-bg-root").source.width,
+                this.textures.get("barangay-bg-root").source.height
+            );
+
+            try {
+                const bgImage = this.add.image(512, 384, "barangay-bg-root");
+                bgImage.setOrigin(0.5, 0.5);
+                bgImage.setDepth(-2000); // Much further behind everything
+                bgImage.setScale(1024 / bgImage.width, 768 / bgImage.height); // Scale to fit screen
+                bgImage.setAlpha(1); // Fully visible
+                bgImage.setVisible(true); // Explicitly set visible
+                console.log("Root background image created successfully");
+                console.log(
+                    "Root background image position:",
+                    bgImage.x,
+                    bgImage.y
+                );
+                console.log(
+                    "Root background image dimensions:",
+                    bgImage.width,
+                    bgImage.height
+                );
+                console.log(
+                    "Root background image scale:",
+                    bgImage.scaleX,
+                    bgImage.scaleY
+                );
+                console.log("Root background image visible:", bgImage.visible);
+                console.log("Root background image alpha:", bgImage.alpha);
+                console.log("Root background image depth:", bgImage.depth);
+            } catch (error) {
+                console.error("Error creating root background image:", error);
+                // Fallback to teal background if image fails
+                const bg = this.add.rectangle(512, 384, 1024, 768, 0x20b2aa);
+                bg.setDepth(-2000);
+                console.log("Using fallback teal background");
+            }
+        } else {
+            console.log(
+                "Barangay background texture not found, using fallback"
+            );
+            // Create a teal background as fallback
+            const bg = this.add.rectangle(512, 384, 1024, 768, 0x20b2aa);
+            bg.setDepth(-2000);
+        }
+    }
+
+    createCollisionAreas() {
+        console.log("Creating collision areas for buildings...");
+
+        // Create invisible collision rectangles for buildings
+        // These should match the building positions in your background image
+        const buildingCollisions = [
+            // Barangay Hall (center)
+            {
+                x: 16 * this.tileSize,
+                y: 8 * this.tileSize,
+                width: 4 * this.tileSize,
+                height: 3 * this.tileSize,
+            },
+            // Health Center (top-left)
+            {
+                x: 4 * this.tileSize,
+                y: 4 * this.tileSize,
+                width: 3 * this.tileSize,
+                height: 2 * this.tileSize,
+            },
+            // School (top-right)
+            {
+                x: 24 * this.tileSize,
+                y: 4 * this.tileSize,
+                width: 4 * this.tileSize,
+                height: 3 * this.tileSize,
+            },
+            // Market (bottom-left)
+            {
+                x: 4 * this.tileSize,
+                y: 16 * this.tileSize,
+                width: 3 * this.tileSize,
+                height: 2 * this.tileSize,
+            },
+            // Library (bottom-right)
+            {
+                x: 24 * this.tileSize,
+                y: 16 * this.tileSize,
+                width: 3 * this.tileSize,
+                height: 2 * this.tileSize,
+            },
+            // Residential areas
+            {
+                x: 8 * this.tileSize,
+                y: 12 * this.tileSize,
+                width: 2 * this.tileSize,
+                height: 2 * this.tileSize,
+            },
+            {
+                x: 20 * this.tileSize,
+                y: 12 * this.tileSize,
+                width: 2 * this.tileSize,
+                height: 2 * this.tileSize,
+            },
+        ];
+
+        buildingCollisions.forEach((building, index) => {
+            const collision = this.add.rectangle(
+                building.x + building.width / 2,
+                building.y + building.height / 2,
+                building.width,
+                building.height,
+                0x000000,
+                0 // Invisible
+            );
+            this.physics.add.existing(collision, true);
+            collision.body.setSize(building.width, building.height);
+            console.log(
+                `Building collision ${index + 1} created at (${building.x}, ${
+                    building.y
+                })`
+            );
+        });
     }
 
     createTileTextures() {

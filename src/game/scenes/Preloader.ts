@@ -26,11 +26,44 @@ export class Preloader extends Scene {
         //  Load the assets for the game - Replace with your own assets
         this.load.setPath("assets");
 
+        // Add error handling for image loading
+        this.load.on("filecomplete", (key: string) => {
+            console.log(`Asset loaded: ${key}`);
+        });
+
+        this.load.on("loaderror", (file: any) => {
+            console.error(`Failed to load asset: ${file.key} - ${file.url}`);
+        });
+
         this.load.image("logo", "logo.png");
         this.load.image("star", "star.png");
 
         // CIVIKA game assets
         this.load.image("background", "bg.png");
+
+        // Load barangay background image (optional) - try different paths
+        console.log(
+            "Attempting to load barangay-bg from: barangay-background.png"
+        );
+        this.load.image("barangay-bg", "barangay-background.png");
+
+        // Also try loading it with a different key as backup
+        console.log(
+            "Attempting to load barangay-bg-backup from: assets/barangay-background.png"
+        );
+        this.load.image("barangay-bg-backup", "assets/barangay-background.png");
+
+        // Try alternative paths
+        console.log(
+            "Attempting to load barangay-bg-alt from: /assets/barangay-background.png"
+        );
+        this.load.image("barangay-bg-alt", "/assets/barangay-background.png");
+
+        // Try the same path as bg.png which works
+        console.log(
+            "Attempting to load barangay-bg-root from: barangay-background.png"
+        );
+        this.load.image("barangay-bg-root", "barangay-background.png");
 
         // Load student sprite assets
         this.loadStudentSprites();
@@ -110,6 +143,17 @@ export class Preloader extends Scene {
             "Player fallback texture exists:",
             this.textures.exists("player")
         );
+        console.log(
+            "Barangay background texture exists:",
+            this.textures.exists("barangay-bg")
+        );
+        console.log(
+            "Barangay background backup texture exists:",
+            this.textures.exists("barangay-bg-backup")
+        );
+
+        // List all available textures for debugging
+        console.log("All available textures:", Object.keys(this.textures.list));
 
         //  Don't start MainMenu automatically - React will handle the UI
         //  Just emit ready event so React knows assets are loaded
