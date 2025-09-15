@@ -22,6 +22,7 @@ export class BarangayMap extends Scene {
     tileSize: number = 32;
     mapWidth: number = 32; // 32 tiles wide
     mapHeight: number = 24; // 24 tiles tall
+    lastDirection: string = "front"; // Track last direction for idle sprites
 
     // Mission locations with tile coordinates
     missionLocations = [
@@ -570,20 +571,179 @@ export class BarangayMap extends Scene {
     }
 
     createPlayer() {
+        // Check if student sprite texture exists, otherwise use a fallback
+        const playerTexture = this.textures.exists("student-front-1")
+            ? "student-front-1"
+            : "player";
+
+        console.log("Creating player with texture:", playerTexture);
+        console.log(
+            "Student texture exists:",
+            this.textures.exists("student-front-1")
+        );
+
         this.player = this.physics.add.sprite(
             16 * this.tileSize,
             12 * this.tileSize,
-            "player"
+            playerTexture
         );
         this.player.setCollideWorldBounds(true);
-        this.player.setScale(1.5);
+        this.player.setScale(0.3); // Much smaller scale for student sprites
 
-        // Set player color from character creation
-        const playerColor = this.registry.get("playerColor") || 0x00ff00;
-        this.player.setTint(playerColor);
+        // Temporarily disable color tinting for student sprites
+        // const playerColor = this.registry.get("playerColor") || 0x00ff00;
+        // this.player.setTint(playerColor);
 
         // Add collision with buildings and trees
         this.physics.add.collider(this.player, this.physics.world.staticBodies);
+
+        // Check if student sprite textures are loaded before creating animations
+        if (this.textures.exists("student-front-1")) {
+            console.log("Student sprites loaded, creating animations...");
+            this.createPlayerAnimations();
+
+            // Set initial idle animation after a short delay to ensure animations are ready
+            this.time.delayedCall(100, () => {
+                console.log("Attempting to set initial idle animation...");
+                console.log(
+                    "Animation exists:",
+                    this.anims.exists("student-front-idle")
+                );
+                if (this.anims.exists("student-front-idle")) {
+                    this.player.play("student-front-idle", true);
+                    console.log("Initial idle animation set successfully!");
+                } else {
+                    console.log(
+                        "Animation not found, skipping initial animation"
+                    );
+                }
+            });
+        } else {
+            console.log(
+                "Student sprites not loaded yet, skipping animation creation"
+            );
+            // Retry after a short delay
+            this.time.delayedCall(500, () => {
+                if (this.textures.exists("student-front-1")) {
+                    console.log(
+                        "Student sprites now loaded, creating animations..."
+                    );
+                    this.createPlayerAnimations();
+                }
+            });
+        }
+    }
+
+    createPlayerAnimations() {
+        console.log("Creating player animations...");
+
+        // Check if all required textures exist
+        const requiredTextures = [
+            "student-front-1",
+            "student-front-2",
+            "student-front-3",
+            "student-front-4",
+            "student-back-1",
+            "student-back-2",
+            "student-back-3",
+            "student-back-4",
+            "student-left-1",
+            "student-left-2",
+            "student-left-3",
+            "student-left-4",
+            "student-right-1",
+            "student-right-2",
+            "student-right-3",
+            "student-right-4",
+        ];
+
+        for (const texture of requiredTextures) {
+            if (!this.textures.exists(texture)) {
+                console.error(`Required texture ${texture} not found!`);
+                return;
+            }
+        }
+
+        console.log("All required textures found, creating animations...");
+
+        // Front animations
+        this.anims.create({
+            key: "student-front-walk",
+            frames: [
+                { key: "student-front-1" },
+                { key: "student-front-2" },
+                { key: "student-front-3" },
+                { key: "student-front-4" },
+            ],
+            frameRate: 8,
+            repeat: -1,
+        });
+
+        // Back animations
+        this.anims.create({
+            key: "student-back-walk",
+            frames: [
+                { key: "student-back-1" },
+                { key: "student-back-2" },
+                { key: "student-back-3" },
+                { key: "student-back-4" },
+            ],
+            frameRate: 8,
+            repeat: -1,
+        });
+
+        // Left animations
+        this.anims.create({
+            key: "student-left-walk",
+            frames: [
+                { key: "student-left-1" },
+                { key: "student-left-2" },
+                { key: "student-left-3" },
+                { key: "student-left-4" },
+            ],
+            frameRate: 8,
+            repeat: -1,
+        });
+
+        // Right animations
+        this.anims.create({
+            key: "student-right-walk",
+            frames: [
+                { key: "student-right-1" },
+                { key: "student-right-2" },
+                { key: "student-right-3" },
+                { key: "student-right-4" },
+            ],
+            frameRate: 8,
+            repeat: -1,
+        });
+
+        // Idle animations (single frame)
+        this.anims.create({
+            key: "student-front-idle",
+            frames: [{ key: "student-front-1" }],
+            frameRate: 1,
+        });
+
+        this.anims.create({
+            key: "student-back-idle",
+            frames: [{ key: "student-back-1" }],
+            frameRate: 1,
+        });
+
+        this.anims.create({
+            key: "student-left-idle",
+            frames: [{ key: "student-left-1" }],
+            frameRate: 1,
+        });
+
+        this.anims.create({
+            key: "student-right-idle",
+            frames: [{ key: "student-right-1" }],
+            frameRate: 1,
+        });
+
+        console.log("Player animations created successfully!");
     }
 
     createNPCs() {
@@ -593,9 +753,14 @@ export class BarangayMap extends Scene {
             const worldX = location.x * this.tileSize + this.tileSize / 2;
             const worldY = location.y * this.tileSize + this.tileSize / 2;
 
-            const npc = this.physics.add.sprite(worldX, worldY, "npc");
-            npc.setScale(1.2);
-            npc.setTint(0x4169e1);
+            const npc = this.physics.add.sprite(
+                worldX,
+                worldY,
+                "student-front-1"
+            );
+            npc.setScale(0.6); // Smaller scale for NPCs
+            // Temporarily disable color tinting for student sprites
+            // npc.setTint(0x4169e1); // Blue tint for NPCs
             npc.setInteractive();
 
             // Add NPC name
@@ -644,25 +809,78 @@ export class BarangayMap extends Scene {
     }
 
     update() {
+        // Check if player exists before proceeding
+        if (!this.player) {
+            return;
+        }
+
         // Player movement
         const speed = 200;
+        let isMoving = false;
+        let currentDirection = "";
 
         if (this.cursors.left.isDown || this.wasd.A.isDown) {
             this.player.setVelocityX(-speed);
-            this.player.setFlipX(true);
+            // Don't flip - use left sprite instead
+            isMoving = true;
+            currentDirection = "left";
+            this.lastDirection = "left";
         } else if (this.cursors.right.isDown || this.wasd.D.isDown) {
             this.player.setVelocityX(speed);
-            this.player.setFlipX(false);
+            // Don't flip - use right sprite instead
+            isMoving = true;
+            currentDirection = "right";
+            this.lastDirection = "right";
         } else {
             this.player.setVelocityX(0);
         }
 
         if (this.cursors.up.isDown || this.wasd.W.isDown) {
             this.player.setVelocityY(-speed);
+            isMoving = true;
+            currentDirection = "back";
+            this.lastDirection = "back";
         } else if (this.cursors.down.isDown || this.wasd.S.isDown) {
             this.player.setVelocityY(speed);
+            isMoving = true;
+            currentDirection = "front";
+            this.lastDirection = "front";
         } else {
             this.player.setVelocityY(0);
+        }
+
+        // Handle sprite direction and animations
+        if (isMoving) {
+            // Set the correct sprite texture for the direction
+            const spriteKey = `student-${currentDirection}-1`;
+            if (this.textures.exists(spriteKey)) {
+                this.player.setTexture(spriteKey);
+            }
+
+            // Play walk animation if it exists
+            if (this.anims && this.anims.exists) {
+                const walkAnimKey = `student-${currentDirection}-walk`;
+                if (this.anims.exists(walkAnimKey)) {
+                    this.player.play(walkAnimKey, true);
+                }
+            }
+        } else {
+            // Stop movement and set idle sprite
+            this.player.setVelocity(0, 0);
+
+            // Set idle sprite for last direction
+            const idleSpriteKey = `student-${this.lastDirection}-1`;
+            if (this.textures.exists(idleSpriteKey)) {
+                this.player.setTexture(idleSpriteKey);
+            }
+
+            // Play idle animation if it exists
+            if (this.anims && this.anims.exists) {
+                const idleAnimKey = `student-${this.lastDirection}-idle`;
+                if (this.anims.exists(idleAnimKey)) {
+                    this.player.play(idleAnimKey, true);
+                }
+            }
         }
 
         // Check for nearby NPCs
