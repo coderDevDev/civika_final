@@ -19,6 +19,19 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({
     const [playerName, setPlayerName] = useState("");
     const [selectedColor, setSelectedColor] = useState("#00ff00");
 
+    // Function to convert hex color to hue rotation for CSS filter
+    const getHueRotation = (hexColor: string) => {
+        const colorMap: { [key: string]: number } = {
+            "#00ff00": 0, // Green - no rotation
+            "#0066ff": 240, // Blue
+            "#ff0000": 0, // Red - no rotation
+            "#ffff00": 60, // Yellow
+            "#9900ff": 270, // Purple
+            "#ff6600": 30, // Orange
+        };
+        return colorMap[hexColor] || 0;
+    };
+
     const handleSubmit = () => {
         if (playerName.trim()) {
             onCharacterCreated(playerName.trim(), selectedColor);
@@ -26,101 +39,147 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({
     };
 
     return (
-        <div className="fixed inset-0 bg-gradient-to-br from-sky-300 via-blue-200 to-green-300 flex items-center justify-center z-50 overflow-y-auto">
+        <div className="fixed inset-0 bg-gradient-to-br from-amber-100 via-yellow-50 to-amber-200 flex items-center justify-center z-50 overflow-y-auto">
             {/* Background decorative elements */}
             <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute top-20 left-20 w-16 h-16 bg-yellow-400/20 rounded-full animate-pulse"></div>
-                <div className="absolute top-32 right-32 w-12 h-12 bg-red-400/20 rounded-full animate-pulse delay-1000"></div>
-                <div className="absolute bottom-40 right-20 w-20 h-20 bg-cyan-400/20 rounded-full animate-pulse delay-2000"></div>
+                <div className="absolute top-20 left-20 w-16 h-16 bg-amber-400/30 rounded-full animate-pulse"></div>
+                <div className="absolute top-32 right-32 w-12 h-12 bg-orange-400/30 rounded-full animate-pulse delay-1000"></div>
+                <div className="absolute bottom-40 right-20 w-20 h-20 bg-yellow-400/30 rounded-full animate-pulse delay-2000"></div>
+                <div className="absolute bottom-20 left-40 w-14 h-14 bg-amber-500/30 rounded-full animate-pulse delay-500"></div>
             </div>
 
             {/* Main content */}
-            <div className="relative z-10 bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 md:p-12 shadow-2xl border-4 border-yellow-400 max-w-2xl w-full mx-4 my-8">
-                {/* Title */}
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-red-500 mb-6 sm:mb-8 text-center drop-shadow-lg">
-                    Create Your Character
-                </h1>
-                <p className="text-lg sm:text-xl text-blue-600 mb-6 sm:mb-8 text-center font-medium">
-                    Customize your 2D avatar
-                </p>
+            <div className="relative z-10 max-w-xl w-full mx-4 my-4">
+                {/* Character Creation Container */}
+                <div className="wooden-frame rounded-lg p-4">
+                    {/* Metal corners */}
+                    <div className="absolute -top-2 -left-2 w-6 h-6 metal-corner rounded-tl-lg z-10" />
+                    <div className="absolute -top-2 -right-2 w-6 h-6 metal-corner rounded-tr-lg z-10" />
+                    <div className="absolute -bottom-2 -left-2 w-6 h-6 metal-corner rounded-bl-lg z-10" />
+                    <div className="absolute -bottom-2 -right-2 w-6 h-6 metal-corner rounded-br-lg z-10" />
 
-                {/* Character Preview */}
-                <div className="flex justify-center mb-6 sm:mb-8">
-                    <div className="relative">
-                        <div
-                            className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full border-4 border-gray-800 shadow-2xl flex items-center justify-center text-4xl sm:text-5xl md:text-6xl"
-                            style={{ backgroundColor: selectedColor }}
+                    {/* Parchment content */}
+                    <div className=" rounded-md p-4 relative">
+                        {/* Title */}
+                        <h1
+                            className="text-2xl sm:text-3xl font-black text-amber-400 mb-3 text-center drop-shadow-lg"
+                            style={{
+                                textShadow: `
+                                -2px -2px 0px #8B4513,
+                                2px -2px 0px #8B4513,
+                                -2px 2px 0px #8B4513,
+                                2px 2px 0px #8B4513,
+                                -1px -1px 0px #A0522D,
+                                1px -1px 0px #A0522D,
+                                -1px 1px 0px #A0522D,
+                                1px 1px 0px #A0522D,
+                                0px 0px 8px rgba(139, 69, 19, 0.5)
+                            `,
+                                WebkitTextStroke: "1.5px #8B4513",
+                            }}
                         >
-                            👤
-                        </div>
-                        {/* Glow effect */}
-                        <div
-                            className="absolute inset-0 w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full animate-ping opacity-30"
-                            style={{ backgroundColor: selectedColor }}
-                        ></div>
-                    </div>
-                </div>
+                            Create Your Character
+                        </h1>
+                        {/* <p className="text-lg sm:text-xl text-amber-700 mb-6 sm:mb-8 text-center font-medium game-element-border rounded-md py-2 px-4">
+                            🏰 Customize your civic hero 🏰
+                        </p> */}
 
-                {/* Name Input */}
-                <div className="mb-6 sm:mb-8">
-                    <label className="block text-base sm:text-lg font-bold text-gray-700 mb-2 sm:mb-3">
-                        Enter your name:
-                    </label>
-                    <input
-                        type="text"
-                        value={playerName}
-                        onChange={(e) => {
-                            console.log("Input changed:", e.target.value);
-                            setPlayerName(e.target.value);
-                        }}
-                        placeholder="Type your name here..."
-                        className="w-full px-3 sm:px-4 py-2 sm:py-3 text-base sm:text-lg border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-200 text-gray-900 bg-white"
-                        maxLength={20}
-                        autoFocus
-                    />
-                    {/* Debug display */}
-                    <div className="mt-2 text-xs sm:text-sm text-gray-600">
-                        Current value: "{playerName}" (Length:{" "}
-                        {playerName.length})
-                    </div>
-                </div>
-
-                {/* Color Selection */}
-                <div className="mb-6 sm:mb-8">
-                    <label className="block text-base sm:text-lg font-bold text-gray-700 mb-2 sm:mb-3">
-                        Choose your color:
-                    </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-                        {colorOptions.map((color) => (
-                            <button
-                                key={color.value}
-                                onClick={() => setSelectedColor(color.value)}
-                                className={`p-3 sm:p-4 rounded-xl border-4 transition-all duration-200 hover:scale-105 ${
-                                    selectedColor === color.value
-                                        ? "border-yellow-400 shadow-lg"
-                                        : "border-gray-300 hover:border-gray-400"
-                                }`}
-                            >
+                        {/* Character Preview */}
+                        <div className="flex justify-center mb-4">
+                            <div className="relative">
+                                <div className="game-element-border rounded-lg p-2 shadow-2xl">
+                                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg border-3 border-amber-800 shadow-2xl overflow-hidden">
+                                        <img
+                                            src="/assets/student-sprites/front/front-1-removebg-preview.png"
+                                            alt="Character Preview"
+                                            className="w-full h-full object-cover"
+                                            style={{
+                                                filter: `hue-rotate(${getHueRotation(
+                                                    selectedColor
+                                                )}deg)`,
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                {/* Glow effect */}
                                 <div
-                                    className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full ${color.bg} mx-auto mb-1 sm:mb-2 shadow-md`}
+                                    className="absolute inset-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg animate-ping opacity-20"
+                                    style={{ backgroundColor: selectedColor }}
                                 ></div>
-                                <div className="text-xs sm:text-sm font-medium text-gray-700">
-                                    {color.name}
+                            </div>
+                        </div>
+
+                        {/* Name Input */}
+                        <div className="mb-4">
+                            <input
+                                type="text"
+                                value={playerName}
+                                onChange={(e) => {
+                                    console.log(
+                                        "Input changed:",
+                                        e.target.value
+                                    );
+                                    setPlayerName(e.target.value);
+                                }}
+                                placeholder="Enter your name..."
+                                className="w-full px-3 py-2 text-sm sm:text-base border-3 border-amber-700 rounded-lg focus:border-amber-500 focus:outline-none transition-colors duration-200 text-amber-900 bg-amber-50 game-element-border"
+                                maxLength={20}
+                                autoFocus
+                            />
+                            {/* Debug display */}
+                            {/* <div className="mt-1 text-xs text-amber-600 text-center">
+                                Current value: "{playerName}" (Length:{" "}
+                                {playerName.length})
+                            </div> */}
+                        </div>
+
+                        {/* Color Selection */}
+                        <div className="mb-4">
+                            <label
+                                className="block text-sm font-bold 
+                            text-amber-400 mb-2
+                          
+                              rounded-md py-1 px-2 text-center"
+                            >
+                                Choose your color:
+                            </label>
+                            <div className="grid grid-cols-3 gap-2">
+                                {colorOptions.map((color) => (
+                                    <button
+                                        key={color.value}
+                                        onClick={() =>
+                                            setSelectedColor(color.value)
+                                        }
+                                        className={`p-2 rounded-lg border-3 transition-all duration-200 hover:scale-105 game-element-border ${
+                                            selectedColor === color.value
+                                                ? "border-amber-400 shadow-lg bg-amber-100"
+                                                : "border-amber-700 hover:border-amber-500 bg-amber-50"
+                                        }`}
+                                    >
+                                        <div
+                                            className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full ${color.bg} mx-auto mb-1 shadow-md border-2 border-amber-800`}
+                                        ></div>
+                                        <div className="text-xs font-medium text-amber-800">
+                                            {color.name}
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Submit Button */}
+                        <div className="text-center">
+                            <button
+                                onClick={handleSubmit}
+                                disabled={!playerName.trim()}
+                                className="game-button-frame px-6 py-2 text-white text-base font-bold rounded-full shadow-2xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none game-glow"
+                            >
+                                <div className="flex items-center justify-center space-x-2">
+                                    <span>Create Character</span>
                                 </div>
                             </button>
-                        ))}
+                        </div>
                     </div>
-                </div>
-
-                {/* Submit Button */}
-                <div className="text-center">
-                    <button
-                        onClick={handleSubmit}
-                        disabled={!playerName.trim()}
-                        className="px-8 sm:px-12 py-3 sm:py-4 bg-gradient-to-r from-green-500 to-blue-600 text-white text-lg sm:text-xl font-bold rounded-2xl shadow-2xl hover:from-green-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border-4 border-blue-800 hover:border-yellow-400"
-                    >
-                        Create Character
-                    </button>
                 </div>
             </div>
         </div>

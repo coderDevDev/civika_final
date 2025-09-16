@@ -4,6 +4,8 @@ import { MainMenu } from "./components/MainMenu";
 import { CharacterCreation } from "./components/CharacterCreation";
 import { QuizSystem } from "./components/QuizSystem";
 import { MissionSystem } from "./components/MissionSystem";
+import { VirtualJoystick } from "./components/VirtualJoystick";
+import { MobileInteractionButton } from "./components/MobileInteractionButton";
 import { EventBus } from "./game/EventBus";
 
 function App() {
@@ -23,6 +25,8 @@ function App() {
     const [showMission, setShowMission] = useState(false);
     const [currentQuiz, setCurrentQuiz] = useState<any>(null);
     const [currentMission, setCurrentMission] = useState<any>(null);
+    const [isMobile, setIsMobile] = useState(false);
+    const [joystickDirection, setJoystickDirection] = useState({ x: 0, y: 0 });
 
     const currentScene = (scene: Phaser.Scene) => {
         console.log("Current scene:", scene.scene.key);
@@ -292,6 +296,23 @@ function App() {
         );
     };
 
+    // Mobile detection
+    useEffect(() => {
+        const checkMobile = () => {
+            const mobile =
+                /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+                    navigator.userAgent
+                ) ||
+                window.innerWidth <= 768 ||
+                "ontouchstart" in window;
+            setIsMobile(mobile);
+        };
+
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+        return () => window.removeEventListener("resize", checkMobile);
+    }, []);
+
     // Set up interval to update game data periodically
     useEffect(() => {
         const interval = setInterval(() => {
@@ -313,6 +334,17 @@ function App() {
 
         return () => clearInterval(interval);
     }, []);
+
+    // Send joystick input to Phaser game
+    useEffect(() => {
+        if (phaserRef.current?.game && isMobile) {
+            // Send joystick direction to Phaser game
+            phaserRef.current.game.registry.set(
+                "joystickDirection",
+                joystickDirection
+            );
+        }
+    }, [joystickDirection, isMobile]);
 
     // Listen for mission events from Phaser
     useEffect(() => {
@@ -372,6 +404,34 @@ function App() {
                 </div>
             )}
 
+            {/* Mobile Controls - React Overlay */}
+            {isMobile &&
+                !showMainMenu &&
+                !showCharacterCreation &&
+                !showQuiz &&
+                !showMission && (
+                    <>
+                        <VirtualJoystick
+                            onMove={(direction) =>
+                                setJoystickDirection(direction)
+                            }
+                            onStop={() => setJoystickDirection({ x: 0, y: 0 })}
+                            isVisible={true}
+                        />
+                        <MobileInteractionButton
+                            onInteract={() => {
+                                // Trigger interaction in Phaser game
+                                if (phaserRef.current?.game) {
+                                    phaserRef.current.game.events.emit(
+                                        "mobile-interact"
+                                    );
+                                }
+                            }}
+                            isVisible={true}
+                        />
+                    </>
+                )}
+
             {/* React Overlay UI - Positioned above Phaser canvas */}
             {!showMainMenu &&
                 !showCharacterCreation &&
@@ -381,118 +441,158 @@ function App() {
                         className="absolute top-0 left-0 w-full h-full pointer-events-none z-10"
                         style={{ zIndex: 10 }}
                     >
-                        {/* HUD - Top Left */}
-                        <div className="absolute top-4 left-4 pointer-events-auto">
-                            <div className="bg-black/70 backdrop-blur-sm rounded-xl p-4 text-white shadow-2xl border border-white/20">
-                                <div className="space-y-2">
-                                    <div className="text-sm font-medium text-blue-300">
-                                        Scene: {gameInfo.currentScene}
-                                    </div>
-                                    <div className="text-lg font-bold text-yellow-400">
-                                        {gameInfo.playerName || "Citizen"}
-                                    </div>
-                                    <div className="flex space-x-4 text-sm">
-                                        <div className="flex items-center space-x-1">
-                                            <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                                            <span>
-                                                Badges: {gameInfo.badges}/10
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center space-x-1">
-                                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                                            <span>Coins: {gameInfo.coins}</span>
-                                        </div>
-                                    </div>
-                                    {/* Debug button */}
-                                    <button
-                                        onClick={() => {
-                                            console.log(
-                                                "Manual BarangayMap start..."
-                                            );
-                                            if (phaserRef.current?.game) {
-                                                phaserRef.current.game.scene.start(
-                                                    "BarangayMap"
-                                                );
-                                            }
-                                        }}
-                                        className="mt-2 px-2 py-1 bg-red-600 text-white text-xs rounded"
-                                    >
-                                        Start BarangayMap
-                                    </button>
+                        {/* HUD - Top Left - Compact */}
+                        <div className="absolute top-2 left-2 pointer-events-auto">
+                            <div className="flex space-x-1">
+                                {/* Player Name */}
+                                <div className="text-xs font-bold text-amber-800 game-element-border rounded px-1 py-0.5 text-center">
+                                    👤 {gameInfo.playerName || "Citizen"}
                                 </div>
+
+                                {/* Badges */}
+                                <div className="text-xs font-bold text-amber-800 game-element-border rounded px-1 py-0.5 text-center">
+                                    🏆 {gameInfo.badges}/10
+                                </div>
+
+                                {/* Coins */}
+                                <div className="text-xs font-bold text-amber-800 game-element-border rounded px-1 py-0.5 text-center">
+                                    💰 {gameInfo.coins}
+                                </div>
+
+                                {/* Debug button - hidden on mobile */}
+                                <button
+                                    onClick={() => {
+                                        console.log(
+                                            "Manual BarangayMap start..."
+                                        );
+                                        if (phaserRef.current?.game) {
+                                            phaserRef.current.game.scene.start(
+                                                "BarangayMap"
+                                            );
+                                        }
+                                    }}
+                                    className="hidden md:block text-xs font-bold text-amber-800 game-element-border rounded px-1 py-0.5 text-center hover:bg-red-600 hover:text-white transition-all duration-200"
+                                >
+                                    🔧
+                                </button>
                             </div>
                         </div>
 
                         {/* Quick Actions - Top Right */}
-                        <div className="absolute top-4 right-4 pointer-events-auto">
-                            <div className="flex space-x-2">
+                        <div className="absolute top-2 right-2 pointer-events-auto">
+                            <div className="flex space-x-1">
                                 <button
                                     onClick={() =>
                                         setShowQuestLog(!showQuestLog)
                                     }
-                                    className="bg-blue-600/80 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-all duration-200 backdrop-blur-sm border border-blue-400/50 shadow-lg"
+                                    className="game-button-frame px-2 py-1 rounded-lg transition-all duration-200 hover:scale-105 game-glow"
                                 >
-                                    📋 Quest Log
+                                    <div className="text-white font-bold text-xs flex items-center space-x-1">
+                                        <span>📋</span>
+                                        <span className="hidden sm:inline">
+                                            Quest
+                                        </span>
+                                    </div>
                                 </button>
                                 <button
                                     onClick={() =>
                                         setShowInventory(!showInventory)
                                     }
-                                    className="bg-purple-600/80 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition-all duration-200 backdrop-blur-sm border border-purple-400/50 shadow-lg"
+                                    className="game-button-frame px-2 py-1 rounded-lg transition-all duration-200 hover:scale-105 game-glow"
                                 >
-                                    🎒 Inventory
+                                    <div className="text-white font-bold text-xs flex items-center space-x-1">
+                                        <span>🎒</span>
+                                        <span className="hidden sm:inline">
+                                            Items
+                                        </span>
+                                    </div>
                                 </button>
                                 <button
                                     onClick={() =>
                                         setShowPauseMenu(!showPauseMenu)
                                     }
-                                    className="bg-gray-600/80 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-all duration-200 backdrop-blur-sm border border-gray-400/50 shadow-lg"
+                                    className="game-button-frame px-2 py-1 rounded-lg transition-all duration-200 hover:scale-105 game-glow"
                                 >
-                                    ⏸️ Menu
+                                    <div className="text-white font-bold text-xs flex items-center space-x-1">
+                                        <span>⏸️</span>
+                                        <span className="hidden sm:inline">
+                                            Menu
+                                        </span>
+                                    </div>
                                 </button>
                             </div>
                         </div>
 
                         {/* Pause Menu Overlay */}
                         {showPauseMenu && (
-                            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center pointer-events-auto">
-                                <div className="bg-gray-900/90 backdrop-blur-md rounded-2xl p-8 max-w-md w-full mx-4 border border-white/20 shadow-2xl">
-                                    <h2 className="text-2xl font-bold text-white mb-6 text-center">
-                                        Game Menu
-                                    </h2>
-                                    <div className="space-y-4">
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center pointer-events-auto">
+                                <div className="wooden-frame rounded-lg p-6 max-w-md w-full mx-4">
+                                    {/* Metal corners */}
+                                    <div className="absolute -top-2 -left-2 w-6 h-6 metal-corner rounded-tl-lg z-10" />
+                                    <div className="absolute -top-2 -right-2 w-6 h-6 metal-corner rounded-tr-lg z-10" />
+                                    <div className="absolute -bottom-2 -left-2 w-6 h-6 metal-corner rounded-bl-lg z-10" />
+                                    <div className="absolute -bottom-2 -right-2 w-6 h-6 metal-corner rounded-br-lg z-10" />
+
+                                    {/* Parchment content */}
+                                    <div className="parchment-bg rounded-md p-6 relative">
                                         <button
                                             onClick={() =>
                                                 setShowPauseMenu(false)
                                             }
-                                            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg transition-all duration-200 font-medium"
+                                            className="absolute -top-3 -right-3 w-10 h-10 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center text-white shadow-lg transition-all duration-200 hover:scale-110 border-2 border-red-800 z-20"
                                         >
-                                            Resume Game
+                                            ✕
                                         </button>
-                                        <button
-                                            onClick={() =>
-                                                setShowQuestLog(true)
-                                            }
-                                            className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg transition-all duration-200 font-medium"
-                                        >
-                                            Quest Log
-                                        </button>
-                                        <button
-                                            onClick={() =>
-                                                setShowInventory(true)
-                                            }
-                                            className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-lg transition-all duration-200 font-medium"
-                                        >
-                                            Inventory
-                                        </button>
-                                        <button
-                                            onClick={() =>
-                                                window.location.reload()
-                                            }
-                                            className="w-full bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-lg transition-all duration-200 font-medium"
-                                        >
-                                            Restart Game
-                                        </button>
+
+                                        <h2 className="text-2xl font-bold text-amber-900 mb-6 text-center game-element-border rounded-md py-2 px-4">
+                                            ⚔️ Game Menu
+                                        </h2>
+                                        <div className="space-y-4">
+                                            <button
+                                                onClick={() =>
+                                                    setShowPauseMenu(false)
+                                                }
+                                                className="w-full game-button-frame py-3 px-6 rounded-lg transition-all duration-200 font-bold hover:scale-105 game-glow"
+                                            >
+                                                <div className="text-white flex items-center justify-center space-x-2">
+                                                    <span>▶️</span>
+                                                    <span>Resume Game</span>
+                                                </div>
+                                            </button>
+                                            <button
+                                                onClick={() =>
+                                                    setShowQuestLog(true)
+                                                }
+                                                className="w-full game-button-frame py-3 px-6 rounded-lg transition-all duration-200 font-bold hover:scale-105 game-glow"
+                                            >
+                                                <div className="text-white flex items-center justify-center space-x-2">
+                                                    <span>📋</span>
+                                                    <span>Quest Log</span>
+                                                </div>
+                                            </button>
+                                            <button
+                                                onClick={() =>
+                                                    setShowInventory(true)
+                                                }
+                                                className="w-full game-button-frame py-3 px-6 rounded-lg transition-all duration-200 font-bold hover:scale-105 game-glow"
+                                            >
+                                                <div className="text-white flex items-center justify-center space-x-2">
+                                                    <span>🎒</span>
+                                                    <span>Inventory</span>
+                                                </div>
+                                            </button>
+                                            <button
+                                                onClick={() =>
+                                                    window.location.reload()
+                                                }
+                                                className="w-full game-button-frame py-3 px-6 rounded-lg transition-all duration-200 font-bold hover:scale-105 game-glow"
+                                            >
+                                                <div className="text-white flex items-center justify-center space-x-2">
+                                                    <span>🔄</span>
+                                                    <span>Restart Game</span>
+                                                </div>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -500,51 +600,74 @@ function App() {
 
                         {/* Quest Log Overlay */}
                         {showQuestLog && (
-                            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center pointer-events-auto">
-                                <div className="bg-gray-900/90 backdrop-blur-md rounded-2xl p-8 max-w-2xl w-full mx-4 border border-white/20 shadow-2xl">
-                                    <div className="flex justify-between items-center mb-6">
-                                        <h2 className="text-2xl font-bold text-white">
-                                            Quest Log
-                                        </h2>
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center pointer-events-auto">
+                                <div className="wooden-frame rounded-lg p-6 max-w-2xl w-full mx-4 medieval-scrollbar">
+                                    {/* Metal corners */}
+                                    <div className="absolute -top-2 -left-2 w-6 h-6 metal-corner rounded-tl-lg z-10" />
+                                    <div className="absolute -top-2 -right-2 w-6 h-6 metal-corner rounded-tr-lg z-10" />
+                                    <div className="absolute -bottom-2 -left-2 w-6 h-6 metal-corner rounded-bl-lg z-10" />
+                                    <div className="absolute -bottom-2 -right-2 w-6 h-6 metal-corner rounded-br-lg z-10" />
+
+                                    {/* Parchment content */}
+                                    <div className="parchment-bg rounded-md p-6 relative">
                                         <button
                                             onClick={() =>
                                                 setShowQuestLog(false)
                                             }
-                                            className="text-gray-400 hover:text-white text-2xl"
+                                            className="absolute -top-3 -right-3 w-10 h-10 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center text-white shadow-lg transition-all duration-200 hover:scale-110 border-2 border-red-800 z-20"
                                         >
-                                            ×
+                                            ✕
                                         </button>
-                                    </div>
-                                    <div className="space-y-4">
-                                        <div className="bg-blue-600/20 border border-blue-400/50 rounded-lg p-4">
-                                            <h3 className="text-lg font-semibold text-blue-300 mb-2">
-                                                Main Objective
-                                            </h3>
-                                            <p className="text-white/80">
-                                                Complete 10 civic missions to
-                                                unlock the next area
-                                            </p>
+
+                                        <div className="flex justify-between items-center mb-6">
+                                            <h2 className="text-2xl font-bold text-amber-900 game-element-border rounded-md py-2 px-4">
+                                                📋 Quest Log
+                                            </h2>
                                         </div>
-                                        <div className="bg-green-600/20 border border-green-400/50 rounded-lg p-4">
-                                            <h3 className="text-lg font-semibold text-green-300 mb-2">
-                                                Progress
-                                            </h3>
-                                            <p className="text-white/80">
-                                                Badges Collected:{" "}
-                                                {gameInfo.badges}
-                                                /10
-                                            </p>
-                                            <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
-                                                <div
-                                                    className="bg-green-400 h-2 rounded-full transition-all duration-300"
-                                                    style={{
-                                                        width: `${
-                                                            (gameInfo.badges /
-                                                                10) *
+                                        <div className="space-y-4">
+                                            <div className="game-element-border rounded-lg p-4">
+                                                <h3 className="text-lg font-bold text-amber-800 mb-2 flex items-center space-x-2">
+                                                    <span>🎯</span>
+                                                    <span>Main Objective</span>
+                                                </h3>
+                                                <p className="text-amber-700">
+                                                    Complete 10 civic missions
+                                                    to unlock the next area and
+                                                    become a true community
+                                                    leader!
+                                                </p>
+                                            </div>
+                                            <div className="game-element-border rounded-lg p-4">
+                                                <h3 className="text-lg font-bold text-amber-800 mb-2 flex items-center space-x-2">
+                                                    <span>📊</span>
+                                                    <span>Progress</span>
+                                                </h3>
+                                                <p className="text-amber-700 mb-3">
+                                                    Badges Collected:{" "}
+                                                    <span className="font-bold text-green-600">
+                                                        {gameInfo.badges}
+                                                    </span>
+                                                    /10
+                                                </p>
+                                                <div className="w-full bg-amber-200 rounded-full h-3 border-2 border-amber-400">
+                                                    <div
+                                                        className="bg-gradient-to-r from-green-500 to-green-600 h-full rounded-full transition-all duration-300 border border-green-700"
+                                                        style={{
+                                                            width: `${
+                                                                (gameInfo.badges /
+                                                                    10) *
+                                                                100
+                                                            }%`,
+                                                        }}
+                                                    ></div>
+                                                </div>
+                                                <div className="text-center mt-2 text-sm text-amber-600">
+                                                    {Math.round(
+                                                        (gameInfo.badges / 10) *
                                                             100
-                                                        }%`,
-                                                    }}
-                                                ></div>
+                                                    )}
+                                                    % Complete
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -554,64 +677,97 @@ function App() {
 
                         {/* Inventory Overlay */}
                         {showInventory && (
-                            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center pointer-events-auto">
-                                <div className="bg-gray-900/90 backdrop-blur-md rounded-2xl p-8 max-w-2xl w-full mx-4 border border-white/20 shadow-2xl">
-                                    <div className="flex justify-between items-center mb-6">
-                                        <h2 className="text-2xl font-bold text-white">
-                                            Inventory
-                                        </h2>
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center pointer-events-auto">
+                                <div className="wooden-frame rounded-lg p-6 max-w-2xl w-full mx-4">
+                                    {/* Metal corners */}
+                                    <div className="absolute -top-2 -left-2 w-6 h-6 metal-corner rounded-tl-lg z-10" />
+                                    <div className="absolute -top-2 -right-2 w-6 h-6 metal-corner rounded-tr-lg z-10" />
+                                    <div className="absolute -bottom-2 -left-2 w-6 h-6 metal-corner rounded-bl-lg z-10" />
+                                    <div className="absolute -bottom-2 -right-2 w-6 h-6 metal-corner rounded-br-lg z-10" />
+
+                                    {/* Parchment content */}
+                                    <div className="parchment-bg rounded-md p-6 relative">
                                         <button
                                             onClick={() =>
                                                 setShowInventory(false)
                                             }
-                                            className="text-gray-400 hover:text-white text-2xl"
+                                            className="absolute -top-3 -right-3 w-10 h-10 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center text-white shadow-lg transition-all duration-200 hover:scale-110 border-2 border-red-800 z-20"
                                         >
-                                            ×
+                                            ✕
                                         </button>
-                                    </div>
-                                    <div className="grid grid-cols-4 gap-4">
-                                        <div className="bg-yellow-600/20 border border-yellow-400/50 rounded-lg p-4 text-center">
-                                            <div className="text-2xl mb-2">
-                                                💰
+
+                                        <div className="flex justify-between items-center mb-6">
+                                            <h2 className="text-2xl font-bold text-amber-900 game-element-border rounded-md py-2 px-4">
+                                                🎒 Inventory
+                                            </h2>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="game-element-border rounded-lg p-4 text-center">
+                                                <div className="text-3xl mb-2">
+                                                    💰
+                                                </div>
+                                                <div className="text-amber-800 font-bold text-xl">
+                                                    {gameInfo.coins}
+                                                </div>
+                                                <div className="text-sm text-amber-600 font-semibold">
+                                                    Gold Coins
+                                                </div>
                                             </div>
-                                            <div className="text-yellow-300 font-bold">
-                                                {gameInfo.coins}
+                                            <div className="game-element-border rounded-lg p-4 text-center">
+                                                <div className="text-3xl mb-2">
+                                                    🏆
+                                                </div>
+                                                <div className="text-amber-800 font-bold text-xl">
+                                                    {gameInfo.badges}
+                                                </div>
+                                                <div className="text-sm text-amber-600 font-semibold">
+                                                    Achievement Badges
+                                                </div>
                                             </div>
-                                            <div className="text-xs text-white/60">
-                                                Coins
+                                            <div className="game-element-border rounded-lg p-4 text-center">
+                                                <div className="text-3xl mb-2">
+                                                    📜
+                                                </div>
+                                                <div className="text-amber-800 font-bold text-xl">
+                                                    0
+                                                </div>
+                                                <div className="text-sm text-amber-600 font-semibold">
+                                                    Quest Items
+                                                </div>
+                                            </div>
+                                            <div className="game-element-border rounded-lg p-4 text-center">
+                                                <div className="text-3xl mb-2">
+                                                    ⭐
+                                                </div>
+                                                <div className="text-amber-800 font-bold text-xl">
+                                                    0
+                                                </div>
+                                                <div className="text-sm text-amber-600 font-semibold">
+                                                    Experience Points
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="bg-blue-600/20 border border-blue-400/50 rounded-lg p-4 text-center">
-                                            <div className="text-2xl mb-2">
-                                                🏆
-                                            </div>
-                                            <div className="text-blue-300 font-bold">
-                                                {gameInfo.badges}
-                                            </div>
-                                            <div className="text-xs text-white/60">
-                                                Badges
-                                            </div>
-                                        </div>
-                                        <div className="bg-gray-600/20 border border-gray-400/50 rounded-lg p-4 text-center">
-                                            <div className="text-2xl mb-2">
-                                                📜
-                                            </div>
-                                            <div className="text-gray-300 font-bold">
-                                                0
-                                            </div>
-                                            <div className="text-xs text-white/60">
-                                                Items
-                                            </div>
-                                        </div>
-                                        <div className="bg-green-600/20 border border-green-400/50 rounded-lg p-4 text-center">
-                                            <div className="text-2xl mb-2">
-                                                ⭐
-                                            </div>
-                                            <div className="text-green-300 font-bold">
-                                                0
-                                            </div>
-                                            <div className="text-xs text-white/60">
-                                                XP
+                                        <div className="mt-6 p-4 game-element-border rounded-lg">
+                                            <h3 className="text-lg font-bold text-amber-800 mb-2 text-center">
+                                                📈 Character Stats
+                                            </h3>
+                                            <div className="grid grid-cols-2 gap-4 text-sm">
+                                                <div className="text-center">
+                                                    <div className="text-amber-700 font-semibold">
+                                                        Level
+                                                    </div>
+                                                    <div className="text-amber-800 font-bold">
+                                                        1
+                                                    </div>
+                                                </div>
+                                                <div className="text-center">
+                                                    <div className="text-amber-700 font-semibold">
+                                                        Reputation
+                                                    </div>
+                                                    <div className="text-amber-800 font-bold">
+                                                        Novice
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

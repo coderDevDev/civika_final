@@ -6,91 +6,123 @@ interface MainMenuProps {
 
 export const MainMenu: React.FC<MainMenuProps> = ({ onStartGame }) => {
     return (
-        <div className="absolute inset-0 bg-gradient-to-br from-sky-300 via-blue-200 to-green-300 flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-100 via-yellow-50 to-amber-200 flex items-center justify-center overflow-hidden">
             {/* Background decorative elements */}
             <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute top-20 left-20 w-16 h-16 bg-yellow-400/30 rounded-full animate-pulse"></div>
-                <div className="absolute top-32 right-32 w-12 h-12 bg-red-400/30 rounded-full animate-pulse delay-1000"></div>
-                <div className="absolute bottom-40 right-20 w-20 h-20 bg-cyan-400/30 rounded-full animate-pulse delay-2000"></div>
-                <div className="absolute bottom-20 left-40 w-14 h-14 bg-orange-400/30 rounded-full animate-pulse delay-500"></div>
+                <div className="absolute top-20 left-20 w-16 h-16 bg-amber-400/30 rounded-full animate-pulse"></div>
+                <div className="absolute top-32 right-32 w-12 h-12 bg-orange-400/30 rounded-full animate-pulse delay-1000"></div>
+                <div className="absolute bottom-40 right-20 w-20 h-20 bg-yellow-400/30 rounded-full animate-pulse delay-2000"></div>
+                <div className="absolute bottom-20 left-40 w-14 h-14 bg-amber-500/30 rounded-full animate-pulse delay-500"></div>
             </div>
 
             {/* Main content */}
             <div className="relative z-10 text-center max-w-4xl mx-4">
-                {/* Logo */}
-                <div className="mb-8">
-                    <div className="relative inline-block">
-                        <div className="w-32 h-32 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-2xl animate-bounce">
-                            <span className="text-6xl">🏛️</span>
+                {/* Main Menu Container */}
+                <div className="wooden-frame rounded-lg p-8">
+                    {/* Metal corners */}
+                    <div className="absolute -top-3 -left-3 w-8 h-8 metal-corner rounded-tl-lg z-10" />
+                    <div className="absolute -top-3 -right-3 w-8 h-8 metal-corner rounded-tr-lg z-10" />
+                    <div className="absolute -bottom-3 -left-3 w-8 h-8 metal-corner rounded-bl-lg z-10" />
+                    <div className="absolute -bottom-3 -right-3 w-8 h-8 metal-corner rounded-br-lg z-10" />
+
+                    {/* Parchment content */}
+                    <div className=" rounded-md p-8 relative">
+                        {/* Logo */}
+                        <div className="mb-8">
+                            <div className="relative inline-block">
+                                <div className="w-32 h-32 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center shadow-2xl animate-bounce game-element-border">
+                                    <span className="text-6xl">🏛️</span>
+                                </div>
+                                {/* Glow effect */}
+                                <div className="absolute inset-0 w-32 h-32 bg-amber-400/30 rounded-full animate-ping"></div>
+                            </div>
                         </div>
-                        {/* Glow effect */}
-                        <div className="absolute inset-0 w-32 h-32 bg-yellow-400/30 rounded-full animate-ping"></div>
+
+                        {/* Title */}
+                        <h1
+                            className="text-6xl font-black text-amber-400 mb-4 drop-shadow-2xl rounded-md py-4 px-6"
+                            style={{
+                                textShadow: `
+                                -3px -3px 0px #8B4513,
+                                3px -3px 0px #8B4513,
+                                -3px 3px 0px #8B4513,
+                                3px 3px 0px #8B4513,
+                                -2px -2px 0px #A0522D,
+                                2px -2px 0px #A0522D,
+                                -2px 2px 0px #A0522D,
+                                2px 2px 0px #A0522D,
+                                0px 0px 10px rgba(139, 69, 19, 0.5)
+                            `,
+                                WebkitTextStroke: "2px #8B4513",
+                            }}
+                        >
+                            CIVIKA
+                        </h1>
+                        {/* <div className="text-2xl font-bold text-amber-800 mb-12 drop-shadow-lg game-element-border rounded-md py-2 px-4">
+                            🏰 A Civic Education Adventure 🏰
+                        </div> */}
+
+                        {/* Game Menu Buttons */}
+                        <div className="flex flex-col items-center space-y-4 mb-12">
+                            {/* Start Game Button */}
+                            <button
+                                onClick={onStartGame}
+                                className="game-button-frame px-12 py-4 rounded-full transition-all duration-200 hover:scale-105 game-glow w-64"
+                            >
+                                <div className="text-white font-bold text-lg flex items-center justify-center space-x-3">
+                                    <span>Start New Game</span>
+                                </div>
+                            </button>
+
+                            {/* Load Game Button */}
+                            <button
+                                onClick={() => {
+                                    // TODO: Implement load game functionality
+                                    console.log("Load game clicked");
+                                }}
+                                className="game-button-frame px-12 py-4 rounded-full transition-all duration-200 hover:scale-105 game-glow w-64"
+                            >
+                                <div className="text-white font-bold text-lg flex items-center justify-center space-x-3">
+                                    <span>Load Game</span>
+                                </div>
+                            </button>
+
+                            {/* Settings Button */}
+                            <button
+                                onClick={() => {
+                                    // TODO: Implement settings functionality
+                                    console.log("Settings clicked");
+                                }}
+                                className="game-button-frame px-12 py-4 rounded-full transition-all duration-200 hover:scale-105 game-glow w-64"
+                            >
+                                <div className="text-white font-bold text-lg flex items-center justify-center space-x-3">
+                                    <span>Settings</span>
+                                </div>
+                            </button>
+
+                            {/* Credits Button */}
+                            <button
+                                onClick={() => {
+                                    // TODO: Implement credits functionality
+                                    console.log("Credits clicked");
+                                }}
+                                className="game-button-frame px-12 py-4 rounded-full transition-all duration-200 hover:scale-105 game-glow w-64"
+                            >
+                                <div className="text-white font-bold text-lg flex items-center justify-center space-x-3">
+                                    <span>Credits</span>
+                                </div>
+                            </button>
+                        </div>
+
+                        {/* Subtitle */}
+                        {/* <p className="mt-8 text-lg text-amber-700 font-medium game-element-border rounded-md py-2 px-4">
+                            🏰 Learn about civic responsibility through
+                            interactive missions 🏰
+                        </p> */}
                     </div>
                 </div>
-
-                {/* Title */}
-                <h1 className="text-6xl font-black text-red-500 mb-4 drop-shadow-2xl">
-                    CIVIKA
-                </h1>
-                <div className="text-2xl font-bold text-blue-600 mb-12 drop-shadow-lg">
-                    A Civic Education Adventure
-                </div>
-
-                {/* Feature Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                    {/* Learning Card */}
-                    <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-xl border-4 border-yellow-400 hover:bg-white/95 transition-all duration-300 transform hover:scale-105">
-                        <div className="text-4xl mb-4">📚</div>
-                        <h3 className="text-xl font-bold text-gray-800 mb-2">
-                            Interactive Learning
-                        </h3>
-                        <p className="text-gray-600 text-sm">
-                            Engage with civic concepts through hands-on
-                            activities and real-world scenarios.
-                        </p>
-                    </div>
-
-                    {/* Mission Card */}
-                    <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-xl border-4 border-blue-400 hover:bg-white/95 transition-all duration-300 transform hover:scale-105">
-                        <div className="text-4xl mb-4">🎯</div>
-                        <h3 className="text-xl font-bold text-gray-800 mb-2">
-                            Mission-Based
-                        </h3>
-                        <p className="text-gray-600 text-sm">
-                            Complete 10 unique missions that teach different
-                            aspects of civic responsibility.
-                        </p>
-                    </div>
-
-                    {/* Community Card */}
-                    <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-xl border-4 border-green-400 hover:bg-white/95 transition-all duration-300 transform hover:scale-105">
-                        <div className="text-4xl mb-4">🤝</div>
-                        <h3 className="text-xl font-bold text-gray-800 mb-2">
-                            Community Focus
-                        </h3>
-                        <p className="text-gray-600 text-sm">
-                            Learn about barangay governance, community service,
-                            and local democracy.
-                        </p>
-                    </div>
-                </div>
-
-                {/* Start Button */}
-                <button
-                    onClick={onStartGame}
-                    className="group relative px-12 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-2xl font-bold rounded-2xl shadow-2xl hover:from-cyan-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-300 border-4 border-blue-800 hover:border-yellow-400"
-                >
-                    <span className="relative z-10">START GAME</span>
-                    {/* Button glow effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-2xl blur opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
-                </button>
-
-                {/* Subtitle */}
-                <p className="mt-8 text-lg text-gray-700 font-medium">
-                    Learn about civic responsibility through interactive
-                    missions
-                </p>
             </div>
         </div>
     );
 };
+

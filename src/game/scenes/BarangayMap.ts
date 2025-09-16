@@ -24,6 +24,11 @@ export class BarangayMap extends Scene {
     mapHeight: number = 24; // 24 tiles tall
     lastDirection: string = "front"; // Track last direction for idle sprites
 
+    // Mobile controls
+    virtualJoystick: any = null;
+    isMobile: boolean = false;
+    touchControls: any = null;
+
     // Mission locations with tile coordinates
     missionLocations = [
         {
@@ -109,7 +114,7 @@ export class BarangayMap extends Scene {
         // Note: Tile textures and tile map are disabled since we're using background image
 
         // Create collision areas for buildings (since we're not using tiles)
-        this.createCollisionAreas();
+        // this.createCollisionAreas();
 
         // Create player with collision
         this.createPlayer();
@@ -127,10 +132,56 @@ export class BarangayMap extends Scene {
             this.mapWidth * this.tileSize,
             this.mapHeight * this.tileSize
         );
+
+        // Ensure camera follows player
         this.cameras.main.startFollow(this.player);
         this.cameras.main.setZoom(1);
 
+        // Force camera to center on player initially
+        this.cameras.main.centerOn(this.player.x, this.player.y);
+
+        // Ensure camera follows after a short delay
+        this.time.delayedCall(100, () => {
+            this.cameras.main.startFollow(this.player);
+            this.optimizeCameraForOpenWorld(); // Optimize for open world style
+            console.log("Camera follow restarted after delay");
+            console.log("=== OPEN WORLD CAMERA SETUP ===");
+            console.log("Player position:", this.player.x, this.player.y);
+            console.log(
+                "Camera position:",
+                this.cameras.main.x,
+                this.cameras.main.y
+            );
+            console.log("Camera following:", this.cameras.main.follow);
+            console.log("Map bounds:", this.cameras.main.getBounds());
+            console.log("===============================");
+        });
+
+        // Mobile-specific camera settings for open world style
+        if (this.isMobile) {
+            // Open world camera settings - smooth following with small deadzone
+            this.cameras.main.setLerp(0.08, 0.08); // Smooth camera scrolling
+            this.cameras.main.setDeadzone(20, 20); // Small deadzone for responsive scrolling
+            console.log("Open world camera settings applied for mobile");
+        } else {
+            // Desktop open world camera settings
+            this.cameras.main.setLerp(0.1, 0.1); // Smooth camera scrolling
+            this.cameras.main.setDeadzone(40, 40); // Medium deadzone for desktop
+            console.log("Open world camera settings applied for desktop");
+        }
+
+        console.log("Camera setup complete:");
+        console.log("- Bounds:", this.cameras.main.getBounds());
+        console.log("- Following player:", this.cameras.main.follow);
+        console.log("- Player position:", this.player.x, this.player.y);
+        console.log(
+            "- Camera position:",
+            this.cameras.main.x,
+            this.cameras.main.y
+        );
+
         // Debug camera and scene info
+        console.log("=== CAMERA DEBUG INFO ===");
         console.log(
             "Camera position:",
             this.cameras.main.x,
@@ -138,8 +189,34 @@ export class BarangayMap extends Scene {
         );
         console.log("Camera bounds:", this.cameras.main.getBounds());
         console.log("Camera zoom:", this.cameras.main.zoom);
+        console.log("Player position:", this.player.x, this.player.y);
+        console.log(
+            "Map size:",
+            this.mapWidth * this.tileSize,
+            "x",
+            this.mapHeight * this.tileSize
+        );
         console.log("Scene visible:", this.scene.isVisible());
         console.log("Scene active:", this.scene.isActive());
+        console.log("=========================");
+
+        // Detect mobile device - use multiple methods for better detection
+        this.isMobile =
+            this.sys.game.device.input.touch ||
+            /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+                navigator.userAgent
+            ) ||
+            window.innerWidth <= 768;
+        console.log("Mobile device detected:", this.isMobile);
+        console.log("Touch support:", this.sys.game.device.input.touch);
+        console.log("User agent:", navigator.userAgent);
+        console.log("Window width:", window.innerWidth);
+        console.log(
+            "Screen dimensions:",
+            this.cameras.main.width,
+            "x",
+            this.cameras.main.height
+        );
 
         // Set up input
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -150,7 +227,80 @@ export class BarangayMap extends Scene {
             this.interactWithNearbyNPC()
         );
 
+        // Listen for mobile interaction events from React
+        this.game.events.on("mobile-interact", () => {
+            this.interactWithNearbyNPC();
+        });
+
+        // Mobile controls are now handled by React overlay
+        console.log("Mobile device detected:", this.isMobile);
+        console.log("Mobile controls handled by React overlay");
+
+        // Add resize handler for orientation changes
+        this.scale.on("resize", this.handleResize, this);
+
         EventBus.emit("current-scene-ready", this);
+    }
+
+    // Method to ensure camera follows player
+    ensureCameraFollowing() {
+        if (this.player && this.cameras.main.follow !== this.player) {
+            console.log("Restarting camera follow...");
+            this.cameras.main.startFollow(this.player);
+        }
+    }
+
+    // Open world camera scrolling optimization
+    optimizeCameraForOpenWorld() {
+        if (this.player) {
+            // Ensure camera bounds are set correctly for open world
+            const mapWidth = this.mapWidth * this.tileSize;
+            const mapHeight = this.mapHeight * this.tileSize;
+
+            this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
+
+            // Smooth camera following for open world exploration
+            this.cameras.main.setLerp(0.08, 0.08);
+            this.cameras.main.setDeadzone(25, 25);
+
+            console.log("Open world camera optimized");
+            console.log("Map size:", mapWidth, "x", mapHeight);
+            console.log("Player position:", this.player.x, this.player.y);
+        }
+    }
+
+    // Handle background scaling for orientation changes
+    updateBackgroundForOrientation() {
+        // Find the background image and update its scale
+        const children = this.children.list;
+        for (let child of children) {
+            if (child.texture && child.texture.key === "barangay-bg-root") {
+                const screenWidth = this.cameras.main.width;
+                const screenHeight = this.cameras.main.height;
+                const isLandscape = screenWidth > screenHeight;
+
+                let scaleX, scaleY;
+                if (isLandscape) {
+                    // In landscape, scale to fit screen width
+                    scaleX = screenWidth / child.width;
+                    scaleY = scaleX; // Keep aspect ratio
+                } else {
+                    // In portrait, scale to cover entire map
+                    const mapWidth = this.mapWidth * this.tileSize;
+                    const mapHeight = this.mapHeight * this.tileSize;
+                    scaleX = mapWidth / child.width;
+                    scaleY = mapHeight / child.height;
+                }
+
+                child.setScale(scaleX, scaleY);
+                console.log(
+                    "Background rescaled for orientation:",
+                    isLandscape ? "Landscape" : "Portrait"
+                );
+                console.log("New scale:", scaleX, scaleY);
+                break;
+            }
+        }
     }
 
     createBackground() {
@@ -207,44 +357,98 @@ export class BarangayMap extends Scene {
             );
 
             try {
-                const bgImage = this.add.image(512, 384, "barangay-bg-root");
+                // Calculate map center and size
+                const mapWidth = this.mapWidth * this.tileSize;
+                const mapHeight = this.mapHeight * this.tileSize;
+                const mapCenterX = mapWidth / 2;
+                const mapCenterY = mapHeight / 2;
+
+                // Detect screen orientation
+                const screenWidth = this.cameras.main.width;
+                const screenHeight = this.cameras.main.height;
+                const isLandscape = screenWidth > screenHeight;
+
+                const bgImage = this.add.image(
+                    mapCenterX,
+                    mapCenterY,
+                    "barangay-bg-root"
+                );
                 bgImage.setOrigin(0.5, 0.5);
                 bgImage.setDepth(-2000); // Much further behind everything
-                bgImage.setScale(1024 / bgImage.width, 768 / bgImage.height); // Scale to fit screen
+
+                // Scale background based on orientation
+                let scaleX, scaleY;
+                if (isLandscape) {
+                    // In landscape, scale to fit screen width while maintaining aspect ratio
+                    scaleX = screenWidth / bgImage.width;
+                    scaleY = scaleX; // Keep aspect ratio
+                    console.log(
+                        "Landscape mode: scaling background to fit screen width"
+                    );
+                } else {
+                    // In portrait, scale to cover the entire map
+                    scaleX = mapWidth / bgImage.width;
+                    scaleY = mapHeight / bgImage.height;
+                    console.log(
+                        "Portrait mode: scaling background to cover entire map"
+                    );
+                }
+
+                bgImage.setScale(scaleX, scaleY);
+
                 bgImage.setAlpha(1); // Fully visible
                 bgImage.setVisible(true); // Explicitly set visible
                 console.log("Root background image created successfully");
                 console.log(
-                    "Root background image position:",
-                    bgImage.x,
-                    bgImage.y
+                    "Screen dimensions:",
+                    screenWidth,
+                    "x",
+                    screenHeight
                 );
                 console.log(
-                    "Root background image dimensions:",
-                    bgImage.width,
-                    bgImage.height
+                    "Orientation:",
+                    isLandscape ? "Landscape" : "Portrait"
                 );
-                console.log(
-                    "Root background image scale:",
-                    bgImage.scaleX,
-                    bgImage.scaleY
-                );
-                console.log("Root background image visible:", bgImage.visible);
-                console.log("Root background image alpha:", bgImage.alpha);
-                console.log("Root background image depth:", bgImage.depth);
+                console.log("Map dimensions:", mapWidth, "x", mapHeight);
+                console.log("Map center:", mapCenterX, mapCenterY);
+                console.log("Background position:", bgImage.x, bgImage.y);
+                console.log("Background scale:", scaleX, scaleY);
+                console.log("Background visible:", bgImage.visible);
             } catch (error) {
                 console.error("Error creating root background image:", error);
                 // Fallback to teal background if image fails
-                const bg = this.add.rectangle(512, 384, 1024, 768, 0x20b2aa);
+                const mapWidth = this.mapWidth * this.tileSize;
+                const mapHeight = this.mapHeight * this.tileSize;
+                const mapCenterX = mapWidth / 2;
+                const mapCenterY = mapHeight / 2;
+
+                const bg = this.add.rectangle(
+                    mapCenterX,
+                    mapCenterY,
+                    mapWidth,
+                    mapHeight,
+                    0x20b2aa
+                );
                 bg.setDepth(-2000);
-                console.log("Using fallback teal background");
+                console.log("Using fallback teal background for entire map");
             }
         } else {
             console.log(
                 "Barangay background texture not found, using fallback"
             );
-            // Create a teal background as fallback
-            const bg = this.add.rectangle(512, 384, 1024, 768, 0x20b2aa);
+            // Create a teal background as fallback for entire map
+            const mapWidth = this.mapWidth * this.tileSize;
+            const mapHeight = this.mapHeight * this.tileSize;
+            const mapCenterX = mapWidth / 2;
+            const mapCenterY = mapHeight / 2;
+
+            const bg = this.add.rectangle(
+                mapCenterX,
+                mapCenterY,
+                mapWidth,
+                mapHeight,
+                0x20b2aa
+            );
             bg.setDepth(-2000);
         }
     }
@@ -305,23 +509,23 @@ export class BarangayMap extends Scene {
             },
         ];
 
-        buildingCollisions.forEach((building, index) => {
-            const collision = this.add.rectangle(
-                building.x + building.width / 2,
-                building.y + building.height / 2,
-                building.width,
-                building.height,
-                0x000000,
-                0 // Invisible
-            );
-            this.physics.add.existing(collision, true);
-            collision.body.setSize(building.width, building.height);
-            console.log(
-                `Building collision ${index + 1} created at (${building.x}, ${
-                    building.y
-                })`
-            );
-        });
+        // buildingCollisions.forEach((building, index) => {
+        //     const collision = this.add.rectangle(
+        //         building.x + building.width / 2,
+        //         building.y + building.height / 2,
+        //         building.width,
+        //         building.height,
+        //         0x000000,
+        //         0 // Invisible
+        //     );
+        //     this.physics.add.existing(collision, true);
+        //     collision.body.setSize(building.width, building.height);
+        //     console.log(
+        //         `Building collision ${index + 1} created at (${building.x}, ${
+        //             building.y
+        //         })`
+        //     );
+        // });
     }
 
     createTileTextures() {
@@ -509,10 +713,9 @@ export class BarangayMap extends Scene {
 
     createTileMap() {
         // Create a simple tilemap using individual tile sprites
-        this.createSimpleTileMap();
-
-        // Add building labels
-        this.addBuildingLabels();
+        // this.createSimpleTileMap();
+        // // Add building labels
+        // this.addBuildingLabels();
     }
 
     createSimpleTileMap() {
@@ -772,7 +975,7 @@ export class BarangayMap extends Scene {
             playerTexture
         );
         this.player.setCollideWorldBounds(true);
-        this.player.setScale(0.3); // Much smaller scale for student sprites
+        this.player.setScale(0.2); // Much smaller scale for student sprites
 
         // Temporarily disable color tinting for student sprites
         // const playerColor = this.registry.get("playerColor") || 0x00ff00;
@@ -933,62 +1136,380 @@ export class BarangayMap extends Scene {
     createNPCs() {
         this.npcs = this.physics.add.group();
 
-        this.missionLocations.forEach((location) => {
+        // Debug: List all available textures
+        console.log(
+            "Available textures in BarangayMap:",
+            Object.keys(this.textures.list)
+        );
+
+        // Map NPC names to their corresponding image keys
+        const npcImageMap = {
+            "Barangay Captain": "barangay-captain",
+            "Barangay Health Worker": "barangay-health-worker",
+            "Barangay Secretary": "barangay-secretary",
+            "Barangay Tanod": "barangay-tanod",
+            "COMELEC Volunteer": "comelec-volunteer",
+            "Construction Foreman": "construction-foreman",
+            "Elderly Resident": "elderly-resident",
+            "High School Student": "high-school-student",
+            Librarian: "librarian",
+            "Mediation Officer": "mediation-officer",
+        };
+
+        // Check if NPC images are loaded, if not load them directly
+        const npcImages = Object.values(npcImageMap);
+        const missingImages = npcImages.filter(
+            (img) => !this.textures.exists(img)
+        );
+
+        if (missingImages.length > 0) {
+            console.log(
+                "Missing NPC images, loading them directly:",
+                missingImages
+            );
+            missingImages.forEach((img) => {
+                this.load.image(img, `assets/LEVEL1/${img}.png`);
+            });
+            this.load.start();
+
+            this.load.once("complete", () => {
+                console.log("NPC images loaded, creating NPCs...");
+                this.createNPCsAfterLoad(npcImageMap);
+            });
+            return;
+        }
+
+        this.createNPCsAfterLoad(npcImageMap);
+    }
+
+    createNPCsAfterLoad(npcImageMap: any) {
+        this.missionLocations.forEach((location, index) => {
             const worldX = location.x * this.tileSize + this.tileSize / 2;
             const worldY = location.y * this.tileSize + this.tileSize / 2;
 
-            const npc = this.physics.add.sprite(
-                worldX,
-                worldY,
-                "student-front-1"
+            // Get the specific NPC image for this character
+            const npcImageKey = npcImageMap[location.npc] || "student-front-1";
+
+            console.log(
+                `Creating NPC: ${location.npc} with image: ${npcImageKey}`
             );
-            npc.setScale(0.6); // Smaller scale for NPCs
-            // Temporarily disable color tinting for student sprites
-            // npc.setTint(0x4169e1); // Blue tint for NPCs
+            console.log(
+                `Texture exists for ${npcImageKey}:`,
+                this.textures.exists(npcImageKey)
+            );
+
+            // Use fallback if texture doesn't exist
+            const finalImageKey = this.textures.exists(npcImageKey)
+                ? npcImageKey
+                : "student-front-1";
+
+            console.log(`Using image: ${finalImageKey} for ${location.npc}`);
+
+            const npc = this.physics.add.sprite(worldX, worldY, finalImageKey);
+            npc.setScale(0.2); // Much smaller scale for NPCs (player is 0.3, NPCs should be smaller)
             npc.setInteractive();
 
-            // Add NPC name
-            this.add
-                .text(worldX, worldY - 30, location.npc, {
-                    fontFamily: "Arial",
-                    fontSize: 10,
-                    color: "#000000",
-                    align: "center",
-                })
-                .setOrigin(0.5);
+            // Set up collision body for NPC - make it static from the start
+            npc.body.setSize(npc.width * 0.8, npc.height * 0.8); // Slightly smaller collision box
+            npc.body.setOffset(npc.width * 0.1, npc.height * 0.1); // Center the collision box
+            npc.body.setImmovable(true); // Make NPCs static so they don't move when player collides
+            npc.body.setGravity(0, 0); // Remove gravity
+            npc.body.setVelocity(0, 0); // Stop any movement
+            npc.body.setAngularVelocity(0); // Stop any rotation
 
-            // Add mission indicator
-            const missionIndicator = this.add
-                .text(worldX + 20, worldY - 20, "!", {
+            console.log(`NPC ${location.npc} collision body set up:`, {
+                width: npc.body.width,
+                height: npc.body.height,
+                offsetX: npc.body.offset.x,
+                offsetY: npc.body.offset.y,
+                immovable: npc.body.immovable,
+            });
+
+            // Add NPC name with better styling
+            const npcName = this.add
+                .text(worldX, worldY - 35, location.npc, {
                     fontFamily: "Arial Black",
-                    fontSize: 16,
-                    color: "#FF0000",
+                    fontSize: 11,
+                    color: "#FFFFFF",
+                    stroke: "#000000",
+                    strokeThickness: 2,
                     align: "center",
+                    shadow: {
+                        offsetX: 1,
+                        offsetY: 1,
+                        color: "#000000",
+                        blur: 2,
+                        fill: true,
+                    },
                 })
-                .setOrigin(0.5);
+                .setOrigin(0.5)
+                .setDepth(100);
 
-            // Store mission data on NPC
+            // Add mission indicator with better styling
+            const missionIndicator = this.add
+                .text(worldX + 25, worldY - 25, "!", {
+                    fontFamily: "Arial Black",
+                    fontSize: 18,
+                    color: "#FFD700",
+                    stroke: "#000000",
+                    strokeThickness: 3,
+                    align: "center",
+                    shadow: {
+                        offsetX: 1,
+                        offsetY: 1,
+                        color: "#000000",
+                        blur: 2,
+                        fill: true,
+                    },
+                })
+                .setOrigin(0.5)
+                .setDepth(100);
+
+            // Add a subtle glow effect around NPCs
+            const glow = this.add.circle(worldX, worldY, 25, 0x4169e1, 0.1);
+            glow.setDepth(-1);
+
+            // Store mission data and original position on NPC
             npc.setData("missionData", location);
+            npc.setData("originalPosition", { x: worldX, y: worldY });
 
             this.npcs.add(npc);
         });
+
+        console.log(
+            `Created ${this.missionLocations.length} NPCs with specific LEVEL1 images`
+        );
+
+        // Add collision between player and NPCs with custom callback to prevent movement
+        this.physics.add.collider(this.player, this.npcs, (player, npc) => {
+            // Ensure NPC doesn't move when collided
+            npc.body.setVelocity(0, 0);
+            npc.body.setAngularVelocity(0);
+            npc.body.setImmovable(true); // Force immovable again
+
+            // Also stop the player's movement when colliding with NPC
+            player.body.setVelocity(0, 0);
+            player.body.setAngularVelocity(0);
+
+            console.log(
+                `Collision detected with ${
+                    npc.getData("missionData")?.npc || "NPC"
+                }, both player and NPC stopped`
+            );
+        });
+        console.log(
+            "Player-NPC collision detection enabled with movement prevention"
+        );
+    }
+
+    createMobileControls() {
+        console.log("Creating mobile controls...");
+        console.log(
+            "Screen size for controls:",
+            this.cameras.main.width,
+            "x",
+            this.cameras.main.height
+        );
+
+        // Create virtual joystick
+        this.createVirtualJoystick();
+
+        // Create interaction button
+        this.createInteractionButton();
+
+        // Update interaction prompt for mobile
+        this.interactionPrompt.setText("Tap to interact");
+
+        console.log("Mobile controls created successfully");
+    }
+
+    createVirtualJoystick() {
+        // Get screen dimensions for responsive positioning
+        const screenWidth = this.cameras.main.width;
+        const screenHeight = this.cameras.main.height;
+
+        // Position joystick in bottom-left corner with proper margins
+        // Use percentage-based positioning for better responsiveness
+        const joystickX = Math.max(60, screenWidth * 0.08); // 8% from left edge, minimum 60px
+        const joystickY = Math.min(screenHeight - 60, screenHeight * 0.9); // 90% from top, maximum 60px from bottom
+
+        console.log("Creating joystick at position:", joystickX, joystickY);
+        console.log("Screen dimensions:", screenWidth, "x", screenHeight);
+        console.log("Landscape mode:", screenWidth > screenHeight);
+
+        // Create joystick base (outer circle) - use camera-relative positioning
+        const joystickBase = this.add.circle(
+            joystickX,
+            joystickY,
+            50,
+            0x000000,
+            0.3
+        );
+        joystickBase.setDepth(2000);
+        joystickBase.setScrollFactor(0); // Don't scroll with camera
+
+        // Create joystick knob (inner circle) - use camera-relative positioning
+        const joystickKnob = this.add.circle(
+            joystickX,
+            joystickY,
+            25,
+            0xffffff,
+            0.8
+        );
+        joystickKnob.setDepth(2001);
+        joystickKnob.setScrollFactor(0); // Don't scroll with camera
+
+        // Store joystick components
+        this.virtualJoystick = {
+            base: joystickBase,
+            knob: joystickKnob,
+            baseX: joystickX,
+            baseY: joystickY,
+            knobX: joystickX,
+            knobY: joystickY,
+            isActive: false,
+            maxDistance: 40,
+        };
+
+        // Make joystick interactive
+        joystickBase.setInteractive();
+        joystickKnob.setInteractive();
+
+        // Touch events for joystick
+        joystickBase.on("pointerdown", (pointer: any) => {
+            this.virtualJoystick.isActive = true;
+            this.updateJoystickPosition(pointer.x, pointer.y);
+        });
+
+        this.input.on("pointermove", (pointer: any) => {
+            if (this.virtualJoystick.isActive) {
+                this.updateJoystickPosition(pointer.x, pointer.y);
+            }
+        });
+
+        this.input.on("pointerup", () => {
+            this.virtualJoystick.isActive = false;
+            this.resetJoystick();
+        });
+    }
+
+    updateJoystickPosition(x: number, y: number) {
+        const dx = x - this.virtualJoystick.baseX;
+        const dy = y - this.virtualJoystick.baseY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance <= this.virtualJoystick.maxDistance) {
+            this.virtualJoystick.knobX = x;
+            this.virtualJoystick.knobY = y;
+        } else {
+            const angle = Math.atan2(dy, dx);
+            this.virtualJoystick.knobX =
+                this.virtualJoystick.baseX +
+                Math.cos(angle) * this.virtualJoystick.maxDistance;
+            this.virtualJoystick.knobY =
+                this.virtualJoystick.baseY +
+                Math.sin(angle) * this.virtualJoystick.maxDistance;
+        }
+
+        this.virtualJoystick.knob.setPosition(
+            this.virtualJoystick.knobX,
+            this.virtualJoystick.knobY
+        );
+    }
+
+    resetJoystick() {
+        this.virtualJoystick.knobX = this.virtualJoystick.baseX;
+        this.virtualJoystick.knobY = this.virtualJoystick.baseY;
+        this.virtualJoystick.knob.setPosition(
+            this.virtualJoystick.knobX,
+            this.virtualJoystick.knobY
+        );
+    }
+
+    createInteractionButton() {
+        // Get screen dimensions for responsive positioning
+        const screenWidth = this.cameras.main.width;
+        const screenHeight = this.cameras.main.height;
+
+        // Position interaction button in bottom-right corner
+        // Use percentage-based positioning for better responsiveness
+        const buttonX = Math.min(screenWidth - 60, screenWidth * 0.92); // 92% from left edge, maximum 60px from right
+        const buttonY = Math.min(screenHeight - 60, screenHeight * 0.9); // 90% from top, maximum 60px from bottom
+
+        console.log(
+            "Creating interaction button at position:",
+            buttonX,
+            buttonY
+        );
+        console.log("Landscape mode:", screenWidth > screenHeight);
+
+        // Create interaction button for mobile
+        const interactionButton = this.add.circle(
+            buttonX,
+            buttonY,
+            40,
+            0x00ff00,
+            0.7
+        );
+        interactionButton.setDepth(2000);
+        interactionButton.setScrollFactor(0); // Don't scroll with camera
+        interactionButton.setInteractive();
+
+        const buttonText = this.add
+            .text(buttonX, buttonY, "TAP", {
+                fontFamily: "Arial Black",
+                fontSize: 12,
+                color: "#000000",
+                align: "center",
+            })
+            .setOrigin(0.5)
+            .setDepth(2001)
+            .setScrollFactor(0); // Don't scroll with camera
+
+        interactionButton.on("pointerdown", () => {
+            this.interactWithNearbyNPC();
+        });
+
+        // Store button reference
+        this.touchControls = {
+            interactionButton: interactionButton,
+            buttonText: buttonText,
+        };
+    }
+
+    handleResize() {
+        console.log("Screen resized, updating camera and background...");
+
+        // Update camera settings for new screen size
+        this.optimizeCameraForOpenWorld();
+
+        // Update background scaling for new orientation
+        this.updateBackgroundForOrientation();
+
+        console.log("Camera and background updated for new screen size");
     }
 
     createUI() {
         // Only create the interaction prompt since other UI is handled by React
         this.interactionPrompt = this.add
-            .text(512, 600, "Press SPACE to interact", {
-                fontFamily: "Arial Black",
-                fontSize: 16,
-                color: "#FFD700",
-                stroke: "#000000",
-                strokeThickness: 3,
-                align: "center",
-                backgroundColor: "#2E86AB",
-                padding: { x: 10, y: 5 },
-            })
+            .text(
+                512,
+                600,
+                this.isMobile ? "Tap to interact" : "Press SPACE to interact",
+                {
+                    fontFamily: "Arial Black",
+                    fontSize: 16,
+                    color: "#FFD700",
+                    stroke: "#000000",
+                    strokeThickness: 3,
+                    align: "center",
+                    backgroundColor: "#2E86AB",
+                    padding: { x: 10, y: 5 },
+                }
+            )
             .setOrigin(0.5)
             .setDepth(1000)
+            .setScrollFactor(0) // Don't scroll with camera
             .setVisible(false);
     }
 
@@ -1002,35 +1523,105 @@ export class BarangayMap extends Scene {
         const speed = 200;
         let isMoving = false;
         let currentDirection = "";
+        let velocityX = 0;
+        let velocityY = 0;
 
-        if (this.cursors.left.isDown || this.wasd.A.isDown) {
-            this.player.setVelocityX(-speed);
-            // Don't flip - use left sprite instead
-            isMoving = true;
-            currentDirection = "left";
-            this.lastDirection = "left";
-        } else if (this.cursors.right.isDown || this.wasd.D.isDown) {
-            this.player.setVelocityX(speed);
-            // Don't flip - use right sprite instead
-            isMoving = true;
-            currentDirection = "right";
-            this.lastDirection = "right";
+        // Handle keyboard input (desktop)
+        if (!this.isMobile) {
+            if (this.cursors.left.isDown || this.wasd.A.isDown) {
+                velocityX = -speed;
+                isMoving = true;
+                currentDirection = "left";
+                this.lastDirection = "left";
+            } else if (this.cursors.right.isDown || this.wasd.D.isDown) {
+                velocityX = speed;
+                isMoving = true;
+                currentDirection = "right";
+                this.lastDirection = "right";
+            }
+
+            if (this.cursors.up.isDown || this.wasd.W.isDown) {
+                velocityY = -speed;
+                isMoving = true;
+                currentDirection = "back";
+                this.lastDirection = "back";
+            } else if (this.cursors.down.isDown || this.wasd.S.isDown) {
+                velocityY = speed;
+                isMoving = true;
+                currentDirection = "front";
+                this.lastDirection = "front";
+            }
         } else {
-            this.player.setVelocityX(0);
+            // Handle React joystick input
+            const joystickDirection = this.registry.get(
+                "joystickDirection"
+            ) || { x: 0, y: 0 };
+
+            if (joystickDirection.x !== 0 || joystickDirection.y !== 0) {
+                velocityX = joystickDirection.x * speed;
+                velocityY = joystickDirection.y * speed;
+
+                isMoving = true;
+
+                // Determine direction based on movement
+                if (Math.abs(velocityX) > Math.abs(velocityY)) {
+                    currentDirection = velocityX > 0 ? "right" : "left";
+                } else {
+                    currentDirection = velocityY > 0 ? "front" : "back";
+                }
+
+                this.lastDirection = currentDirection;
+            }
         }
 
-        if (this.cursors.up.isDown || this.wasd.W.isDown) {
-            this.player.setVelocityY(-speed);
-            isMoving = true;
-            currentDirection = "back";
-            this.lastDirection = "back";
-        } else if (this.cursors.down.isDown || this.wasd.S.isDown) {
-            this.player.setVelocityY(speed);
-            isMoving = true;
-            currentDirection = "front";
-            this.lastDirection = "front";
+        // Apply velocity only if player can move to the new position
+        if (isMoving) {
+            const newX = this.player.x + velocityX * 0.016; // Approximate new position (60fps)
+            const newY = this.player.y + velocityY * 0.016;
+
+            if (this.canPlayerMoveTo(newX, newY)) {
+                this.player.setVelocity(velocityX, velocityY);
+            } else {
+                // Stop player if they would hit an NPC
+                this.player.setVelocity(0, 0);
+                console.log("Player movement blocked by NPC collision");
+            }
         } else {
-            this.player.setVelocityY(0);
+            this.player.setVelocity(0, 0);
+        }
+
+        // Ensure camera is following player (debug occasionally)
+        if (Math.random() < 0.01) {
+            // Occasional debug
+            const playerScreenX = this.cameras.main.getWorldPoint(
+                this.player.x,
+                this.player.y
+            ).x;
+            const playerScreenY = this.cameras.main.getWorldPoint(
+                this.player.x,
+                this.player.y
+            ).y;
+            const screenCenterX = this.cameras.main.width / 2;
+            const screenCenterY = this.cameras.main.height / 2;
+
+            console.log("=== OPEN WORLD CAMERA SCROLLING ===");
+            console.log("Player world position:", this.player.x, this.player.y);
+            console.log(
+                "Player screen position:",
+                playerScreenX,
+                playerScreenY
+            );
+            console.log("Screen center:", screenCenterX, screenCenterY);
+            console.log(
+                "Camera offset from center:",
+                Math.abs(playerScreenX - screenCenterX),
+                Math.abs(playerScreenY - screenCenterY)
+            );
+            console.log("Camera following:", this.cameras.main.follow);
+            console.log("Map bounds:", this.cameras.main.getBounds());
+            console.log("Camera lerp:", this.cameras.main.lerp);
+            console.log("Camera deadzone:", this.cameras.main.deadzone);
+            console.log("===================================");
         }
 
         // Handle sprite direction and animations
@@ -1069,6 +1660,101 @@ export class BarangayMap extends Scene {
 
         // Check for nearby NPCs
         this.checkForNearbyNPCs();
+
+        // Debug: Show interaction prompt status occasionally
+        if (Math.random() < 0.02) {
+            // 2% chance every frame
+            console.log("=== INTERACTION DEBUG ===");
+            console.log(
+                "Player position:",
+                this.player.x.toFixed(1),
+                this.player.y.toFixed(1)
+            );
+            console.log(
+                "Nearby NPC:",
+                this.nearbyNPC
+                    ? this.nearbyNPC.getData("missionData")?.npc
+                    : "None"
+            );
+            console.log(
+                "Interaction prompt visible:",
+                this.interactionPrompt.visible
+            );
+            console.log("=========================");
+        }
+
+        // Ensure NPCs stay in their original positions (prevent movement)
+        this.enforceNPCPositions();
+
+        // Ensure camera is following player (fallback)
+        this.ensureCameraFollowing();
+    }
+
+    enforceNPCPositions() {
+        // Ensure all NPCs stay in their original positions
+        this.npcs.children.entries.forEach((npc: any) => {
+            // Stop any movement
+            npc.body.setVelocity(0, 0);
+            npc.body.setAngularVelocity(0);
+            npc.body.setImmovable(true);
+
+            // Reset to original position if they've moved
+            const originalPosition = npc.getData("originalPosition");
+            const missionData = npc.getData("missionData");
+
+            if (originalPosition) {
+                // Only reset position if they've moved significantly
+                const distance = Phaser.Math.Distance.Between(
+                    npc.x,
+                    npc.y,
+                    originalPosition.x,
+                    originalPosition.y
+                );
+                if (distance > 5) {
+                    npc.setPosition(originalPosition.x, originalPosition.y);
+                    console.log(
+                        `Reset NPC ${
+                            missionData?.npc || "Unknown"
+                        } to original position`
+                    );
+                }
+            }
+        });
+    }
+
+    canPlayerMoveTo(x: number, y: number) {
+        // Check if player can move to the given position without hitting an NPC
+        const playerWidth = this.player.width * this.player.scaleX;
+        const playerHeight = this.player.height * this.player.scaleY;
+
+        for (let npc of this.npcs.children.entries) {
+            const npcWidth = npc.width * npc.scaleX;
+            const npcHeight = npc.height * npc.scaleY;
+
+            // Check if player's bounding box would overlap with NPC's bounding box
+            const playerLeft = x - playerWidth / 2;
+            const playerRight = x + playerWidth / 2;
+            const playerTop = y - playerHeight / 2;
+            const playerBottom = y + playerHeight / 2;
+
+            const npcLeft = npc.x - npcWidth / 2;
+            const npcRight = npc.x + npcWidth / 2;
+            const npcTop = npc.y - npcHeight / 2;
+            const npcBottom = npc.y + npcHeight / 2;
+
+            // Check for overlap with minimal padding to allow interaction
+            const padding = 0.5; // Minimal padding to allow getting very close for interaction
+            if (
+                playerLeft < npcRight + padding &&
+                playerRight > npcLeft - padding &&
+                playerTop < npcBottom + padding &&
+                playerBottom > npcTop - padding
+            ) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     checkForNearbyNPCs() {
@@ -1089,9 +1775,15 @@ export class BarangayMap extends Scene {
             }
         });
 
-        if (nearestNPC && nearestDistance < 50) {
+        // Increased interaction range to make it easier to trigger
+        if (nearestNPC && nearestDistance < 80) {
             this.nearbyNPC = nearestNPC;
             this.interactionPrompt.setVisible(true);
+            console.log(
+                `Interaction prompt shown for ${
+                    nearestNPC.getData("missionData")?.npc || "NPC"
+                } at distance ${nearestDistance.toFixed(1)}`
+            );
         } else {
             this.nearbyNPC = null;
             this.interactionPrompt.setVisible(false);

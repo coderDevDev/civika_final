@@ -71,3 +71,135 @@ textarea:focus {
     outline: none !important;
 }
 
+/* Mobile Controls Styles */
+@media (max-width: 768px) {
+    #game-container {
+        touch-action: none; /* Prevent default touch behaviors */
+        user-select: none; /* Prevent text selection */
+    }
+
+    /* Ensure game canvas is full screen on mobile */
+    canvas {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: 100vw !important;
+        max-height: 100vh !important;
+    }
+}
+
+/* Prevent zoom on double tap for mobile */
+@media (hover: none) and (pointer: coarse) {
+    * {
+        touch-action: manipulation;
+    }
+}
+
+/* Medieval/Fantasy Game UI Styles */
+@layer components {
+    /* Wooden Frame - Main container styling */
+    .wooden-frame {
+        @apply bg-gradient-to-br from-amber-800 via-amber-700 to-amber-900;
+        @apply border-4 border-amber-900;
+        @apply shadow-2xl;
+        position: relative;
+    }
+
+    /* Parchment Background - Content area styling */
+    .parchment-bg {
+        @apply bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100;
+        @apply border-2 border-amber-300;
+        @apply shadow-inner;
+        background-image: radial-gradient(
+                circle at 20% 80%,
+                rgba(120, 53, 15, 0.1) 0%,
+                transparent 50%
+            ),
+            radial-gradient(
+                circle at 80% 20%,
+                rgba(120, 53, 15, 0.1) 0%,
+                transparent 50%
+            ),
+            radial-gradient(
+                circle at 40% 40%,
+                rgba(120, 53, 15, 0.05) 0%,
+                transparent 50%
+            );
+    }
+
+    /* Metal Corner Decorations */
+    .metal-corner {
+        @apply bg-gradient-to-br from-gray-400 via-gray-500 to-gray-600;
+        @apply border-2 border-gray-700;
+        @apply shadow-lg;
+        position: relative;
+    }
+
+    .metal-corner::before {
+        content: "";
+        position: absolute;
+        top: 1px;
+        left: 1px;
+        right: 1px;
+        bottom: 1px;
+        @apply bg-gradient-to-br from-gray-300 to-gray-500;
+        @apply rounded-sm;
+    }
+
+    /* Game Element Border - For text and small elements */
+    .game-element-border {
+        @apply border-2 border-amber-600;
+        @apply bg-gradient-to-br from-amber-100 to-amber-200;
+        @apply shadow-md;
+    }
+
+    /* Game Button Frame - For interactive buttons */
+    .game-button-frame {
+        @apply border-4 border-amber-800;
+        @apply bg-gradient-to-br from-amber-600 to-amber-800;
+        @apply shadow-lg;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .game-button-frame::before {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        right: 2px;
+        bottom: 2px;
+        @apply bg-gradient-to-br from-amber-500 to-amber-700;
+        @apply rounded-sm;
+        z-index: -1;
+    }
+
+    /* Scrollbar styling for medieval theme */
+    .medieval-scrollbar::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    .medieval-scrollbar::-webkit-scrollbar-track {
+        @apply bg-amber-200 border-2 border-amber-400;
+    }
+
+    .medieval-scrollbar::-webkit-scrollbar-thumb {
+        @apply bg-gradient-to-b from-amber-600 to-amber-800 border-2 border-amber-400;
+    }
+
+    .medieval-scrollbar::-webkit-scrollbar-thumb:hover {
+        @apply bg-gradient-to-b from-amber-700 to-amber-900;
+    }
+
+    /* Glow effects for interactive elements */
+    .game-glow {
+        @apply shadow-lg;
+        box-shadow: 0 0 10px rgba(245, 158, 11, 0.3),
+            0 0 20px rgba(245, 158, 11, 0.2), 0 0 30px rgba(245, 158, 11, 0.1);
+    }
+
+    .game-glow:hover {
+        box-shadow: 0 0 15px rgba(245, 158, 11, 0.4),
+            0 0 25px rgba(245, 158, 11, 0.3), 0 0 35px rgba(245, 158, 11, 0.2);
+    }
+}
+

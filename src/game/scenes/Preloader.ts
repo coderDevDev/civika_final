@@ -110,8 +110,74 @@ export class Preloader extends Scene {
         this.load.image("student-right-3", "right/3.png");
         this.load.image("student-right-4", "right/4.png");
 
+        // Load NPC images from LEVEL1 folder
+        this.loadNPCImages();
+
         // Create placeholder sprites for NPCs (keep simple for now)
         this.createPlaceholderSprites();
+    }
+
+    loadNPCImages() {
+        console.log("Loading NPC images from LEVEL1 folder...");
+
+        // Load all NPC images from LEVEL1 folder with correct path
+        this.load.image(
+            "barangay-captain",
+            "assets/LEVEL1/barangay-captain.png"
+        );
+        this.load.image(
+            "barangay-health-worker",
+            "assets/LEVEL1/barangay-health-worker.png"
+        );
+        this.load.image(
+            "barangay-secretary",
+            "assets/LEVEL1/barangay-secretary.png"
+        );
+        this.load.image("barangay-tanod", "assets/LEVEL1/barangay-tanod.png");
+        this.load.image(
+            "comelec-volunteer",
+            "assets/LEVEL1/comelec-volunteer.png"
+        );
+        this.load.image(
+            "construction-foreman",
+            "assets/LEVEL1/construction-foreman.png"
+        );
+        this.load.image(
+            "elderly-resident",
+            "assets/LEVEL1/elderly-resident.png"
+        );
+        this.load.image(
+            "high-school-student",
+            "assets/LEVEL1/high-school-student.png"
+        );
+        this.load.image("librarian", "assets/LEVEL1/librarian.png");
+        this.load.image(
+            "mediation-officer",
+            "assets/LEVEL1/mediation-officer.png"
+        );
+
+        // Add debugging for image loading
+        this.load.on("filecomplete", (key: string) => {
+            if (
+                key.includes("barangay") ||
+                key.includes("comelec") ||
+                key.includes("construction") ||
+                key.includes("elderly") ||
+                key.includes("high-school") ||
+                key.includes("librarian") ||
+                key.includes("mediation")
+            ) {
+                console.log(`NPC image loaded: ${key}`);
+            }
+        });
+
+        this.load.on("loaderror", (file: any) => {
+            console.error(
+                `Failed to load NPC image: ${file.key} from ${file.url}`
+            );
+        });
+
+        console.log("NPC images loading started...");
     }
 
     createPlaceholderSprites() {

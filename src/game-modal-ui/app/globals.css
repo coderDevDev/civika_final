@@ -1,0 +1,174 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Updated to medieval fantasy game theme colors */
+  --background: #2c1810; /* Dark wood background */
+  --foreground: #f8f1e8; /* Parchment text */
+  --card: #f8f1e8; /* Parchment background for cards */
+  --card-foreground: #3b2a2a; /* Dark wood for card text */
+  --popover: #f8f1e8; /* Parchment background for popovers */
+  --popover-foreground: #3b2a2a; /* Dark wood for popover text */
+  --primary: #6b4c3a; /* Wooden frame */
+  --primary-foreground: #f8f1e8; /* Light text on wooden backgrounds */
+  --secondary: #e63946; /* Vibrant red for buttons */
+  --secondary-foreground: #ffffff; /* Text on red buttons */
+  --muted: #d1c2b5; /* Light earth tone for subtle backgrounds */
+  --muted-foreground: #3b2a2a; /* Dark wood for muted text */
+  --accent: #4ade80; /* Bright green for sliders and active states */
+  --accent-foreground: #ffffff; /* Text on green elements */
+  --destructive: #e63946; /* Destructive actions */
+  --destructive-foreground: #ffffff; /* Text on destructive actions */
+  --border: #6b4c3a; /* Wooden border */
+  --input: #ffffff; /* Input fields */
+  --ring: rgba(107, 76, 58, 0.3); /* Wooden shadow for focus */
+  --chart-1: #e63946; /* Red */
+  --chart-2: #f97316; /* Orange */
+  --chart-3: #eab308; /* Yellow */
+  --chart-4: #4ade80; /* Green */
+  --chart-5: #3b82f6; /* Blue */
+  --radius: 0.5rem;
+  --sidebar: #f8f1e8;
+  --sidebar-foreground: #3b2a2a;
+  --sidebar-primary: #6b4c3a;
+  --sidebar-primary-foreground: #f8f1e8;
+  --sidebar-accent: #e63946;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #6b4c3a;
+  --sidebar-ring: rgba(107, 76, 58, 0.3);
+}
+
+.dark {
+  --background: #2c1810;
+  --foreground: #f8f1e8;
+  --card: #f8f1e8;
+  --card-foreground: #3b2a2a;
+  --popover: #f8f1e8;
+  --popover-foreground: #3b2a2a;
+  --primary: #6b4c3a;
+  --primary-foreground: #f8f1e8;
+  --secondary: #e63946;
+  --secondary-foreground: #ffffff;
+  --muted: #d1c2b5;
+  --muted-foreground: #3b2a2a;
+  --accent: #4ade80;
+  --accent-foreground: #ffffff;
+  --destructive: #e63946;
+  --destructive-foreground: #ffffff;
+  --border: #6b4c3a;
+  --input: #ffffff;
+  --ring: rgba(107, 76, 58, 0.3);
+  --chart-1: #e63946;
+  --chart-2: #f97316;
+  --chart-3: #eab308;
+  --chart-4: #4ade80;
+  --chart-5: #3b82f6;
+  --radius: 0.5rem;
+  --sidebar: #f8f1e8;
+  --sidebar-foreground: #3b2a2a;
+  --sidebar-primary: #6b4c3a;
+  --sidebar-primary-foreground: #f8f1e8;
+  --sidebar-accent: #e63946;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #6b4c3a;
+  --sidebar-ring: rgba(107, 76, 58, 0.3);
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Enhanced game UI styles with more prominent borders and details */
+@layer components {
+  .wooden-frame {
+    background: linear-gradient(145deg, #c4a373, #b8956a);
+    border: 4px solid #3d2817;
+    box-shadow: inset 3px 3px 6px rgba(196, 163, 115, 0.4), inset -3px -3px 6px rgba(61, 40, 23, 0.4), 0 6px 12px
+      rgba(0, 0, 0, 0.4), 0 0 0 2px #b8956a;
+    position: relative;
+  }
+
+  .wooden-frame::before {
+    content: "";
+    position: absolute;
+    inset: 2px;
+    border: 1px solid rgba(196, 163, 115, 0.6);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  .parchment-bg {
+    background: linear-gradient(145deg, #f8f1e8, #f0e6d6);
+    background-image: radial-gradient(circle at 20% 80%, rgba(120, 119, 108, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(120, 119, 108, 0.1) 0%, transparent 50%);
+    border: 2px solid #d1c2b5;
+    box-shadow: inset 0 0 20px rgba(120, 119, 108, 0.1);
+  }
+
+  .metal-corner {
+    background: linear-gradient(145deg, #6a6a6a, #3a3a3a);
+    border: 2px solid #2a2a2a;
+    box-shadow: inset 1px 1px 2px rgba(106, 106, 106, 0.5), inset -1px -1px 2px rgba(42, 42, 42, 0.5), 0 2px 4px
+      rgba(0, 0, 0, 0.3);
+  }
+
+  .game-element-border {
+    border: 2px solid #3d2817;
+    box-shadow: inset 1px 1px 2px rgba(196, 163, 115, 0.3), inset -1px -1px 2px rgba(61, 40, 23, 0.3);
+    background: linear-gradient(145deg, rgba(196, 163, 115, 0.1), rgba(184, 149, 106, 0.1));
+  }
+
+  .game-button-frame {
+    border: 3px solid #3d2817;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3), inset 1px 1px 2px rgba(255, 255, 255, 0.2), inset -1px -1px 2px
+      rgba(0, 0, 0, 0.2);
+  }
+}

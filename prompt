@@ -1,0 +1,202 @@
+Goal:
+Players must complete civic-themed missions and quizzes to progress through various
+maps (Barangay ➝ Municipality ➝ City ➝ Nation) by understanding governance,
+voting, and community involvement.
+
+Player Journey in the Barangay (Start to End):
+
+1. Start as a Citizen (Character Creation & Intro Story)
+   • Customize your 2D avatar.
+   • Wake up in a pixel-art barangay and receive a letter from the Barangay Captain asking
+   for help improving the community.
+   • Tutorial starts: how to walk, talk to NPCs, open map/quest log.
+2. Main Objective in Barangay:
+   Earn 10 Civic Badges by completing missions and quizzes to unlock the gate to the next map:
+   the Municipality.
+   BARANGAY MAP: 10 MISSIONS/QUIZZES
+   Each mission includes an interactive task, a mini-quiz (3–5 items), and an NPC interaction with
+   choices and consequences.
+   Mission 1: Basura Patrol
+   NPC: Barangay Tanod
+   Task: Help clean the streets. Talk to 3 residents about proper segregation.
+   Reward: “Eco-Kabataan” Badge + 20 coins
+   Quiz: Which of the following is classified as biodegradable waste?
+   A. Plastic bottle
+   B. Banana peel
+   C. Aluminum can
+   D. Glass jar
+   Correct Answer: B
+   Mission 2: Taga Rehistro
+   NPC: COMELEC Volunteer
+   Task: Assist in a voter registration drive simulation.
+   Reward: “Registered Voter” Badge + 15 coins
+   Quiz: What is the minimum age to register and vote in the Philippines?
+   A. 16
+   B. 17
+   C. 18
+   D. 21
+   Correct Answer: C
+   Mission 3: Kapitbahay Ko, Alamin Ko
+   NPC: Elderly Resident
+   Task: Interview 3 NPCs about their role in the barangay.
+   Reward: “Community Explorer” Badge + Map access to hidden area
+   Quiz: What is the main duty of a Barangay Captain?
+   A. Clean streets
+   B. Approve national laws
+   C. Lead barangay governance and implement ordinances
+   D. Collect taxes for the BIR
+   Correct Answer: C
+   Mission 4: Ordinansa Time
+   NPC: Barangay Secretary
+   Task: Read the local barangay ordinance and attend a mock public hearing.
+   Reward: “Law Reader” Badge + Unlock new quest options
+   Quiz: Which of the following is an example of a barangay ordinance?
+   A. Increase in national income tax
+   B. Road widening for highways
+   C. Curfew for minors
+   D. National ID registration
+   Correct Answer: C
+   Mission 5: Fake or Fact?
+   NPC: High School Student
+   Task: Spot and report 3 fake news posts on the town bulletin board.
+   Reward: “Digital Defender” Badge + 30 coins
+   Quiz: How can you verify if news online is fake?
+   A. If it has many likes
+   B. If a celebrity shares it
+   C. By checking official sources or fact-checking websites
+   D. If it matches your opinion
+   Correct Answer: C
+   Mission 6: Serbisyo Seryoso
+   NPC: Construction Foreman
+   Task: Fix potholes by choosing correct barangay services.
+   Reward: “Public Service Aide” Badge + 1 time-based bonus item
+   Quiz: Which barangay official is responsible for implementing local projects?
+   A. Barangay Treasurer
+   B. Barangay Kagawad
+   C. City Mayor
+   D. Barangay Clerk
+   Correct Answer: B
+   Mission 7: Ayusin Natin ‘To!
+   NPC: Mediation Officer
+   Task: Mediate a conflict between two NPCs (e.g. noise complaint).
+   Reward: “Peacekeeper” Badge + unlock secret dialogue paths
+   Quiz: What is the best first step in resolving neighbor conflicts?
+   A. Shout at them
+   B. Post on social media
+   C. Talk calmly or seek mediation
+   D. Ignore it completely
+   Correct Answer: C
+   Mission 8: Civic Memory Hunt
+   NPC: Librarian
+   Task: Find lost historical documents in the library.
+   Reward: “Historian Badge” + collectible lore item
+   Quiz: What year was the current Philippine Constitution ratified?
+   A. 1898
+   B. 1945
+   C. 1973
+   D. 1987
+   Correct Answer: D
+   Mission 9: Kabataang Kalusugan
+   NPC: Barangay Health Worker
+   Task: Distribute vitamins and create awareness posters.
+   Reward: “Health Advocate” Badge + bonus healing item
+   Quiz: Which of the following is a common barangay health service?
+   A. Surgery
+   B. Blood donation and immunization
+   C. Ambulance repair
+   D. Pharmacy sales
+   Correct Answer: B
+   Mission 10: Pagpupulong ng Barangay
+   NPC: Barangay Captain
+   Task: Attend and speak in a mock barangay assembly.
+   Reward: “Youth Leader” Badge + unlock pathway to Municipality Map
+   Quiz: What should you do during a barangay meeting?
+   A. Shout your opinions
+   B. Sleep silently
+   C. Listen, respect turns, and speak politely
+   D. Record secretly without consent
+   Correct Answer: C
+   Barangay Map: Suggested Layout for Gameplay Flow
+   Here’s a text-based layout while I troubleshoot image rendering:
+   [Community Library]
+   |
+   [Barangay Hall]---[Covered Court]---[Health Center]
+   | | |
+   [Residential Area] [Park] [Mediation Kubo]
+   | | |
+   [Sari-Sari Store]---[Public Market]---[Basura Zone]
+
+Location-Based Mission Placement:
+Location Mission
+Barangay Hall Mission 10: Barangay Meeting
+Health Center Mission 9: Kabataang Kalusugan
+Basura Zone Mission 1: Basura Patrol
+Sari-Sari Store Mission 2: Voter Registration
+Mediation Kubo Mission 7: Ayusin Natin 'To
+Community Library Mission 8: Civic Memory Hunt
+Covered Court Mission 6: Serbisyo Seryoso
+Residential Area Mission 3: Kapitbahay Ko
+Public Market Mission 4: Ordinansa Time
+Park (with bulletin) Mission 5: Fake or Fact
+Action Reward
+Completing a mission Coins (10–30), XP, Badge
+Action Reward
+Passing a quiz XP + Mini bonus item
+Secret mission completed Unique title or hidden badge
+Talking to extra NPCs Civic trivia & coins
+UNLOCK CONDITION FOR NEXT MAP:
+• Collect at least 8 out of 10 Civic Badges
+• Pass final Barangay Quiz Challenge (5-question civic exam)
+• Cutscene: You're appointed as Youth Civic Envoy → Proceed to Municipality
+NPC: Barangay Captain (Final Mission Dialogue)
+Barangay Captain:
+"Congratulations, you’ve completed all barangay tasks.
+But to move forward, you must pass the Barangay Civic Challenge.
+Answer these five questions correctly to prove you’re ready!"
+
+1. What is the primary role of the Barangay Captain?
+   A. To collect taxes from residents
+   B. To supervise basketball games
+   C. To lead the barangay and enforce ordinances
+   D. To manage businesses in the community
+   Correct Answer: C
+2. When is a barangay assembly typically held?
+   A. Every New Year’s Day
+   B. Every end of the month
+   C. Every summer vacation
+   D. Twice a year (March and October) for public consultation
+   Correct Answer: D
+3. Which of the following is a responsibility of a Barangay Tanod?
+   A. Selling groceries
+   B. Maintaining peace and order in the community
+   C. Cleaning streets only
+   D. Preparing barangay ID cards
+   Correct Answer: B
+4. What should you do if you witness an illegal dumping of garbage?
+   A. Record a TikTok video about it
+   B. Ignore and walk away
+   C. Report it to the barangay or proper authorities
+   D. Dump your trash next to it
+   Correct Answer: C
+5. Why is it important to participate in barangay elections?
+   A. To win prizes
+   B. To skip school
+   C. To choose leaders who represent and serve your community
+   D. To avoid penalties
+   Correct Answer: C
+   Barangay Captain (if passed):
+   “Well done! You’ve proven yourself to be a responsible citizen.
+   You may now proceed to the next barangay or city map. Serve well!”
+   Barangay Captain (if failed):
+   Barangay Captain:
+   “Hmm… It seems you still need to strengthen your understanding of your role as a citizen.”
+   “There’s nothing wrong with making mistakes. What matters is your willingness to learn and try
+   again.”
+   “Take time to revisit the barangay. Talk to the people again, listen to their stories, and learn
+   more about their duties.”
+   “Come back when you’re ready. The barangay will always welcome those who are eager to grow
+   and serve.”
+   [SYSTEM MESSAGE]:
+   You didn’t pass the final civic exam.
+   Tip: Review past missions and talk to NPCs for helpful hints.
+   You can try again anytime.
