@@ -394,8 +394,11 @@ function App() {
 
             {/* Phaser Game Canvas - Show when in game world */}
             {!showMainMenu && !showCharacterCreation && (
-                <div className="flex items-center justify-center min-h-screen">
-                    <div id="game-container" className="relative">
+                <div className="w-full h-full flex items-center justify-center">
+                    <div
+                        id="game-container"
+                        className="relative w-full h-full max-w-full max-h-full"
+                    >
                         <PhaserGame
                             ref={phaserRef}
                             currentActiveScene={currentScene}

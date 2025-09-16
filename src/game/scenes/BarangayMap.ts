@@ -19,15 +19,19 @@ export class BarangayMap extends Scene {
     isUIVisible: boolean = false;
     interactionPrompt: GameObjects.Text;
     nearbyNPC: any = null;
-    tileSize: number = 32;
-    mapWidth: number = 32; // 32 tiles wide
-    mapHeight: number = 24; // 24 tiles tall
+    // Unlimited open world - no tile restrictions
+    tileSize: number = 32; // Keep for reference but not used for boundaries
+    mapWidth: number = 1000; // Large world width (unlimited)
+    mapHeight: number = 1000; // Large world height (unlimited)
     lastDirection: string = "front"; // Track last direction for idle sprites
 
     // Mobile controls
     virtualJoystick: any = null;
     isMobile: boolean = false;
     touchControls: any = null;
+
+    // Background image reference
+    backgroundImage: any = null;
 
     // Mission locations with tile coordinates
     missionLocations = [
@@ -125,12 +129,13 @@ export class BarangayMap extends Scene {
         // Create UI
         this.createUI();
 
-        // Set up camera
+        // Remove ALL camera bounds for truly unlimited movement
+        // Player can move infinitely in all directions
         this.cameras.main.setBounds(
-            0,
-            0,
-            this.mapWidth * this.tileSize,
-            this.mapHeight * this.tileSize
+            -Infinity, // Unlimited movement to the left
+            -Infinity, // Unlimited movement up
+            Infinity, // Unlimited movement to the right
+            Infinity // Unlimited movement down
         );
 
         // Ensure camera follows player
@@ -170,7 +175,7 @@ export class BarangayMap extends Scene {
             console.log("Open world camera settings applied for desktop");
         }
 
-        console.log("Camera setup complete:");
+        console.log("Camera setup complete with INFINITE unlimited bounds:");
         console.log("- Bounds:", this.cameras.main.getBounds());
         console.log("- Following player:", this.cameras.main.follow);
         console.log("- Player position:", this.player.x, this.player.y);
@@ -178,6 +183,9 @@ export class BarangayMap extends Scene {
             "- Camera position:",
             this.cameras.main.x,
             this.cameras.main.y
+        );
+        console.log(
+            "- INFINITE OPEN WORLD - player can move infinitely in ALL directions!"
         );
 
         // Debug camera and scene info
@@ -236,8 +244,9 @@ export class BarangayMap extends Scene {
         console.log("Mobile device detected:", this.isMobile);
         console.log("Mobile controls handled by React overlay");
 
-        // Add resize handler for orientation changes
+        // Add resize handler for screen size and orientation changes
         this.scale.on("resize", this.handleResize, this);
+        this.scale.on("orientationchange", this.handleResize, this);
 
         EventBus.emit("current-scene-ready", this);
     }
@@ -253,19 +262,22 @@ export class BarangayMap extends Scene {
     // Open world camera scrolling optimization
     optimizeCameraForOpenWorld() {
         if (this.player) {
-            // Ensure camera bounds are set correctly for open world
-            const mapWidth = this.mapWidth * this.tileSize;
-            const mapHeight = this.mapHeight * this.tileSize;
-
-            this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
+            // Remove ALL camera bounds for truly unlimited movement
+            // Player can move infinitely in all directions
+            this.cameras.main.setBounds(
+                -Infinity, // Unlimited movement to the left
+                -Infinity, // Unlimited movement up
+                Infinity, // Unlimited movement to the right
+                Infinity // Unlimited movement down
+            );
 
             // Smooth camera following for open world exploration
             this.cameras.main.setLerp(0.08, 0.08);
             this.cameras.main.setDeadzone(25, 25);
 
-            console.log("Open world camera optimized");
-            console.log("Map size:", mapWidth, "x", mapHeight);
+            console.log("Open world camera optimized with INFINITE bounds");
             console.log("Player position:", this.player.x, this.player.y);
+            console.log("Camera bounds:", this.cameras.main.getBounds());
         }
     }
 
@@ -275,29 +287,41 @@ export class BarangayMap extends Scene {
         const children = this.children.list;
         for (let child of children) {
             if (child.texture && child.texture.key === "barangay-bg-root") {
-                const screenWidth = this.cameras.main.width;
-                const screenHeight = this.cameras.main.height;
-                const isLandscape = screenWidth > screenHeight;
+                const gameWidth = this.scale.width;
+                const gameHeight = this.scale.height;
 
-                let scaleX, scaleY;
-                if (isLandscape) {
-                    // In landscape, scale to fit screen width
-                    scaleX = screenWidth / child.width;
-                    scaleY = scaleX; // Keep aspect ratio
-                } else {
-                    // In portrait, scale to cover entire map
-                    const mapWidth = this.mapWidth * this.tileSize;
-                    const mapHeight = this.mapHeight * this.tileSize;
-                    scaleX = mapWidth / child.width;
-                    scaleY = mapHeight / child.height;
-                }
+                // Scale background to cover the entire Phaser game canvas
+                const scaleToCoverWidth = gameWidth / child.width;
+                const scaleToCoverHeight = gameHeight / child.height;
+
+                // Use the larger scale to ensure the image covers the entire game canvas
+                const scaleX = Math.max(scaleToCoverWidth, scaleToCoverHeight);
+                const scaleY = scaleX; // Keep aspect ratio
 
                 child.setScale(scaleX, scaleY);
+                child.setPosition(gameWidth / 2, gameHeight / 2);
+
                 console.log(
-                    "Background rescaled for orientation:",
-                    isLandscape ? "Landscape" : "Portrait"
+                    "Background rescaled to cover entire Phaser game canvas:"
                 );
-                console.log("New scale:", scaleX, scaleY);
+                console.log(
+                    "Game canvas dimensions:",
+                    gameWidth,
+                    "x",
+                    gameHeight
+                );
+                console.log(
+                    "Image dimensions:",
+                    child.width,
+                    "x",
+                    child.height
+                );
+                console.log(
+                    "Scale factors:",
+                    scaleToCoverWidth,
+                    scaleToCoverHeight
+                );
+                console.log("Final scale:", scaleX, scaleY);
                 break;
             }
         }
@@ -357,60 +381,92 @@ export class BarangayMap extends Scene {
             );
 
             try {
-                // Calculate map center and size
-                const mapWidth = this.mapWidth * this.tileSize;
-                const mapHeight = this.mapHeight * this.tileSize;
-                const mapCenterX = mapWidth / 2;
-                const mapCenterY = mapHeight / 2;
-
-                // Detect screen orientation
-                const screenWidth = this.cameras.main.width;
-                const screenHeight = this.cameras.main.height;
-                const isLandscape = screenWidth > screenHeight;
+                // Get Phaser game canvas dimensions for perfect coverage
+                const gameWidth = this.scale.width;
+                const gameHeight = this.scale.height;
+                const gameCenterX = gameWidth / 2;
+                const gameCenterY = gameHeight / 2;
+                const isLandscape = gameWidth > gameHeight;
 
                 const bgImage = this.add.image(
-                    mapCenterX,
-                    mapCenterY,
+                    gameCenterX,
+                    gameCenterY,
                     "barangay-bg-root"
                 );
                 bgImage.setOrigin(0.5, 0.5);
                 bgImage.setDepth(-2000); // Much further behind everything
 
-                // Scale background based on orientation
-                let scaleX, scaleY;
-                if (isLandscape) {
-                    // In landscape, scale to fit screen width while maintaining aspect ratio
-                    scaleX = screenWidth / bgImage.width;
-                    scaleY = scaleX; // Keep aspect ratio
-                    console.log(
-                        "Landscape mode: scaling background to fit screen width"
-                    );
-                } else {
-                    // In portrait, scale to cover the entire map
-                    scaleX = mapWidth / bgImage.width;
-                    scaleY = mapHeight / bgImage.height;
-                    console.log(
-                        "Portrait mode: scaling background to cover entire map"
-                    );
-                }
+                // Scale background to cover the entire Phaser game canvas
+                // This ensures the image fills the game canvas completely
+                const scaleToCoverWidth = gameWidth / bgImage.width;
+                const scaleToCoverHeight = gameHeight / bgImage.height;
 
-                bgImage.setScale(scaleX, scaleY);
+                // Use the larger scale to ensure the image covers the entire game canvas
+                const scaleX = Math.max(scaleToCoverWidth, scaleToCoverHeight);
+                const scaleY = scaleX; // Keep aspect ratio
+
+                // Ensure minimum scale for very small screens
+                const minScale = 0.1;
+                const finalScaleX = Math.max(scaleX, minScale);
+                const finalScaleY = Math.max(scaleY, minScale);
+
+                console.log(
+                    "Background scaling to cover entire Phaser game canvas:"
+                );
+                console.log(
+                    "Game canvas dimensions:",
+                    gameWidth,
+                    "x",
+                    gameHeight
+                );
+                // console.log(
+                //     "Massive world dimensions:",
+                //     worldWidth,
+                //     "x",
+                //     worldHeight
+                // );
+                console.log(
+                    "Image dimensions:",
+                    bgImage.width,
+                    "x",
+                    bgImage.height
+                );
+                console.log(
+                    "Scale factors:",
+                    scaleToCoverWidth,
+                    scaleToCoverHeight
+                );
+                console.log("Calculated scale:", scaleX, scaleY);
+                console.log("Final scale:", finalScaleX, finalScaleY);
+
+                bgImage.setScale(finalScaleX, finalScaleY);
+
+                // Position background to cover the entire Phaser game canvas
+                bgImage.setPosition(gameWidth / 2, gameHeight / 2);
+
+                // Store the background reference for future updates
+                this.backgroundImage = bgImage;
 
                 bgImage.setAlpha(1); // Fully visible
                 bgImage.setVisible(true); // Explicitly set visible
                 console.log("Root background image created successfully");
                 console.log(
-                    "Screen dimensions:",
-                    screenWidth,
+                    "Game canvas dimensions:",
+                    gameWidth,
                     "x",
-                    screenHeight
+                    gameHeight
                 );
                 console.log(
                     "Orientation:",
                     isLandscape ? "Landscape" : "Portrait"
                 );
-                console.log("Map dimensions:", mapWidth, "x", mapHeight);
-                console.log("Map center:", mapCenterX, mapCenterY);
+                console.log(
+                    "Game canvas dimensions:",
+                    gameWidth,
+                    "x",
+                    gameHeight
+                );
+                console.log("Game canvas center:", gameCenterX, gameCenterY);
                 console.log("Background position:", bgImage.x, bgImage.y);
                 console.log("Background scale:", scaleX, scaleY);
                 console.log("Background visible:", bgImage.visible);
@@ -974,8 +1030,13 @@ export class BarangayMap extends Scene {
             12 * this.tileSize,
             playerTexture
         );
-        this.player.setCollideWorldBounds(true);
+        // Remove world bounds collision for unlimited movement
+        this.player.setCollideWorldBounds(false);
         this.player.setScale(0.2); // Much smaller scale for student sprites
+
+        console.log(
+            "Player created with UNLIMITED movement - no world bounds collision"
+        );
 
         // Temporarily disable color tinting for student sprites
         // const playerColor = this.registry.get("playerColor") || 0x00ff00;
@@ -1479,13 +1540,28 @@ export class BarangayMap extends Scene {
 
     handleResize() {
         console.log("Screen resized, updating camera and background...");
+        console.log(
+            "New screen dimensions:",
+            this.cameras.main.width,
+            "x",
+            this.cameras.main.height
+        );
 
         // Update camera settings for new screen size
         this.optimizeCameraForOpenWorld();
 
-        // Update background scaling for new orientation
+        // Update background scaling for new screen size
         this.updateBackgroundForOrientation();
 
+        // Re-detect mobile device for new screen size
+        this.isMobile =
+            this.sys.game.device.input.touch ||
+            /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+                navigator.userAgent
+            ) ||
+            window.innerWidth <= 768;
+
+        console.log("Mobile device detected after resize:", this.isMobile);
         console.log("Camera and background updated for new screen size");
     }
 
@@ -1574,12 +1650,15 @@ export class BarangayMap extends Scene {
             }
         }
 
-        // Apply velocity only if player can move to the new position
+        // Apply velocity with improved collision detection
         if (isMoving) {
             const newX = this.player.x + velocityX * 0.016; // Approximate new position (60fps)
             const newY = this.player.y + velocityY * 0.016;
 
-            if (this.canPlayerMoveTo(newX, newY)) {
+            // Check if moving away from NPCs or towards them
+            const isMovingAway = this.isPlayerMovingAwayFromNPCs(newX, newY);
+
+            if (isMovingAway || this.canPlayerMoveTo(newX, newY)) {
                 this.player.setVelocity(velocityX, velocityY);
             } else {
                 // Stop player if they would hit an NPC
@@ -1720,6 +1799,36 @@ export class BarangayMap extends Scene {
                 }
             }
         });
+    }
+
+    isPlayerMovingAwayFromNPCs(newX: number, newY: number) {
+        // Check if player is moving away from any nearby NPCs
+        const currentDistance = this.getDistanceToNearestNPC();
+        const newDistance = this.getDistanceToNearestNPC(newX, newY);
+
+        // If moving away (increasing distance), allow movement
+        return newDistance > currentDistance;
+    }
+
+    getDistanceToNearestNPC(x?: number, y?: number) {
+        const playerX = x !== undefined ? x : this.player.x;
+        const playerY = y !== undefined ? y : this.player.y;
+
+        let nearestDistance = Infinity;
+
+        for (let npc of this.npcs.children.entries) {
+            const distance = Phaser.Math.Distance.Between(
+                playerX,
+                playerY,
+                npc.x,
+                npc.y
+            );
+            if (distance < nearestDistance) {
+                nearestDistance = distance;
+            }
+        }
+
+        return nearestDistance;
     }
 
     canPlayerMoveTo(x: number, y: number) {
