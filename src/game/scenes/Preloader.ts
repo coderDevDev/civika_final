@@ -65,6 +65,12 @@ export class Preloader extends Scene {
         );
         this.load.image("barangay-bg-root", "barangay-background.png");
 
+        // Load city background for Level 2
+        console.log(
+            "Attempting to load city-bg-root from: city-background.png"
+        );
+        this.load.image("city-bg-root", "city-background.png");
+
         // Load student sprite assets
         this.loadStudentSprites();
     }
@@ -112,6 +118,9 @@ export class Preloader extends Scene {
 
         // Load NPC images from LEVEL1 folder
         this.loadNPCImages();
+
+        // Load Level 2 city officials from LEVEL2 folder
+        this.loadLevel2NPCImages();
 
         // Create placeholder sprites for NPCs (keep simple for now)
         this.createPlaceholderSprites();
@@ -180,6 +189,49 @@ export class Preloader extends Scene {
         console.log("NPC images loading started...");
     }
 
+    loadLevel2NPCImages() {
+        console.log(
+            "Loading Level 2 city official images from LEVEL2 folder..."
+        );
+
+        // Load all city official images from LEVEL2 folder with correct path
+        this.load.image("city-councilor", "assets/LEVEL2/City_Councilor.png");
+        this.load.image("city-treasurer", "assets/LEVEL2/City_Treasurer.png");
+        this.load.image("city-engineer", "assets/LEVEL2/City_Engineer.png");
+        this.load.image(
+            "business-permit-officer",
+            "assets/LEVEL2/Business_Permit_Officer.png"
+        );
+        this.load.image("city-planner", "assets/LEVEL2/City_Planner.png");
+        this.load.image(
+            "environmental-officer",
+            "assets/LEVEL2/Environmental_Officer.png"
+        );
+        this.load.image(
+            "public-safety-officer",
+            "assets/LEVEL2/Public_Safety_Officer.png"
+        );
+        this.load.image("tourism-officer", "assets/LEVEL2/Tourism_Officer.png");
+        this.load.image("health-officer", "assets/LEVEL2/Health_Officer.png");
+        this.load.image("city-mayor", "assets/LEVEL2/City_Mayor.png");
+
+        // Add debugging for Level 2 image loading
+        this.load.on("filecomplete", (key: string) => {
+            if (
+                key.includes("city-") ||
+                key.includes("business-permit") ||
+                key.includes("environmental") ||
+                key.includes("public-safety") ||
+                key.includes("tourism") ||
+                key.includes("health-officer")
+            ) {
+                console.log(`Level 2 city official image loaded: ${key}`);
+            }
+        });
+
+        console.log("Level 2 city official images loading started...");
+    }
+
     createPlaceholderSprites() {
         // Create a simple colored rectangle for NPC sprite
         const npcGraphics = this.add.graphics();
@@ -217,6 +269,36 @@ export class Preloader extends Scene {
             "Barangay background backup texture exists:",
             this.textures.exists("barangay-bg-backup")
         );
+        console.log(
+            "City background texture exists:",
+            this.textures.exists("city-bg-root")
+        );
+
+        // Check Level 2 city official textures
+        console.log("=== LEVEL 2 CITY OFFICIALS ===");
+        console.log("City Councilor:", this.textures.exists("city-councilor"));
+        console.log("City Treasurer:", this.textures.exists("city-treasurer"));
+        console.log("City Engineer:", this.textures.exists("city-engineer"));
+        console.log(
+            "Business Permit Officer:",
+            this.textures.exists("business-permit-officer")
+        );
+        console.log("City Planner:", this.textures.exists("city-planner"));
+        console.log(
+            "Environmental Officer:",
+            this.textures.exists("environmental-officer")
+        );
+        console.log(
+            "Public Safety Officer:",
+            this.textures.exists("public-safety-officer")
+        );
+        console.log(
+            "Tourism Officer:",
+            this.textures.exists("tourism-officer")
+        );
+        console.log("Health Officer:", this.textures.exists("health-officer"));
+        console.log("City Mayor:", this.textures.exists("city-mayor"));
+        console.log("===============================");
 
         // List all available textures for debugging
         console.log("All available textures:", Object.keys(this.textures.list));

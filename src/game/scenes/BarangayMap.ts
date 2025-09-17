@@ -1,5 +1,6 @@
 import { GameObjects, Scene } from "phaser";
 import { EventBus } from "../EventBus";
+import { GameStateManager } from "../../utils/GameStateManager";
 
 export class BarangayMap extends Scene {
     player: Phaser.Physics.Arcade.Sprite;
@@ -32,6 +33,9 @@ export class BarangayMap extends Scene {
 
     // Background image reference
     backgroundImage: any = null;
+
+    // Mission indicators for real-time updates
+    missionIndicators: Map<number, any> = new Map();
 
     // Mission locations with tile coordinates
     missionLocations = [
@@ -249,6 +253,35 @@ export class BarangayMap extends Scene {
         this.scale.on("orientationchange", this.handleResize, this);
 
         EventBus.emit("current-scene-ready", this);
+    }
+
+    // Method to update NPC indicators in real-time
+    updateNPCIndicators() {
+        const gameStateManager = GameStateManager.getInstance();
+
+        this.missionLocations.forEach((location) => {
+            const indicator = this.missionIndicators.get(location.missionId);
+
+            if (indicator) {
+                let indicatorText = "!";
+                let indicatorColor = "#FFD700"; // Gold for available
+
+                if (gameStateManager.isMissionCompleted(location.missionId)) {
+                    indicatorText = "✓";
+                    indicatorColor = "#32CD32"; // Lime green for completed
+                } else if (
+                    !gameStateManager.canAccessMission(location.missionId)
+                ) {
+                    indicatorText = "🔒";
+                    indicatorColor = "#DC143C"; // Crimson red for locked
+                }
+
+                indicator.setText(indicatorText);
+                indicator.setColor(indicatorColor);
+            }
+        });
+
+        console.log("NPC indicators updated in real-time");
     }
 
     // Method to ensure camera follows player
@@ -1267,7 +1300,7 @@ export class BarangayMap extends Scene {
             console.log(`Using image: ${finalImageKey} for ${location.npc}`);
 
             const npc = this.physics.add.sprite(worldX, worldY, finalImageKey);
-            npc.setScale(0.2); // Much smaller scale for NPCs (player is 0.3, NPCs should be smaller)
+            npc.setScale(0.2); // Same scale as player for consistent sizing
             npc.setInteractive();
 
             // Set up collision body for NPC - make it static from the start
@@ -1306,12 +1339,27 @@ export class BarangayMap extends Scene {
                 .setOrigin(0.5)
                 .setDepth(100);
 
-            // Add mission indicator with better styling
+            // Add mission indicator with validation-based styling
+            const gameStateManager = GameStateManager.getInstance();
+            let indicatorText = "!";
+            let indicatorColor = "#FFD700"; // Gold for available
+
+            if (gameStateManager.isMissionCompleted(location.missionId)) {
+                indicatorText = "✓";
+                indicatorColor = "#32CD32"; // Lime green for completed
+            } else if (!gameStateManager.canAccessMission(location.missionId)) {
+                indicatorText = "🔒";
+                indicatorColor = "#DC143C"; // Crimson red for locked
+            }
+
+            // Store reference to indicator for real-time updates
+            const indicatorKey = `mission-indicator-${location.missionId}`;
+
             const missionIndicator = this.add
-                .text(worldX + 25, worldY - 25, "!", {
+                .text(worldX + 25, worldY - 25, indicatorText, {
                     fontFamily: "Arial Black",
                     fontSize: 18,
-                    color: "#FFD700",
+                    color: indicatorColor,
                     stroke: "#000000",
                     strokeThickness: 3,
                     align: "center",
@@ -1322,6 +1370,24 @@ export class BarangayMap extends Scene {
                         blur: 2,
                         fill: true,
                     },
+                })
+                .setOrigin(0.5)
+                .setDepth(100);
+
+            // Store reference for real-time updates
+            this.missionIndicators.set(location.missionId, missionIndicator);
+
+            // Add mission number beside NPC name
+            const missionNumber = this.add
+                .text(worldX - 35, worldY - 35, `#${location.missionId}`, {
+                    fontFamily: "Arial Black",
+                    fontSize: 12,
+                    color: "#FFD700",
+                    stroke: "#000000",
+                    strokeThickness: 2,
+                    align: "center",
+                    backgroundColor: "#8B4513",
+                    padding: { x: 4, y: 2 },
                 })
                 .setOrigin(0.5)
                 .setDepth(100);
@@ -1340,6 +1406,9 @@ export class BarangayMap extends Scene {
         console.log(
             `Created ${this.missionLocations.length} NPCs with specific LEVEL1 images`
         );
+
+        // Update indicators after all NPCs are created
+        this.updateNPCIndicators();
 
         // Add collision between player and NPCs with custom callback to prevent movement
         this.physics.add.collider(this.player, this.npcs, (player, npc) => {
@@ -1907,12 +1976,47 @@ export class BarangayMap extends Scene {
     }
 
     interactWithNPC(location: any) {
+        const gameStateManager = GameStateManager.getInstance();
+
         // Check if mission is already completed
-        const completedMissions = this.registry.get("completedMissions") || [];
-        if (completedMissions.includes(location.missionId)) {
-            this.showMessage(
-                `${location.npc}: "Thank you for completing this mission!"`
-            );
+        if (gameStateManager.isMissionCompleted(location.missionId)) {
+            EventBus.emit("show-notification", {
+                type: "success",
+                title: "Mission Already Completed! ✅",
+                message: `${location.npc}: "Thank you for completing this mission! You've earned your badge and helped our community. Keep up the great work, citizen!"`,
+                icon: "🎖️",
+                actions: [
+                    {
+                        label: "Continue Exploring",
+                        action: () => {}, // Will be handled by the notification component
+                        style: "primary",
+                    },
+                ],
+            });
+            return;
+        }
+
+        // Check if mission is accessible
+        if (!gameStateManager.canAccessMission(location.missionId)) {
+            const availableMissions = gameStateManager.getAvailableMissions();
+            const availableList =
+                availableMissions.length > 0
+                    ? availableMissions.join(", ")
+                    : "Complete Mission 1 first";
+
+            EventBus.emit("show-notification", {
+                type: "info",
+                title: "Mission Prerequisites Required 🔒",
+                message: `${location.npc}: "Hello there! I'd love to give you this mission, but you need to complete some other tasks first. Available missions: ${availableList}. Come back after you've gained more experience!"`,
+                icon: "📋",
+                actions: [
+                    {
+                        label: "Check Available Missions",
+                        action: () => {}, // Will be handled by the notification component
+                        style: "secondary",
+                    },
+                ],
+            });
             return;
         }
 
@@ -2071,7 +2175,7 @@ export class BarangayMap extends Scene {
         };
 
         return (
-            missions[missionId] || {
+            missions[missionId as keyof typeof missions] || {
                 id: missionId.toString(),
                 title: "Unknown Mission",
                 description: "A mission to help the community.",

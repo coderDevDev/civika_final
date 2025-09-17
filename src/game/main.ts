@@ -3,6 +3,7 @@ import { Preloader } from "./scenes/Preloader";
 import { MainMenu } from "./scenes/MainMenu";
 import { CharacterCreation } from "./scenes/CharacterCreation";
 import { BarangayMap } from "./scenes/BarangayMap";
+import { CityMap } from "./scenes/CityMap";
 import { QuizSystem } from "./scenes/QuizSystem";
 import { AUTO, Game } from "phaser";
 
@@ -41,6 +42,7 @@ const config: Phaser.Types.Core.GameConfig = {
         MainMenu,
         CharacterCreation,
         BarangayMap,
+        CityMap,
         QuizSystem,
     ],
 };
