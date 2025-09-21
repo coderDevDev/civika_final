@@ -7,6 +7,9 @@ import { MissionSystem } from "./components/MissionSystem";
 import { VirtualJoystick } from "./components/VirtualJoystick";
 import { MobileInteractionButton } from "./components/MobileInteractionButton";
 import { GameDebugPanel } from "./components/GameDebugPanel";
+import { Settings } from "./components/Settings";
+import { Extras } from "./components/Extras";
+import { Credits } from "./components/Credits";
 import {
     GameNotification,
     NotificationData,
@@ -14,6 +17,7 @@ import {
 import { EventBus } from "./game/EventBus";
 import { GameStateManager } from "./utils/GameStateManager";
 import { GameProgress } from "./utils/GameValidation";
+import { audioManager } from "./utils/AudioManager";
 
 function App() {
     const phaserRef = useRef<IRefPhaserGame | null>(null);
@@ -42,6 +46,9 @@ function App() {
         null
     );
     const [showNotification, setShowNotification] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
+    const [showExtras, setShowExtras] = useState(false);
+    const [showCredits, setShowCredits] = useState(false);
 
     const currentScene = (scene: Phaser.Scene) => {
         console.log("Current scene:", scene.scene.key);
@@ -89,15 +96,84 @@ function App() {
         return () => window.removeEventListener("keydown", handleKeyPress);
     }, [showPauseMenu, showInventory, showQuestLog]);
 
+    // Initialize audio manager
+    useEffect(() => {
+        const initAudio = async () => {
+            try {
+                await audioManager.initialize();
+                audioManager.playLevelMusic("MainMenu");
+            } catch (error) {
+                console.warn("Audio initialization failed:", error);
+            }
+        };
+
+        // Initialize audio on first user interaction
+        const handleFirstInteraction = () => {
+            initAudio();
+            document.removeEventListener("click", handleFirstInteraction);
+            document.removeEventListener("keydown", handleFirstInteraction);
+        };
+
+        document.addEventListener("click", handleFirstInteraction);
+        document.addEventListener("keydown", handleFirstInteraction);
+
+        return () => {
+            document.removeEventListener("click", handleFirstInteraction);
+            document.removeEventListener("keydown", handleFirstInteraction);
+        };
+    }, []);
+
     // Game flow handlers
     const handleStartGame = () => {
+        audioManager.playEffect("button-click");
+        // Don't start level music here - wait until character is created and scene starts
         setShowMainMenu(false);
         setShowCharacterCreation(true);
+    };
+
+    const handleLoadGame = () => {
+        audioManager.playEffect("button-click");
+        const savedProgress = localStorage.getItem("civika-game-progress");
+        if (savedProgress) {
+            try {
+                const progress = JSON.parse(savedProgress);
+                const playerName = progress.playerName || "Citizen";
+                handleCharacterCreated(playerName, "default");
+            } catch (error) {
+                console.error("Failed to load game:", error);
+                alert("Failed to load saved game. Please start a new game.");
+            }
+        } else {
+            alert("No saved game found! Start a new game first.");
+        }
+    };
+
+    const handleShowSettings = () => {
+        audioManager.playEffect("menu-open");
+        setShowSettings(true);
+    };
+
+    const handleShowExtras = () => {
+        audioManager.playEffect("menu-open");
+        setShowExtras(true);
+    };
+
+    const handleShowCredits = () => {
+        audioManager.playEffect("menu-open");
+        setShowCredits(true);
+    };
+
+    const handleExit = () => {
+        audioManager.playEffect("button-click");
+        // Exit functionality is handled in MainMenu component
     };
 
     const handleCharacterCreated = (name: string, color: string) => {
         console.log("Character created:", name, color);
         setShowCharacterCreation(false);
+
+        // Stop any current music to ensure clean transition
+        audioManager.stopMusic();
 
         // Initialize game state with validation
         const progress = gameStateManager.current.initializeGame(name);
@@ -149,6 +225,12 @@ function App() {
                 console.log(
                     `Starting ${startScene} scene for Level ${progress.level}...`
                 );
+
+                // Play level-specific music
+                audioManager.crossfadeToLevel(
+                    startScene as "BarangayMap" | "CityMap"
+                );
+
                 phaserRef.current.game.scene.start(startScene);
                 console.log(`${startScene} scene started successfully`);
 
@@ -246,6 +328,9 @@ function App() {
                         const leveledUp = progress.level > gameInfo.level;
 
                         if (leveledUp) {
+                            // Play level up sound effect
+                            audioManager.playEffect("level-up");
+
                             // Show level up notification and transition to new scene
                             setTimeout(() => {
                                 showGameNotification({
@@ -275,6 +360,9 @@ function App() {
                                                     console.log(
                                                         "Transitioning to CityMap for Level 2..."
                                                     );
+                                                    audioManager.crossfadeToLevel(
+                                                        "CityMap"
+                                                    );
                                                     phaserRef.current.game.scene.start(
                                                         "CityMap"
                                                     );
@@ -286,6 +374,11 @@ function App() {
                                 });
                             }, 2000); // Show after mission completion notification
                         }
+
+                        // Play mission completion sounds
+                        audioManager.playEffect("mission-complete");
+                        audioManager.playEffect("badge-earned");
+                        audioManager.playEffect("coin-collect");
 
                         showGameNotification({
                             type: "success",
@@ -311,6 +404,10 @@ function App() {
                     console.log(
                         `Quiz failed for mission ${missionId}. Try again!`
                     );
+
+                    // Play quiz wrong sound effect
+                    audioManager.playEffect("quiz-wrong");
+
                     showGameNotification({
                         type: "warning",
                         title: "Quiz Failed",
@@ -324,6 +421,9 @@ function App() {
                             },
                         ],
                     });
+                } else {
+                    // Correct answer but mission not completed (shouldn't happen in current logic)
+                    audioManager.playEffect("quiz-correct");
                 }
             } catch (error) {
                 console.error("Error handling quiz answer:", error);
@@ -357,6 +457,9 @@ function App() {
             setShowMission(false);
             setShowQuiz(true);
             setCurrentQuiz(getQuizForMission(currentMission.id));
+
+            // Play quiz start music
+            audioManager.crossfadeToLevel("Quiz");
         }
     };
 
@@ -763,20 +866,38 @@ function App() {
             showGameNotification(data);
         };
 
+        const handleOpenQuestLog = () => {
+            console.log("Quest Log open event received");
+            setShowQuestLog(true);
+            // Close any open notification when quest log opens
+            closeNotification();
+        };
+
         // Listen for events using EventBus
         EventBus.on("show-mission", handleShowMission);
         EventBus.on("show-notification", handleGameNotification);
+        EventBus.on("open-quest-log", handleOpenQuestLog);
 
         return () => {
             EventBus.off("show-mission", handleShowMission);
             EventBus.off("show-notification", handleGameNotification);
+            EventBus.off("open-quest-log", handleOpenQuestLog);
         };
     }, []);
 
     return (
         <div className="relative w-screen h-screen overflow-hidden bg-gradient-to-br from-sky-300 via-blue-200 to-green-300">
             {/* React UI Components */}
-            {showMainMenu && <MainMenu onStartGame={handleStartGame} />}
+            {showMainMenu && (
+                <MainMenu
+                    onStartGame={handleStartGame}
+                    onLoadGame={handleLoadGame}
+                    onShowSettings={handleShowSettings}
+                    onShowExtras={handleShowExtras}
+                    onShowCredits={handleShowCredits}
+                    onExit={handleExit}
+                />
+            )}
             {showCharacterCreation && (
                 <div>
                     <div className="fixed top-4 left-4 bg-red-500 text-white p-2 rounded z-50">
@@ -885,7 +1006,7 @@ function App() {
                                 </div>
 
                                 {/* Debug button - hidden on mobile */}
-                                <button
+                                {/* <button
                                     onClick={() => {
                                         console.log(
                                             "Manual BarangayMap start..."
@@ -899,7 +1020,7 @@ function App() {
                                     className="hidden md:block text-xs font-bold text-amber-800 game-element-border rounded px-1 py-0.5 text-center hover:bg-red-600 hover:text-white transition-all duration-200"
                                 >
                                     🔧
-                                </button>
+                                </button> */}
                             </div>
                         </div>
 
@@ -1323,6 +1444,33 @@ function App() {
                 notification={notification}
                 onClose={closeNotification}
                 isVisible={showNotification}
+            />
+
+            {/* Settings Modal */}
+            <Settings
+                onClose={() => {
+                    audioManager.playEffect("menu-close");
+                    setShowSettings(false);
+                }}
+                isVisible={showSettings}
+            />
+
+            {/* Extras Modal */}
+            <Extras
+                onClose={() => {
+                    audioManager.playEffect("menu-close");
+                    setShowExtras(false);
+                }}
+                isVisible={showExtras}
+            />
+
+            {/* Credits Modal */}
+            <Credits
+                onClose={() => {
+                    audioManager.playEffect("menu-close");
+                    setShowCredits(false);
+                }}
+                isVisible={showCredits}
             />
 
             {/* Debug Panel for Development */}

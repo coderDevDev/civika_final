@@ -28,6 +28,9 @@ export class CityMap extends Scene {
     // Mission indicators for real-time updates
     missionIndicators: Map<number, any> = new Map();
 
+    // NPC glow effects for interaction feedback
+    npcGlowEffects: Map<number, any> = new Map();
+
     // Level 2 City Mission locations
     missionLocations = [
         {
@@ -1032,7 +1035,10 @@ export class CityMap extends Scene {
                 actions: [
                     {
                         label: "Check Prerequisites",
-                        action: () => {},
+                        action: () => {
+                            // Emit event to open Quest Log
+                            EventBus.emit("open-quest-log");
+                        },
                         style: "secondary",
                     },
                 ],

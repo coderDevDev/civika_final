@@ -37,6 +37,9 @@ export class BarangayMap extends Scene {
     // Mission indicators for real-time updates
     missionIndicators: Map<number, any> = new Map();
 
+    // NPC glow effects for interaction feedback
+    npcGlowEffects: Map<number, any> = new Map();
+
     // Mission locations with tile coordinates
     missionLocations = [
         {
@@ -263,7 +266,7 @@ export class BarangayMap extends Scene {
             const indicator = this.missionIndicators.get(location.missionId);
 
             if (indicator) {
-                let indicatorText = "!";
+                let indicatorText = `Mission #${location.missionId}`;
                 let indicatorColor = "#FFD700"; // Gold for available
 
                 if (gameStateManager.isMissionCompleted(location.missionId)) {
@@ -282,6 +285,61 @@ export class BarangayMap extends Scene {
         });
 
         console.log("NPC indicators updated in real-time");
+    }
+
+    // Method to activate/deactivate NPC glow effect
+    activateNPCGlow(missionId: number, activate: boolean) {
+        const glowData = this.npcGlowEffects.get(missionId);
+        if (!glowData) return;
+
+        const { interactiveGlow, npc } = glowData;
+
+        if (activate && !glowData.isAnimating) {
+            // Start glowing animation
+            interactiveGlow.setVisible(true);
+            glowData.isAnimating = true;
+
+            // Create pulsing glow animation
+            glowData.animationTween = this.tweens.add({
+                targets: interactiveGlow,
+                alpha: { from: 0.3, to: 0.8 },
+                scaleX: { from: 1, to: 1.2 },
+                scaleY: { from: 1, to: 1.2 },
+                duration: 800,
+                ease: "Sine.easeInOut",
+                yoyo: true,
+                repeat: -1,
+                onStart: () => {
+                    console.log(`Activated glow for NPC Mission #${missionId}`);
+                },
+            });
+
+            // Add slight NPC highlight effect
+            this.tweens.add({
+                targets: npc,
+                alpha: { from: 1, to: 0.9 },
+                duration: 400,
+                ease: "Sine.easeInOut",
+                yoyo: true,
+                repeat: -1,
+            });
+        } else if (!activate && glowData.isAnimating) {
+            // Stop glowing animation
+            interactiveGlow.setVisible(false);
+            glowData.isAnimating = false;
+
+            // Stop and cleanup animations
+            if (glowData.animationTween) {
+                glowData.animationTween.destroy();
+                glowData.animationTween = null;
+            }
+
+            // Stop NPC highlight effect
+            this.tweens.killTweensOf(npc);
+            npc.setAlpha(1); // Reset NPC alpha
+
+            console.log(`Deactivated glow for NPC Mission #${missionId}`);
+        }
     }
 
     // Method to ensure camera follows player
@@ -1378,23 +1436,43 @@ export class BarangayMap extends Scene {
             this.missionIndicators.set(location.missionId, missionIndicator);
 
             // Add mission number beside NPC name
-            const missionNumber = this.add
-                .text(worldX - 35, worldY - 35, `#${location.missionId}`, {
-                    fontFamily: "Arial Black",
-                    fontSize: 12,
-                    color: "#FFD700",
-                    stroke: "#000000",
-                    strokeThickness: 2,
-                    align: "center",
-                    backgroundColor: "#8B4513",
-                    padding: { x: 4, y: 2 },
-                })
-                .setOrigin(0.5)
-                .setDepth(100);
+            // const missionNumber = this.add
+            //     .text(worldX - 35, worldY - 35, `#${location.missionId}`, {
+            //         fontFamily: "Arial Black",
+            //         fontSize: 12,
+            //         color: "#FFD700",
+            //         stroke: "#000000",
+            //         strokeThickness: 2,
+            //         align: "center",
+            //         backgroundColor: "#8B4513",
+            //         padding: { x: 4, y: 2 },
+            //     })
+            //     .setOrigin(0.5)
+            //     .setDepth(100);
 
-            // Add a subtle glow effect around NPCs
-            const glow = this.add.circle(worldX, worldY, 25, 0x4169e1, 0.1);
-            glow.setDepth(-1);
+            // Add a subtle base glow effect around NPCs
+            const baseGlow = this.add.circle(worldX, worldY, 25, 0x4169e1, 0.1);
+            baseGlow.setDepth(-1);
+
+            // Create interactive glow effect (initially invisible)
+            const interactiveGlow = this.add.circle(
+                worldX,
+                worldY,
+                35,
+                0xffd700,
+                0
+            );
+            interactiveGlow.setDepth(-1);
+            interactiveGlow.setVisible(false);
+
+            // Store reference for real-time interaction feedback
+            this.npcGlowEffects.set(location.missionId, {
+                baseGlow,
+                interactiveGlow,
+                npc,
+                isAnimating: false,
+                animationTween: null,
+            });
 
             // Store mission data and original position on NPC
             npc.setData("missionData", location);
@@ -1938,6 +2016,7 @@ export class BarangayMap extends Scene {
     checkForNearbyNPCs() {
         let nearestNPC = null;
         let nearestDistance = 100; // Interaction range
+        let nearestMissionId = null;
 
         this.npcs.children.entries.forEach((npc: any) => {
             const distance = Phaser.Math.Distance.Between(
@@ -1950,19 +2029,42 @@ export class BarangayMap extends Scene {
             if (distance < nearestDistance) {
                 nearestDistance = distance;
                 nearestNPC = npc;
+                nearestMissionId = npc.getData("missionData")?.missionId;
             }
         });
 
+        // Check if we have a new nearby NPC
+        const currentNearbyMissionId =
+            this.nearbyNPC?.getData("missionData")?.missionId;
+
         // Increased interaction range to make it easier to trigger
         if (nearestNPC && nearestDistance < 80) {
+            // New NPC detected - activate glow
+            if (currentNearbyMissionId !== nearestMissionId) {
+                // Deactivate previous NPC glow if exists
+                if (currentNearbyMissionId) {
+                    this.activateNPCGlow(currentNearbyMissionId, false);
+                }
+
+                // Activate new NPC glow
+                if (nearestMissionId) {
+                    this.activateNPCGlow(nearestMissionId, true);
+                }
+            }
+
             this.nearbyNPC = nearestNPC;
             this.interactionPrompt.setVisible(true);
             console.log(
                 `Interaction prompt shown for ${
                     nearestNPC.getData("missionData")?.npc || "NPC"
-                } at distance ${nearestDistance.toFixed(1)}`
+                } at distance ${nearestDistance.toFixed(1)} - Glow activated`
             );
         } else {
+            // No nearby NPC - deactivate glow and hide prompt
+            if (currentNearbyMissionId) {
+                this.activateNPCGlow(currentNearbyMissionId, false);
+            }
+
             this.nearbyNPC = null;
             this.interactionPrompt.setVisible(false);
         }
@@ -2012,7 +2114,10 @@ export class BarangayMap extends Scene {
                 actions: [
                     {
                         label: "Check Available Missions",
-                        action: () => {}, // Will be handled by the notification component
+                        action: () => {
+                            // Emit event to open Quest Log
+                            EventBus.emit("open-quest-log");
+                        },
                         style: "secondary",
                     },
                 ],

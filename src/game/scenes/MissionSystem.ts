@@ -150,7 +150,7 @@ export class MissionSystem extends Scene {
         },
         9: {
             name: "Kabataang Kalusugan",
-            npc: "Barangay Health Worker",
+            npc: "Barangay Health Workessr",
             description: "Distribute vitamins and create awareness posters.",
             reward: "Health Advocate Badge + bonus healing item",
             task: "Distribute vitamins and create health posters",
