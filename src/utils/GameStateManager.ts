@@ -314,6 +314,163 @@ export class GameStateManager {
     }
 
     /**
+     * Collect an item and update progress
+     */
+    public collectItem(itemId: string, coins: number, points: number): boolean {
+        if (!this.gameProgress) {
+            console.error("Game not initialized");
+            return false;
+        }
+
+        // Ensure collectibles arrays exist
+        if (!this.gameProgress.collectedItems) {
+            this.gameProgress.collectedItems = [];
+        }
+        if (this.gameProgress.totalItemsCollected === undefined) {
+            this.gameProgress.totalItemsCollected = 0;
+        }
+
+        // Check if item already collected
+        if (this.gameProgress.collectedItems.includes(itemId)) {
+            console.log(`Item ${itemId} already collected`);
+            return false;
+        }
+
+        // Add item to collected list
+        this.gameProgress.collectedItems.push(itemId);
+        this.gameProgress.totalItemsCollected += 1;
+        this.gameProgress.coins += coins;
+        this.gameProgress.totalScore += points;
+        this.gameProgress.lastPlayedDate = new Date().toISOString();
+
+        console.log(
+            `Collected item ${itemId}: +${coins} coins, +${points} points`
+        );
+
+        // Save and notify
+        this.saveProgress();
+        this.notifyListeners();
+
+        return true;
+    }
+
+    /**
+     * Check if an item has been collected
+     */
+    public isItemCollected(itemId: string): boolean {
+        if (!this.gameProgress || !this.gameProgress.collectedItems) {
+            return false;
+        }
+        return this.gameProgress.collectedItems.includes(itemId);
+    }
+
+    /**
+     * Get total collected items count
+     */
+    public getTotalCollectedItems(): number {
+        if (!this.gameProgress) return 0;
+        return this.gameProgress.totalItemsCollected || 0;
+    }
+
+    /**
+     * Get all collected items
+     */
+    public getCollectedItems(): string[] {
+        if (!this.gameProgress || !this.gameProgress.collectedItems) {
+            return [];
+        }
+        return [...this.gameProgress.collectedItems];
+    }
+
+    /**
+     * Record speed challenge performance
+     */
+    public recordSpeedChallenge(timeSpent: number): void {
+        if (!this.gameProgress) return;
+
+        // Initialize if not exists
+        if (!this.gameProgress.speedChallenges) {
+            this.gameProgress.speedChallenges = {
+                excellentAnswers: 0,
+                greatAnswers: 0,
+                goodAnswers: 0,
+            };
+        }
+
+        // Track speed category
+        if (timeSpent <= 10) {
+            this.gameProgress.speedChallenges.excellentAnswers += 1;
+        } else if (timeSpent <= 20) {
+            this.gameProgress.speedChallenges.greatAnswers += 1;
+        } else if (timeSpent <= 30) {
+            this.gameProgress.speedChallenges.goodAnswers += 1;
+        }
+
+        // Track fastest time
+        if (
+            !this.gameProgress.fastestQuizTime ||
+            timeSpent < this.gameProgress.fastestQuizTime
+        ) {
+            this.gameProgress.fastestQuizTime = timeSpent;
+        }
+
+        this.saveProgress();
+        console.log(`Speed challenge recorded: ${timeSpent}s`);
+    }
+
+    /**
+     * Get speed challenge statistics
+     */
+    public getSpeedChallengeStats(): any {
+        if (!this.gameProgress || !this.gameProgress.speedChallenges) {
+            return {
+                excellentAnswers: 0,
+                greatAnswers: 0,
+                goodAnswers: 0,
+                fastestTime: Infinity,
+            };
+        }
+
+        return {
+            excellentAnswers:
+                this.gameProgress.speedChallenges.excellentAnswers,
+            greatAnswers: this.gameProgress.speedChallenges.greatAnswers,
+            goodAnswers: this.gameProgress.speedChallenges.goodAnswers,
+            fastestTime: this.gameProgress.fastestQuizTime || Infinity,
+        };
+    }
+
+    /**
+     * Check for speed challenge achievements
+     */
+    public checkSpeedAchievements(): string[] {
+        const achievements: string[] = [];
+        const stats = this.getSpeedChallengeStats();
+
+        // Speed Demon: 5 excellent answers
+        if (stats.excellentAnswers >= 5) {
+            achievements.push("Speed Demon");
+        }
+
+        // Quick Thinker: 10 great answers
+        if (stats.greatAnswers >= 10) {
+            achievements.push("Quick Thinker");
+        }
+
+        // Lightning Fast: Answer in under 5 seconds
+        if (stats.fastestTime < 5) {
+            achievements.push("Lightning Fast");
+        }
+
+        // Perfect Speed: 10 excellent answers
+        if (stats.excellentAnswers >= 10) {
+            achievements.push("Perfect Speed");
+        }
+
+        return achievements;
+    }
+
+    /**
      * Get debug information
      */
     public getDebugInfo(): any {
@@ -323,6 +480,8 @@ export class GameStateManager {
             isValid: this.validateCurrentState(),
             availableMissions: this.getAvailableMissions(),
             stats: this.getPlayerStats(),
+            collectedItems: this.getTotalCollectedItems(),
+            speedChallenges: this.getSpeedChallengeStats(),
         };
     }
 }

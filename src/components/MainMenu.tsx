@@ -6,6 +6,7 @@ interface MainMenuProps {
     onShowSettings?: () => void;
     onShowExtras?: () => void;
     onShowCredits?: () => void;
+    onShowLeaderboard?: () => void;
     onExit?: () => void;
 }
 
@@ -15,6 +16,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     onShowSettings,
     onShowExtras,
     onShowCredits,
+    onShowLeaderboard,
     onExit,
 }) => {
     const [showSubMenu, setShowSubMenu] = useState<string | null>(null);
@@ -130,6 +132,17 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                                 <div className="text-white font-bold text-sm sm:text-base md:text-lg flex items-center justify-center space-x-1 sm:space-x-2">
                                     <span>⚙️</span>
                                     <span>Settings</span>
+                                </div>
+                            </button>
+
+                            {/* Leaderboard Button */}
+                            <button
+                                onClick={() => onShowLeaderboard?.()}
+                                className="game-button-frame px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-full transition-all duration-200 hover:scale-105 game-glow w-full"
+                            >
+                                <div className="text-white font-bold text-sm sm:text-base md:text-lg flex items-center justify-center space-x-1 sm:space-x-2">
+                                    <span>🏆</span>
+                                    <span>Leaderboard</span>
                                 </div>
                             </button>
 

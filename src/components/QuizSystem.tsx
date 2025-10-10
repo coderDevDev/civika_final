@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface QuizQuestion {
     question: string;
@@ -26,6 +26,51 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({
     const [submissionTime, setSubmissionTime] = useState<number>(0);
     const [startTime] = useState<number>(Date.now());
 
+    // Timer system
+    const QUIZ_TIME_LIMIT = 60; // 60 seconds per quiz
+    const [timeRemaining, setTimeRemaining] = useState(QUIZ_TIME_LIMIT);
+    const [isTimerRunning, setIsTimerRunning] = useState(true);
+    const [timeBonus, setTimeBonus] = useState(0);
+
+    // Countdown timer effect
+    useEffect(() => {
+        if (!isTimerRunning || showResult) return;
+
+        const timerInterval = setInterval(() => {
+            setTimeRemaining((prev) => {
+                if (prev <= 1) {
+                    // Time's up! Auto-submit or fail
+                    clearInterval(timerInterval);
+                    setIsTimerRunning(false);
+                    handleTimeUp();
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(timerInterval);
+    }, [isTimerRunning, showResult]);
+
+    // Calculate time bonus based on remaining time
+    const calculateTimeBonus = (remainingTime: number): number => {
+        if (remainingTime >= 50) return 30; // Answered in 10s or less - Excellent!
+        if (remainingTime >= 40) return 20; // Answered in 20s or less - Great!
+        if (remainingTime >= 30) return 10; // Answered in 30s or less - Good!
+        return 0; // No bonus
+    };
+
+    const handleTimeUp = () => {
+        // Time ran out - auto-fail
+        setIsCorrect(false);
+        setSubmissionTime(QUIZ_TIME_LIMIT);
+        setShowResult(true);
+        setTimeBonus(0);
+
+        console.log("Quiz time expired - auto-failed");
+        onAnswer(false);
+    };
+
     const handleOptionSelect = (index: number) => {
         if (!showResult) {
             setSelectedOption(index);
@@ -34,8 +79,15 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({
 
     const handleSubmit = () => {
         if (selectedOption !== null) {
+            // Stop the timer
+            setIsTimerRunning(false);
+
             const correct = selectedOption === question.correctAnswer;
             const timeSpent = (Date.now() - startTime) / 1000;
+
+            // Calculate time bonus
+            const bonus = correct ? calculateTimeBonus(timeRemaining) : 0;
+            setTimeBonus(bonus);
 
             setIsCorrect(correct);
             setSubmissionTime(timeSpent);
@@ -48,6 +100,8 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({
                 correctAnswer: question.correctAnswer,
                 isCorrect: correct,
                 timeSpent: Math.round(timeSpent),
+                timeRemaining,
+                timeBonus: bonus,
             });
 
             onAnswer(correct);
@@ -57,6 +111,32 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({
     const handleNext = () => {
         onClose();
     };
+
+    // Helper function to get timer color based on time remaining
+    const getTimerColor = () => {
+        if (timeRemaining <= 10) return "text-red-600 animate-pulse";
+        if (timeRemaining <= 20) return "text-orange-600";
+        if (timeRemaining <= 30) return "text-yellow-600";
+        return "text-green-600";
+    };
+
+    // Helper function to get timer background color
+    const getTimerBgColor = () => {
+        if (timeRemaining <= 10) return "bg-red-100 border-red-500";
+        if (timeRemaining <= 20) return "bg-orange-100 border-orange-500";
+        if (timeRemaining <= 30) return "bg-yellow-100 border-yellow-500";
+        return "bg-green-100 border-green-500";
+    };
+
+    // Helper function to get progress bar color
+    const getProgressBarColor = () => {
+        if (timeRemaining <= 10) return "bg-red-600";
+        if (timeRemaining <= 20) return "bg-orange-500";
+        if (timeRemaining <= 30) return "bg-yellow-500";
+        return "bg-green-500";
+    };
+
+    const timePercentage = (timeRemaining / QUIZ_TIME_LIMIT) * 100;
 
     return (
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
@@ -71,6 +151,42 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({
 
                     {/* Parchment content */}
                     <div className="parchment-bg rounded-md p-3 sm:p-6 relative">
+                        {/* Timer Display - Prominent */}
+                        {!showResult && (
+                            <div
+                                className={`mb-4 p-3 sm:p-4 rounded-lg border-3 game-element-border ${getTimerBgColor()} transition-all duration-300`}
+                            >
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center space-x-2">
+                                        <span className="text-2xl sm:text-3xl">
+                                            ⏱️
+                                        </span>
+                                        <span
+                                            className={`text-xl sm:text-3xl font-bold ${getTimerColor()} transition-colors duration-300`}
+                                        >
+                                            {timeRemaining}s
+                                        </span>
+                                    </div>
+                                    <div className="text-xs sm:text-sm font-semibold text-amber-800">
+                                        {timeRemaining <= 10
+                                            ? "⚠️ HURRY!"
+                                            : timeRemaining <= 20
+                                            ? "⏰ Time Running Out!"
+                                            : timeRemaining <= 30
+                                            ? "⏳ Keep Going!"
+                                            : "💪 You Got This!"}
+                                    </div>
+                                </div>
+                                {/* Progress Bar */}
+                                <div className="w-full bg-gray-300 rounded-full h-2 sm:h-3 border-2 border-gray-400 overflow-hidden">
+                                    <div
+                                        className={`h-full ${getProgressBarColor()} transition-all duration-1000 ease-linear`}
+                                        style={{ width: `${timePercentage}%` }}
+                                    ></div>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Header */}
                         <div className="flex justify-between items-center mb-4 sm:mb-6">
                             <h2 className="text-lg sm:text-2xl font-bold text-amber-900 game-element-border rounded-md py-1 sm:py-2 px-2 sm:px-4">
@@ -204,7 +320,11 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({
                                                 }`}
                                             >
                                                 {isCorrect
-                                                    ? "Great job! You earned points and coins!"
+                                                    ? timeBonus > 0
+                                                        ? `Excellent! You earned bonus points for quick thinking! +${timeBonus} time bonus!`
+                                                        : "Great job! You earned points and coins!"
+                                                    : timeRemaining === 0
+                                                    ? "⏰ Time's up! The quiz failed due to timeout."
                                                     : `The correct answer was: ${
                                                           question.options[
                                                               question
@@ -212,13 +332,31 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({
                                                           ]
                                                       }`}
                                             </p>
-                                            <p className="text-xs text-gray-600">
-                                                Time:{" "}
-                                                {Math.round(submissionTime)}s
-                                                {submissionTime <= 30 &&
-                                                    isCorrect &&
-                                                    " (⚡ Speed bonus!)"}
-                                            </p>
+                                            <div className="flex flex-col space-y-1">
+                                                <p className="text-xs sm:text-sm text-gray-600">
+                                                    ⏱️ Time Taken:{" "}
+                                                    {Math.round(submissionTime)}
+                                                    s / {QUIZ_TIME_LIMIT}s
+                                                </p>
+                                                {isCorrect && timeBonus > 0 && (
+                                                    <p className="text-xs sm:text-sm text-green-600 font-bold flex items-center space-x-1">
+                                                        <span>⚡</span>
+                                                        <span>
+                                                            Speed Bonus: +
+                                                            {timeBonus} points!
+                                                        </span>
+                                                    </p>
+                                                )}
+                                                {isCorrect &&
+                                                    timeBonus === 0 &&
+                                                    timeRemaining > 0 && (
+                                                        <p className="text-xs sm:text-sm text-amber-600">
+                                                            💡 Tip: Answer
+                                                            faster (within 30s)
+                                                            for bonus points!
+                                                        </p>
+                                                    )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

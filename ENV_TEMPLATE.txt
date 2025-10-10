@@ -1,0 +1,21 @@
+# ==========================================
+# CIVIKA Environment Variables Template
+# ==========================================
+# Instructions:
+# 1. Create a new file named ".env.local" in the project root
+# 2. Copy the lines below to .env.local
+# 3. Replace the placeholder values with your actual Supabase credentials
+# 4. Restart your development server (npm run dev)
+
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url_here
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+
+# Get these values from:
+# 1. Go to https://supabase.com
+# 2. Select your project
+# 3. Go to Project Settings → API
+# 4. Copy Project URL and anon/public key
+
+# ⚠️ IMPORTANT: Never commit .env.local to version control!
+

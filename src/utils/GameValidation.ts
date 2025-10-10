@@ -15,6 +15,16 @@ export interface GameProgress {
     totalQuestions: number;
     lastPlayedDate: string;
     playtime: number; // in minutes
+    collectedItems?: string[]; // IDs of collected items (e.g., "barangay-coin-1", "city-badge-2")
+    totalItemsCollected?: number; // Total count of all collected items
+    speedChallenges?: {
+        excellentAnswers: number; // Answered in ≤10s
+        greatAnswers: number; // Answered in ≤20s
+        goodAnswers: number; // Answered in ≤30s
+    };
+    fastestQuizTime?: number; // Fastest quiz completion time
+    purchasedItems?: string[]; // IDs of purchased shop items
+    npcRewardsReceived?: string[]; // IDs of NPC rewards already claimed
 }
 
 export interface MissionReward {
@@ -33,6 +43,19 @@ export interface QuizResult {
     isCorrect: boolean;
     timeSpent: number;
     points: number;
+}
+
+export interface CollectibleItem {
+    id: string;
+    type: "coin" | "badge" | "powerup" | "treasure";
+    name: string;
+    description: string;
+    value: number; // coins awarded
+    points: number; // score points awarded
+    rarity: "common" | "uncommon" | "rare" | "legendary";
+    percentX: number; // Background-relative X position
+    percentY: number; // Background-relative Y position
+    icon: string; // Emoji or sprite key
 }
 
 export class GameValidation {
@@ -179,8 +202,12 @@ export class GameValidation {
     private static readonly QUIZ_SCORING = {
         CORRECT_ANSWER: 50,
         PERFECT_SCORE_BONUS: 25, // Bonus for getting all questions correct
-        TIME_BONUS_THRESHOLD: 30, // seconds
-        TIME_BONUS: 10,
+        TIME_BONUS_THRESHOLDS: {
+            EXCELLENT: { maxTime: 10, bonus: 30 }, // Answer in 10s or less
+            GREAT: { maxTime: 20, bonus: 20 }, // Answer in 20s or less
+            GOOD: { maxTime: 30, bonus: 10 }, // Answer in 30s or less
+        },
+        QUIZ_TIME_LIMIT: 60, // Maximum time allowed per quiz (seconds)
     };
 
     private static readonly PROGRESSION_REQUIREMENTS = {
@@ -210,6 +237,14 @@ export class GameValidation {
             totalQuestions: 0,
             lastPlayedDate: new Date().toISOString(),
             playtime: 0,
+            collectedItems: [], // Initialize empty collectibles array
+            totalItemsCollected: 0, // Initialize item count
+            speedChallenges: {
+                excellentAnswers: 0,
+                greatAnswers: 0,
+                goodAnswers: 0,
+            },
+            fastestQuizTime: Infinity,
         };
     }
 
@@ -228,9 +263,32 @@ export class GameValidation {
         if (isCorrect) {
             points = this.QUIZ_SCORING.CORRECT_ANSWER;
 
-            // Time bonus for quick answers
-            if (timeSpent <= this.QUIZ_SCORING.TIME_BONUS_THRESHOLD) {
-                points += this.QUIZ_SCORING.TIME_BONUS;
+            // Tiered time bonus for quick answers
+            if (
+                timeSpent <=
+                this.QUIZ_SCORING.TIME_BONUS_THRESHOLDS.EXCELLENT.maxTime
+            ) {
+                points +=
+                    this.QUIZ_SCORING.TIME_BONUS_THRESHOLDS.EXCELLENT.bonus;
+                console.log(
+                    `⚡ EXCELLENT speed bonus: +${this.QUIZ_SCORING.TIME_BONUS_THRESHOLDS.EXCELLENT.bonus} points!`
+                );
+            } else if (
+                timeSpent <=
+                this.QUIZ_SCORING.TIME_BONUS_THRESHOLDS.GREAT.maxTime
+            ) {
+                points += this.QUIZ_SCORING.TIME_BONUS_THRESHOLDS.GREAT.bonus;
+                console.log(
+                    `⚡ GREAT speed bonus: +${this.QUIZ_SCORING.TIME_BONUS_THRESHOLDS.GREAT.bonus} points!`
+                );
+            } else if (
+                timeSpent <=
+                this.QUIZ_SCORING.TIME_BONUS_THRESHOLDS.GOOD.maxTime
+            ) {
+                points += this.QUIZ_SCORING.TIME_BONUS_THRESHOLDS.GOOD.bonus;
+                console.log(
+                    `⚡ GOOD speed bonus: +${this.QUIZ_SCORING.TIME_BONUS_THRESHOLDS.GOOD.bonus} points!`
+                );
             }
         }
 

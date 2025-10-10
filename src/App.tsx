@@ -10,6 +10,9 @@ import { GameDebugPanel } from "./components/GameDebugPanel";
 import { Settings } from "./components/Settings";
 import { Extras } from "./components/Extras";
 import { Credits } from "./components/Credits";
+import { Leaderboard } from "./components/Leaderboard";
+import { Shop } from "./components/Shop";
+import { DailyChallenges } from "./components/DailyChallenges";
 import {
     GameNotification,
     NotificationData,
@@ -18,6 +21,8 @@ import { EventBus } from "./game/EventBus";
 import { GameStateManager } from "./utils/GameStateManager";
 import { GameProgress } from "./utils/GameValidation";
 import { audioManager } from "./utils/AudioManager";
+import LeaderboardService from "./services/LeaderboardService";
+import ShopService from "./services/ShopService";
 
 function App() {
     const phaserRef = useRef<IRefPhaserGame | null>(null);
@@ -49,6 +54,11 @@ function App() {
     const [showSettings, setShowSettings] = useState(false);
     const [showExtras, setShowExtras] = useState(false);
     const [showCredits, setShowCredits] = useState(false);
+    const [showLeaderboard, setShowLeaderboard] = useState(false);
+    const [showShop, setShowShop] = useState(false);
+    const [showDailyChallenges, setShowDailyChallenges] = useState(false);
+    const leaderboardService = useRef(LeaderboardService.getInstance());
+    const shopService = useRef(ShopService.getInstance());
 
     const currentScene = (scene: Phaser.Scene) => {
         console.log("Current scene:", scene.scene.key);
@@ -161,6 +171,11 @@ function App() {
     const handleShowCredits = () => {
         audioManager.playEffect("menu-open");
         setShowCredits(true);
+    };
+
+    const handleShowLeaderboard = () => {
+        audioManager.playEffect("menu-open");
+        setShowLeaderboard(true);
     };
 
     const handleExit = () => {
@@ -311,6 +326,31 @@ function App() {
                     }
                 }
 
+                // Record speed challenge if answer is correct
+                if (isCorrect && result.timeSpent) {
+                    gameStateManager.current.recordSpeedChallenge(
+                        result.timeSpent
+                    );
+
+                    // Check for speed achievements
+                    const speedAchievements =
+                        gameStateManager.current.checkSpeedAchievements();
+                    if (speedAchievements.length > 0) {
+                        console.log(
+                            "Speed achievements earned:",
+                            speedAchievements
+                        );
+                    }
+
+                    // Update daily challenge progress for speed
+                    if (result.timeSpent <= 10) {
+                        shopService.current.updateChallengeProgress(
+                            "excellent quiz",
+                            1
+                        );
+                    }
+                }
+
                 // Show result feedback with notifications
                 if (updated) {
                     console.log(`Mission ${missionId} completed successfully!`);
@@ -379,6 +419,15 @@ function App() {
                         audioManager.playEffect("mission-complete");
                         audioManager.playEffect("badge-earned");
                         audioManager.playEffect("coin-collect");
+
+                        // Submit score to leaderboard
+                        leaderboardService.current.submitScore(progress);
+
+                        // Update daily challenge progress for missions
+                        shopService.current.updateChallengeProgress(
+                            "missions",
+                            1
+                        );
 
                         showGameNotification({
                             type: "success",
@@ -873,15 +922,22 @@ function App() {
             closeNotification();
         };
 
+        const handleDailyChallengeUpdate = (data: any) => {
+            console.log("Daily challenge update:", data);
+            shopService.current.updateChallengeProgress(data.type, data.amount);
+        };
+
         // Listen for events using EventBus
         EventBus.on("show-mission", handleShowMission);
         EventBus.on("show-notification", handleGameNotification);
         EventBus.on("open-quest-log", handleOpenQuestLog);
+        EventBus.on("update-daily-challenge", handleDailyChallengeUpdate);
 
         return () => {
             EventBus.off("show-mission", handleShowMission);
             EventBus.off("show-notification", handleGameNotification);
             EventBus.off("open-quest-log", handleOpenQuestLog);
+            EventBus.off("update-daily-challenge", handleDailyChallengeUpdate);
         };
     }, []);
 
@@ -895,6 +951,7 @@ function App() {
                     onShowSettings={handleShowSettings}
                     onShowExtras={handleShowExtras}
                     onShowCredits={handleShowCredits}
+                    onShowLeaderboard={handleShowLeaderboard}
                     onExit={handleExit}
                 />
             )}
@@ -1041,15 +1098,28 @@ function App() {
                                     </div>
                                 </button>
                                 <button
+                                    onClick={() => setShowShop(!showShop)}
+                                    className="game-button-frame px-2 py-1 rounded-lg transition-all duration-200 hover:scale-105 game-glow"
+                                >
+                                    <div className="text-white font-bold text-xs flex items-center space-x-1">
+                                        <span>🏪</span>
+                                        <span className="hidden sm:inline">
+                                            Shop
+                                        </span>
+                                    </div>
+                                </button>
+                                <button
                                     onClick={() =>
-                                        setShowInventory(!showInventory)
+                                        setShowDailyChallenges(
+                                            !showDailyChallenges
+                                        )
                                     }
                                     className="game-button-frame px-2 py-1 rounded-lg transition-all duration-200 hover:scale-105 game-glow"
                                 >
                                     <div className="text-white font-bold text-xs flex items-center space-x-1">
-                                        <span>🎒</span>
+                                        <span>📅</span>
                                         <span className="hidden sm:inline">
-                                            Items
+                                            Daily
                                         </span>
                                     </div>
                                 </button>
@@ -1117,14 +1187,55 @@ function App() {
                                                 </div>
                                             </button>
                                             <button
-                                                onClick={() =>
-                                                    setShowInventory(true)
-                                                }
+                                                onClick={() => {
+                                                    setShowPauseMenu(false);
+                                                    setShowInventory(true);
+                                                }}
                                                 className="w-full game-button-frame py-2 sm:py-3 px-3 sm:px-6 rounded-lg transition-all duration-200 font-bold hover:scale-105 game-glow"
                                             >
                                                 <div className="text-white flex items-center justify-center space-x-1 sm:space-x-2 text-sm sm:text-base">
                                                     <span>🎒</span>
                                                     <span>Inventory</span>
+                                                </div>
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setShowPauseMenu(false);
+                                                    setShowShop(true);
+                                                }}
+                                                className="w-full game-button-frame py-2 sm:py-3 px-3 sm:px-6 rounded-lg transition-all duration-200 font-bold hover:scale-105 game-glow"
+                                            >
+                                                <div className="text-white flex items-center justify-center space-x-1 sm:space-x-2 text-sm sm:text-base">
+                                                    <span>🏪</span>
+                                                    <span>Shop</span>
+                                                </div>
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setShowPauseMenu(false);
+                                                    setShowDailyChallenges(
+                                                        true
+                                                    );
+                                                }}
+                                                className="w-full game-button-frame py-2 sm:py-3 px-3 sm:px-6 rounded-lg transition-all duration-200 font-bold hover:scale-105 game-glow"
+                                            >
+                                                <div className="text-white flex items-center justify-center space-x-1 sm:space-x-2 text-sm sm:text-base">
+                                                    <span>📅</span>
+                                                    <span>
+                                                        Daily Challenges
+                                                    </span>
+                                                </div>
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setShowPauseMenu(false);
+                                                    setShowLeaderboard(true);
+                                                }}
+                                                className="w-full game-button-frame py-2 sm:py-3 px-3 sm:px-6 rounded-lg transition-all duration-200 font-bold hover:scale-105 game-glow"
+                                            >
+                                                <div className="text-white flex items-center justify-center space-x-1 sm:space-x-2 text-sm sm:text-base">
+                                                    <span>🏆</span>
+                                                    <span>Leaderboard</span>
                                                 </div>
                                             </button>
                                             <button
@@ -1471,6 +1582,33 @@ function App() {
                     setShowCredits(false);
                 }}
                 isVisible={showCredits}
+            />
+
+            {/* Leaderboard Modal */}
+            <Leaderboard
+                onClose={() => {
+                    audioManager.playEffect("menu-close");
+                    setShowLeaderboard(false);
+                }}
+                isVisible={showLeaderboard}
+            />
+
+            {/* Shop Modal */}
+            <Shop
+                onClose={() => {
+                    audioManager.playEffect("menu-close");
+                    setShowShop(false);
+                }}
+                isVisible={showShop}
+            />
+
+            {/* Daily Challenges Modal */}
+            <DailyChallenges
+                onClose={() => {
+                    audioManager.playEffect("menu-close");
+                    setShowDailyChallenges(false);
+                }}
+                isVisible={showDailyChallenges}
             />
 
             {/* Debug Panel for Development */}

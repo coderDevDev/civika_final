@@ -40,6 +40,20 @@ export class BarangayMap extends Scene {
     // NPC glow effects for interaction feedback
     npcGlowEffects: Map<number, any> = new Map();
 
+    // Location display above player head
+    locationDisplay: GameObjects.Text | null = null;
+
+    // Collectible items system
+    collectibles: Phaser.Physics.Arcade.Group | null = null;
+    collectibleItems: Map<string, any> = new Map(); // Store collectible sprites by ID
+
+    // Minimap/Radar system
+    minimap: GameObjects.Container | null = null;
+    minimapBackground: GameObjects.Graphics | null = null;
+    minimapPlayerDot: GameObjects.Circle | null = null;
+    minimapNPCDots: GameObjects.Circle[] = [];
+    minimapCollectibleDots: GameObjects.Circle[] = [];
+
     // Mission locations with tile coordinates
     missionLocations = [
         {
@@ -48,6 +62,8 @@ export class BarangayMap extends Scene {
             name: "Basura Patrol",
             npc: "Barangay Tanod",
             missionId: 1,
+            percentX: 87, // Background-relative percentage X
+            percentY: 52, // Background-relative percentage
         },
         {
             x: 12,
@@ -55,6 +71,8 @@ export class BarangayMap extends Scene {
             name: "Taga Rehistro",
             npc: "COMELEC Volunteer",
             missionId: 2,
+            percentX: 50, // Background-relative percentage X
+            percentY: 22, // Background-relative percentag
         },
         {
             x: 18,
@@ -62,6 +80,8 @@ export class BarangayMap extends Scene {
             name: "Kapitbahay Ko",
             npc: "Elderly Resident",
             missionId: 3,
+            percentX: 8, // Background-relative percentage X
+            percentY: 27, // Background-relative percentag
         },
         {
             x: 9,
@@ -69,6 +89,8 @@ export class BarangayMap extends Scene {
             name: "Ordinansa Time",
             npc: "Barangay Secretary",
             missionId: 4,
+            percentX: 40, // Background-relative percentage X
+            percentY: 22, // Background-relative percentag
         },
         {
             x: 21,
@@ -76,6 +98,8 @@ export class BarangayMap extends Scene {
             name: "Fake or Fact?",
             npc: "High School Student",
             missionId: 5,
+            percentX: 11, // Background-relative percentage X
+            percentY: 13, // Background-relative percentag
         },
         {
             x: 3,
@@ -83,6 +107,8 @@ export class BarangayMap extends Scene {
             name: "Serbisyo Seryoso",
             npc: "Construction Foreman",
             missionId: 6,
+            percentX: 10, // Background-relative percentage X
+            percentY: 67, // Background-relative percentag
         },
         {
             x: 15,
@@ -90,6 +116,8 @@ export class BarangayMap extends Scene {
             name: "Ayusin Natin 'To",
             npc: "Mediation Officer",
             missionId: 7,
+            percentX: 89, // Background-relative percentage X
+            percentY: 13, // Background-relative percentag
         },
         {
             x: 25,
@@ -97,6 +125,8 @@ export class BarangayMap extends Scene {
             name: "Civic Memory Hunt",
             npc: "Librarian",
             missionId: 8,
+            percentX: 72, // Background-relative percentage X
+            percentY: 22, // Background-relative percentage
         },
         {
             x: 6,
@@ -104,6 +134,8 @@ export class BarangayMap extends Scene {
             name: "Kabataang Kalusugan",
             npc: "Barangay Health Worker",
             missionId: 9,
+            percentX: 59, // Background-relative percentage X
+            percentY: 54, // Background-relative percentage Y
         },
         {
             x: 12,
@@ -111,6 +143,108 @@ export class BarangayMap extends Scene {
             name: "Pagpupulong ng Barangay",
             npc: "Barangay Captain",
             missionId: 10,
+            percentX: 29, // Background-relative percentage X
+            percentY: 21, // Background-relative percentage
+        },
+    ];
+
+    // Collectible items for Barangay (Level 1)
+    collectibleItemsData = [
+        {
+            id: "barangay-coin-1",
+            type: "coin",
+            name: "Civic Coin",
+            description: "A shiny coin representing civic pride",
+            value: 5,
+            points: 10,
+            rarity: "common",
+            percentX: 25,
+            percentY: 35,
+            icon: "💰",
+        },
+        {
+            id: "barangay-coin-2",
+            type: "coin",
+            name: "Civic Coin",
+            description: "A shiny coin representing civic pride",
+            value: 5,
+            points: 10,
+            rarity: "common",
+            percentX: 75,
+            percentY: 65,
+            icon: "💰",
+        },
+        {
+            id: "barangay-coin-3",
+            type: "coin",
+            name: "Civic Coin",
+            description: "A shiny coin representing civic pride",
+            value: 5,
+            points: 10,
+            rarity: "common",
+            percentX: 45,
+            percentY: 80,
+            icon: "💰",
+        },
+        {
+            id: "barangay-badge-1",
+            type: "badge",
+            name: "Community Badge",
+            description: "A special badge for active citizens",
+            value: 10,
+            points: 25,
+            rarity: "uncommon",
+            percentX: 15,
+            percentY: 50,
+            icon: "🏅",
+        },
+        {
+            id: "barangay-badge-2",
+            type: "badge",
+            name: "Community Badge",
+            description: "A special badge for active citizens",
+            value: 10,
+            points: 25,
+            rarity: "uncommon",
+            percentX: 85,
+            percentY: 35,
+            icon: "🏅",
+        },
+        {
+            id: "barangay-treasure-1",
+            type: "treasure",
+            name: "Barangay Treasure",
+            description: "A rare treasure hidden in the barangay",
+            value: 25,
+            points: 50,
+            rarity: "rare",
+            percentX: 50,
+            percentY: 50,
+            icon: "💎",
+        },
+        {
+            id: "barangay-powerup-1",
+            type: "powerup",
+            name: "Civic Power",
+            description: "Boosts your civic engagement",
+            value: 15,
+            points: 30,
+            rarity: "uncommon",
+            percentX: 30,
+            percentY: 70,
+            icon: "⚡",
+        },
+        {
+            id: "barangay-powerup-2",
+            type: "powerup",
+            name: "Civic Power",
+            description: "Boosts your civic engagement",
+            value: 15,
+            points: 30,
+            rarity: "uncommon",
+            percentX: 70,
+            percentY: 30,
+            icon: "⚡",
         },
     ];
 
@@ -127,7 +261,7 @@ export class BarangayMap extends Scene {
         // Create collision areas for buildings (since we're not using tiles)
         // this.createCollisionAreas();
 
-        // Create player with collision
+        // Create player with collision (will be positioned relative to background)
         this.createPlayer();
 
         // Create NPCs
@@ -135,6 +269,9 @@ export class BarangayMap extends Scene {
 
         // Create UI
         this.createUI();
+
+        // Create location display above player head
+        this.createLocationDisplay();
 
         // Remove ALL camera bounds for truly unlimited movement
         // Player can move infinitely in all directions
@@ -241,6 +378,18 @@ export class BarangayMap extends Scene {
         this.input.keyboard.on("keydown-SPACE", () =>
             this.interactWithNearbyNPC()
         );
+
+        // Create location display after player is created (with delay to ensure player exists)
+        this.time.delayedCall(200, () => {
+            if (this.player && !this.locationDisplay) {
+                this.createLocationDisplay();
+            }
+        });
+
+        // Create minimap after everything is loaded
+        this.time.delayedCall(400, () => {
+            this.createMinimap();
+        });
 
         // Listen for mobile interaction events from React
         this.game.events.on("mobile-interact", () => {
@@ -541,6 +690,19 @@ export class BarangayMap extends Scene {
                 bgImage.setAlpha(1); // Fully visible
                 bgImage.setVisible(true); // Explicitly set visible
                 console.log("Root background image created successfully");
+
+                // Reposition player relative to background if player already exists
+                if (this.player) {
+                    this.repositionPlayerRelativeToBackground();
+                }
+
+                // Reposition NPCs relative to background if they already exist
+                this.repositionNPCsRelativeToBackground();
+
+                // Create collectibles after background is ready
+                this.time.delayedCall(300, () => {
+                    this.createCollectibles();
+                });
                 console.log(
                     "Game canvas dimensions:",
                     gameWidth,
@@ -1116,11 +1278,36 @@ export class BarangayMap extends Scene {
             this.textures.exists("student-front-1")
         );
 
-        this.player = this.physics.add.sprite(
-            16 * this.tileSize,
-            12 * this.tileSize,
-            playerTexture
-        );
+        // Calculate player position relative to background image
+        let playerX, playerY;
+
+        if (this.backgroundImage) {
+            // Position relative to background image center
+            // Use percentage-based positioning (e.g., 50% of background width/height)
+            const bgWidth = this.backgroundImage.displayWidth;
+            const bgHeight = this.backgroundImage.displayHeight;
+            const bgX = this.backgroundImage.x;
+            const bgY = this.backgroundImage.y;
+
+            // Spawn player at center of background image
+            playerX = bgX;
+            playerY = bgY;
+
+            console.log(
+                "Player spawning at background center:",
+                playerX,
+                playerY
+            );
+            console.log("Background dimensions:", bgWidth, bgHeight);
+            console.log("Background position:", bgX, bgY);
+        } else {
+            // Fallback to original position if background not ready
+            playerX = 16 * this.tileSize;
+            playerY = 12 * this.tileSize;
+            console.log("Using fallback player position:", playerX, playerY);
+        }
+
+        this.player = this.physics.add.sprite(playerX, playerY, playerTexture);
         // Remove world bounds collision for unlimited movement
         this.player.setCollideWorldBounds(false);
         this.player.setScale(0.2); // Much smaller scale for student sprites
@@ -1336,8 +1523,31 @@ export class BarangayMap extends Scene {
 
     createNPCsAfterLoad(npcImageMap: any) {
         this.missionLocations.forEach((location, index) => {
-            const worldX = location.x * this.tileSize + this.tileSize / 2;
-            const worldY = location.y * this.tileSize + this.tileSize / 2;
+            // Use percentage coordinates if available, otherwise fallback to tile coordinates
+            let worldX, worldY;
+
+            if (
+                location.percentX !== undefined &&
+                location.percentY !== undefined
+            ) {
+                // Use background-relative percentage coordinates
+                const coords = this.percentageToWorldCoordinates(
+                    location.percentX,
+                    location.percentY
+                );
+                worldX = coords.x;
+                worldY = coords.y;
+                console.log(
+                    `NPC ${location.npc} positioned at (${location.percentX}%, ${location.percentY}%) = (${worldX}, ${worldY})`
+                );
+            } else {
+                // Fallback to tile-based coordinates
+                worldX = location.x * this.tileSize + this.tileSize / 2;
+                worldY = location.y * this.tileSize + this.tileSize / 2;
+                console.log(
+                    `NPC ${location.npc} positioned at tile (${location.x}, ${location.y}) = (${worldX}, ${worldY})`
+                );
+            }
 
             // Get the specific NPC image for this character
             const npcImageKey = npcImageMap[location.npc] || "student-front-1";
@@ -1508,6 +1718,382 @@ export class BarangayMap extends Scene {
         console.log(
             "Player-NPC collision detection enabled with movement prevention"
         );
+    }
+
+    createCollectibles() {
+        console.log("=== CREATING COLLECTIBLE ITEMS ===");
+        console.log(`Background ready: ${!!this.backgroundImage}`);
+        console.log(`Player exists: ${!!this.player}`);
+        console.log(
+            `Total items to create: ${this.collectibleItemsData.length}`
+        );
+
+        // Create physics group for collectibles
+        this.collectibles = this.physics.add.group();
+
+        const gameStateManager = GameStateManager.getInstance();
+
+        this.collectibleItemsData.forEach((item) => {
+            // Check if item has already been collected
+            if (gameStateManager.isItemCollected(item.id)) {
+                console.log(`Item ${item.id} already collected, skipping`);
+                return;
+            }
+
+            // Calculate world position from percentage
+            const coords = this.percentageToWorldCoordinates(
+                item.percentX,
+                item.percentY
+            );
+
+            // Create collectible sprite using emoji/icon
+            const collectible = this.add
+                .text(coords.x, coords.y, item.icon, {
+                    fontSize: "48px", // Larger size for better visibility
+                    fontFamily: "Arial",
+                })
+                .setOrigin(0.5)
+                .setScrollFactor(1); // Follow camera
+
+            // Add physics body
+            this.physics.add.existing(collectible);
+            (collectible.body as Phaser.Physics.Arcade.Body).setSize(48, 48);
+            (collectible.body as Phaser.Physics.Arcade.Body).setAllowGravity(
+                false
+            );
+
+            // Set depth - above NPCs and below UI
+            collectible.setDepth(200);
+            collectible.setVisible(true);
+
+            // Store item data on sprite
+            collectible.setData("itemData", item);
+
+            // Add to collectibles group
+            this.collectibles.add(collectible);
+
+            // Store reference
+            this.collectibleItems.set(item.id, collectible);
+
+            // Add floating animation
+            this.tweens.add({
+                targets: collectible,
+                y: coords.y - 10,
+                duration: 1000,
+                ease: "Sine.easeInOut",
+                yoyo: true,
+                repeat: -1,
+            });
+
+            // Add glow effect based on rarity
+            const glowColor =
+                item.rarity === "legendary"
+                    ? 0xffd700 // Gold
+                    : item.rarity === "rare"
+                    ? 0xff00ff // Purple
+                    : item.rarity === "uncommon"
+                    ? 0x00ffff // Cyan
+                    : 0xffffff; // White
+
+            const glow = this.add.circle(
+                coords.x,
+                coords.y,
+                30,
+                glowColor,
+                0.4
+            );
+            glow.setDepth(199); // Just below collectible
+            glow.setScrollFactor(1); // Follow camera
+
+            // Pulsing glow animation
+            this.tweens.add({
+                targets: glow,
+                alpha: { from: 0.3, to: 0.6 },
+                scaleX: { from: 1, to: 1.3 },
+                scaleY: { from: 1, to: 1.3 },
+                duration: 1200,
+                ease: "Sine.easeInOut",
+                yoyo: true,
+                repeat: -1,
+            });
+
+            console.log(
+                `✓ Created collectible ${item.id} (${item.type}) at (${
+                    item.percentX
+                }%, ${item.percentY}%) = world(${coords.x.toFixed(
+                    1
+                )}, ${coords.y.toFixed(1)})`
+            );
+        });
+
+        // Add overlap detection between player and collectibles
+        if (this.collectibles && this.player) {
+            this.physics.add.overlap(
+                this.player,
+                this.collectibles,
+                this.collectItem,
+                undefined,
+                this
+            );
+            console.log("✓ Collision detection enabled");
+        }
+
+        console.log("=== COLLECTIBLES CREATION COMPLETE ===");
+        console.log(`Items created: ${this.collectibleItems.size}`);
+        console.log(
+            `Collectibles group size: ${this.collectibles?.children?.size || 0}`
+        );
+        console.log("=====================================");
+    }
+
+    collectItem(player: any, collectible: any) {
+        const itemData = collectible.getData("itemData");
+        if (!itemData) return;
+
+        const gameStateManager = GameStateManager.getInstance();
+
+        // Attempt to collect the item
+        const collected = gameStateManager.collectItem(
+            itemData.id,
+            itemData.value,
+            itemData.points
+        );
+
+        if (collected) {
+            // Create particle effect (sparkles) at collection point
+            this.createCollectionParticles(
+                collectible.x,
+                collectible.y,
+                itemData.rarity
+            );
+
+            // Play collection sound based on item rarity
+            this.playCollectionSound(itemData.rarity);
+
+            // Play collection animation
+            this.tweens.add({
+                targets: collectible,
+                y: collectible.y - 80,
+                alpha: 0,
+                scaleX: 2,
+                scaleY: 2,
+                duration: 600,
+                ease: "Back.easeOut",
+                onComplete: () => {
+                    collectible.destroy();
+                    this.collectibleItems.delete(itemData.id);
+                },
+            });
+
+            // Show floating text animation
+            this.showFloatingText(
+                collectible.x,
+                collectible.y,
+                `+${itemData.value} 💰 +${itemData.points} ⭐`
+            );
+
+            // Check if all items collected for achievement
+            this.checkCollectionAchievement();
+
+            // Update daily challenge progress for collectibles
+            EventBus.emit("update-daily-challenge", {
+                type: "collect",
+                amount: 1,
+            });
+
+            // Show notification
+            EventBus.emit("show-notification", {
+                type: "success",
+                title: `${itemData.name} Collected! ✨`,
+                message: `You found a ${itemData.name}! +${itemData.value} coins, +${itemData.points} points`,
+                icon: itemData.icon,
+                actions: [
+                    {
+                        label: "Continue Exploring",
+                        action: () => {},
+                        style: "primary",
+                    },
+                ],
+            });
+
+            console.log(
+                `Collected item ${itemData.id}: +${itemData.value} coins, +${itemData.points} points`
+            );
+        }
+    }
+
+    createCollectionParticles(x: number, y: number, rarity: string) {
+        // Particle color based on rarity
+        const particleColor =
+            rarity === "legendary"
+                ? 0xffd700 // Gold
+                : rarity === "rare"
+                ? 0xff00ff // Purple
+                : rarity === "uncommon"
+                ? 0x00ffff // Cyan
+                : 0xffff00; // Yellow
+
+        // Create multiple sparkle particles
+        for (let i = 0; i < 20; i++) {
+            const angle = (Math.PI * 2 * i) / 20;
+            const distance = 30 + Math.random() * 20;
+            const targetX = x + Math.cos(angle) * distance;
+            const targetY = y + Math.sin(angle) * distance;
+
+            const particle = this.add.circle(x, y, 3, particleColor, 1);
+            particle.setDepth(300);
+
+            this.tweens.add({
+                targets: particle,
+                x: targetX,
+                y: targetY,
+                alpha: 0,
+                scale: 0,
+                duration: 500 + Math.random() * 300,
+                ease: "Power2",
+                onComplete: () => {
+                    particle.destroy();
+                },
+            });
+        }
+
+        // Create star burst effect
+        for (let i = 0; i < 5; i++) {
+            const star = this.add.text(x, y, "⭐", {
+                fontSize: "24px",
+            });
+            star.setOrigin(0.5);
+            star.setDepth(300);
+
+            const angle = (Math.PI * 2 * i) / 5;
+            const distance = 40;
+            const targetX = x + Math.cos(angle) * distance;
+            const targetY = y + Math.sin(angle) * distance;
+
+            this.tweens.add({
+                targets: star,
+                x: targetX,
+                y: targetY,
+                alpha: 0,
+                rotation: Math.PI * 2,
+                scale: { from: 1, to: 0.5 },
+                duration: 600,
+                ease: "Power2",
+                onComplete: () => {
+                    star.destroy();
+                },
+            });
+        }
+    }
+
+    playCollectionSound(rarity: string) {
+        // Play sound based on rarity - using HTML5 Audio API
+        const soundFrequency =
+            rarity === "legendary"
+                ? [440, 554, 659, 880] // High pitched for legendary
+                : rarity === "rare"
+                ? [392, 494, 587] // Mid-high for rare
+                : rarity === "uncommon"
+                ? [349, 440, 523] // Mid for uncommon
+                : [330, 392, 440]; // Lower for common
+
+        // Create AudioContext for sound generation
+        if (
+            typeof AudioContext !== "undefined" ||
+            typeof (window as any).webkitAudioContext !== "undefined"
+        ) {
+            try {
+                const AudioContextClass =
+                    AudioContext || (window as any).webkitAudioContext;
+                const audioContext = new AudioContextClass();
+
+                soundFrequency.forEach((freq, index) => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+
+                    oscillator.frequency.value = freq;
+                    oscillator.type = "sine";
+
+                    const startTime = audioContext.currentTime + index * 0.1;
+                    const duration = 0.15;
+
+                    gainNode.gain.setValueAtTime(0.3, startTime);
+                    gainNode.gain.exponentialRampToValueAtTime(
+                        0.01,
+                        startTime + duration
+                    );
+
+                    oscillator.start(startTime);
+                    oscillator.stop(startTime + duration);
+                });
+            } catch (error) {
+                console.log("Audio playback not available:", error);
+            }
+        }
+    }
+
+    showFloatingText(x: number, y: number, text: string) {
+        const floatingText = this.add.text(x, y, text, {
+            fontFamily: "Arial Black",
+            fontSize: "24px",
+            color: "#FFD700",
+            stroke: "#000000",
+            strokeThickness: 4,
+        });
+        floatingText.setOrigin(0.5);
+        floatingText.setDepth(300);
+
+        this.tweens.add({
+            targets: floatingText,
+            y: y - 60,
+            alpha: 0,
+            duration: 1000,
+            ease: "Power2",
+            onComplete: () => {
+                floatingText.destroy();
+            },
+        });
+    }
+
+    checkCollectionAchievement() {
+        const gameStateManager = GameStateManager.getInstance();
+        const totalItems = this.collectibleItemsData.length;
+        const collectedCount = gameStateManager.getTotalCollectedItems();
+
+        // Check if all barangay items collected
+        const allBarangayItemsCollected = this.collectibleItemsData.every(
+            (item) => gameStateManager.isItemCollected(item.id)
+        );
+
+        if (allBarangayItemsCollected && collectedCount > 0) {
+            // Award special achievement badge
+            EventBus.emit("show-notification", {
+                type: "success",
+                title: "🏆 Master Collector Achievement! 🏆",
+                message: `Congratulations! You've collected all ${totalItems} items in the Barangay! You've earned the "Treasure Hunter" badge and a bonus of 50 coins + 100 points!`,
+                icon: "🎖️",
+                actions: [
+                    {
+                        label: "Awesome!",
+                        action: () => {},
+                        style: "primary",
+                    },
+                ],
+            });
+
+            // Award bonus coins and points for completing collection
+            gameStateManager.addCoins(50, "Master Collector Achievement");
+            const progress = gameStateManager.getProgress();
+            if (progress) {
+                progress.totalScore += 100;
+                gameStateManager.updatePlaytime(0); // Trigger save
+            }
+
+            console.log("🏆 Master Collector Achievement unlocked!");
+        }
     }
 
     createMobileControls() {
@@ -1736,6 +2322,334 @@ export class BarangayMap extends Scene {
             .setVisible(false);
     }
 
+    createLocationDisplay() {
+        // Create location display above player head
+        this.locationDisplay = this.add
+            .text(
+                this.player.x,
+                this.player.y - 60, // Position above player head
+                "Location: (0, 0)",
+                {
+                    fontFamily: "Arial Black",
+                    fontSize: this.isMobile ? 12 : 14,
+                    color: "#FFFFFF",
+                    stroke: "#000000",
+                    strokeThickness: 2,
+                    align: "center",
+                    backgroundColor: "rgba(46, 134, 171, 0.8)",
+                    padding: { x: 8, y: 4 },
+                    shadow: {
+                        offsetX: 1,
+                        offsetY: 1,
+                        color: "#000000",
+                        blur: 2,
+                        fill: true,
+                    },
+                }
+            )
+            .setOrigin(0.5)
+            .setDepth(500) // Above player but below UI elements
+            .setScrollFactor(1) // Follow camera (moves with world)
+            .setVisible(true);
+
+        console.log("Location display created above player head");
+    }
+
+    createMinimap() {
+        // Create minimap in bottom-left corner
+        const minimapSize = this.isMobile ? 100 : 150;
+        const minimapX = this.isMobile ? 70 : 90;
+        const minimapY = this.cameras.main.height - (this.isMobile ? 120 : 170);
+
+        // Create minimap container
+        this.minimap = this.add.container(minimapX, minimapY);
+        this.minimap.setScrollFactor(0); // Fixed on screen
+        this.minimap.setDepth(1500);
+
+        // Create minimap background
+        const minimapBg = this.add.graphics();
+        minimapBg.fillStyle(0x000000, 0.6);
+        minimapBg.fillRoundedRect(0, 0, minimapSize, minimapSize, 8);
+        minimapBg.lineStyle(2, 0xffd700, 1);
+        minimapBg.strokeRoundedRect(0, 0, minimapSize, minimapSize, 8);
+        this.minimap.add(minimapBg);
+
+        // Add minimap title
+        const minimapTitle = this.add.text(minimapSize / 2, -15, "MAP", {
+            fontFamily: "Arial Black",
+            fontSize: "12px",
+            color: "#FFD700",
+            stroke: "#000000",
+            strokeThickness: 2,
+        });
+        minimapTitle.setOrigin(0.5);
+        this.minimap.add(minimapTitle);
+
+        // Create player dot (green)
+        this.minimapPlayerDot = this.add.circle(
+            minimapSize / 2,
+            minimapSize / 2,
+            4,
+            0x00ff00,
+            1
+        );
+        this.minimap.add(this.minimapPlayerDot);
+
+        // Add NPC dots (blue)
+        this.missionLocations.forEach((location) => {
+            const npcX = (location.percentX / 100) * minimapSize;
+            const npcY = (location.percentY / 100) * minimapSize;
+
+            const npcDot = this.add.circle(npcX, npcY, 2, 0x4169e1, 0.8);
+            this.minimap.add(npcDot);
+            this.minimapNPCDots.push(npcDot);
+        });
+
+        // Add collectible dots (yellow/gold based on rarity)
+        this.collectibleItemsData.forEach((item) => {
+            const itemX = (item.percentX / 100) * minimapSize;
+            const itemY = (item.percentY / 100) * minimapSize;
+
+            const dotColor =
+                item.rarity === "legendary"
+                    ? 0xffd700 // Gold
+                    : item.rarity === "rare"
+                    ? 0xff00ff // Purple
+                    : item.rarity === "uncommon"
+                    ? 0x00ffff // Cyan
+                    : 0xffff00; // Yellow
+
+            const collectibleDot = this.add.circle(
+                itemX,
+                itemY,
+                2,
+                dotColor,
+                1
+            );
+            collectibleDot.setData("itemId", item.id);
+            this.minimap.add(collectibleDot);
+            this.minimapCollectibleDots.push(collectibleDot);
+
+            // Add pulsing animation to collectible dots
+            this.tweens.add({
+                targets: collectibleDot,
+                alpha: { from: 0.5, to: 1 },
+                scale: { from: 0.8, to: 1.2 },
+                duration: 800,
+                ease: "Sine.easeInOut",
+                yoyo: true,
+                repeat: -1,
+            });
+        });
+
+        console.log("Minimap created with collectible locations");
+    }
+
+    updateMinimap() {
+        if (
+            !this.minimap ||
+            !this.minimapPlayerDot ||
+            !this.player ||
+            !this.backgroundImage
+        )
+            return;
+
+        const minimapSize = this.isMobile ? 100 : 150;
+
+        // Calculate player position as percentage
+        const bgWidth = this.backgroundImage.displayWidth;
+        const bgHeight = this.backgroundImage.displayHeight;
+        const bgX = this.backgroundImage.x;
+        const bgY = this.backgroundImage.y;
+
+        const playerRelativeX = this.player.x - (bgX - bgWidth / 2);
+        const playerRelativeY = this.player.y - (bgY - bgHeight / 2);
+
+        const percentX = Math.max(
+            0,
+            Math.min(100, (playerRelativeX / bgWidth) * 100)
+        );
+        const percentY = Math.max(
+            0,
+            Math.min(100, (playerRelativeY / bgHeight) * 100)
+        );
+
+        // Update player dot position on minimap
+        this.minimapPlayerDot.setPosition(
+            (percentX / 100) * minimapSize,
+            (percentY / 100) * minimapSize
+        );
+
+        // Update collectible dots - hide if collected
+        const gameStateManager = GameStateManager.getInstance();
+        this.minimapCollectibleDots.forEach((dot) => {
+            const itemId = dot.getData("itemId");
+            if (itemId && gameStateManager.isItemCollected(itemId)) {
+                dot.setVisible(false);
+            }
+        });
+    }
+
+    repositionPlayerRelativeToBackground() {
+        if (this.player && this.backgroundImage) {
+            // Position player at center of background image
+            const bgX = this.backgroundImage.x;
+            const bgY = this.backgroundImage.y;
+
+            this.player.setPosition(bgX, bgY);
+
+            console.log("Player repositioned to background center:", bgX, bgY);
+            console.log(
+                "Background dimensions:",
+                this.backgroundImage.displayWidth,
+                this.backgroundImage.displayHeight
+            );
+        }
+    }
+
+    // Convert percentage coordinates to world coordinates relative to background image
+    percentageToWorldCoordinates(percentX: number, percentY: number) {
+        if (!this.backgroundImage) {
+            // Fallback to tile-based coordinates
+            return {
+                x: (percentX / 100) * (this.mapWidth * this.tileSize),
+                y: (percentY / 100) * (this.mapHeight * this.tileSize),
+            };
+        }
+
+        const bgWidth = this.backgroundImage.displayWidth;
+        const bgHeight = this.backgroundImage.displayHeight;
+        const bgX = this.backgroundImage.x;
+        const bgY = this.backgroundImage.y;
+
+        // Calculate world coordinates from percentage
+        const worldX = bgX + (percentX - 50) * (bgWidth / 100);
+        const worldY = bgY + (percentY - 50) * (bgHeight / 100);
+
+        return { x: worldX, y: worldY };
+    }
+
+    repositionNPCsRelativeToBackground() {
+        if (!this.npcs || !this.backgroundImage) return;
+
+        this.npcs.children.entries.forEach((npc: any, index: number) => {
+            const missionData = npc.getData("missionData");
+            if (
+                missionData &&
+                missionData.percentX !== undefined &&
+                missionData.percentY !== undefined
+            ) {
+                // Reposition NPC using percentage coordinates
+                const coords = this.percentageToWorldCoordinates(
+                    missionData.percentX,
+                    missionData.percentY
+                );
+                npc.setPosition(coords.x, coords.y);
+
+                // Update original position data
+                npc.setData("originalPosition", { x: coords.x, y: coords.y });
+
+                console.log(
+                    `Repositioned NPC ${missionData.npc} to (${missionData.percentX}%, ${missionData.percentY}%) = (${coords.x}, ${coords.y})`
+                );
+            }
+        });
+    }
+
+    updateLocationDisplay() {
+        if (this.locationDisplay && this.player) {
+            // Calculate position relative to background image
+            let relativeX = 0,
+                relativeY = 0;
+            let areaName = "Barangay";
+
+            if (this.backgroundImage) {
+                // Calculate percentage position relative to background image
+                const bgWidth = this.backgroundImage.displayWidth;
+                const bgHeight = this.backgroundImage.displayHeight;
+                const bgX = this.backgroundImage.x;
+                const bgY = this.backgroundImage.y;
+
+                // Calculate relative position within background image
+                const playerRelativeX = this.player.x - (bgX - bgWidth / 2);
+                const playerRelativeY = this.player.y - (bgY - bgHeight / 2);
+
+                // Convert to percentage (0-100%)
+                relativeX = Math.round((playerRelativeX / bgWidth) * 100);
+                relativeY = Math.round((playerRelativeY / bgHeight) * 100);
+
+                // Clamp values to 0-100%
+                relativeX = Math.max(0, Math.min(100, relativeX));
+                relativeY = Math.max(0, Math.min(100, relativeY));
+
+                // Determine area based on percentage position
+                if (relativeX < 25 && relativeY < 25) {
+                    areaName = "Northwest District";
+                } else if (relativeX >= 75 && relativeY < 25) {
+                    areaName = "Northeast District";
+                } else if (relativeX < 25 && relativeY >= 75) {
+                    areaName = "Southwest District";
+                } else if (relativeX >= 75 && relativeY >= 75) {
+                    areaName = "Southeast District";
+                } else if (
+                    relativeX >= 37.5 &&
+                    relativeX < 62.5 &&
+                    relativeY >= 37.5 &&
+                    relativeY < 62.5
+                ) {
+                    areaName = "Central District";
+                } else if (
+                    relativeX >= 25 &&
+                    relativeX < 75 &&
+                    relativeY < 25
+                ) {
+                    areaName = "North District";
+                } else if (
+                    relativeX >= 25 &&
+                    relativeX < 75 &&
+                    relativeY >= 75
+                ) {
+                    areaName = "South District";
+                } else if (
+                    relativeX < 25 &&
+                    relativeY >= 25 &&
+                    relativeY < 75
+                ) {
+                    areaName = "West District";
+                } else if (
+                    relativeX >= 75 &&
+                    relativeY >= 25 &&
+                    relativeY < 75
+                ) {
+                    areaName = "East District";
+                } else {
+                    areaName = "Barangay";
+                }
+
+                console.log(
+                    `Player position: ${relativeX}%, ${relativeY}% - Area: ${areaName}`
+                );
+            } else {
+                // Fallback to tile-based coordinates if background not available
+                const mapX = Math.round(this.player.x / this.tileSize);
+                const mapY = Math.round(this.player.y / this.tileSize);
+                relativeX = mapX;
+                relativeY = mapY;
+            }
+
+            // Update display text with percentage coordinates and area name
+            const displayText = `${areaName}\n(${relativeX}%, ${relativeY}%)`;
+            this.locationDisplay.setText(displayText);
+
+            // Position above player head
+            this.locationDisplay.setPosition(this.player.x, this.player.y - 60);
+
+            // Update font size based on screen size
+            const fontSize = this.isMobile ? 10 : 12;
+            this.locationDisplay.setStyle({ fontSize });
+        }
+    }
+
     update() {
         // Check if player exists before proceeding
         if (!this.player) {
@@ -1886,6 +2800,12 @@ export class BarangayMap extends Scene {
 
         // Check for nearby NPCs
         this.checkForNearbyNPCs();
+
+        // Update location display above player head
+        this.updateLocationDisplay();
+
+        // Update minimap
+        this.updateMinimap();
 
         // Debug: Show interaction prompt status occasionally
         if (Math.random() < 0.02) {
