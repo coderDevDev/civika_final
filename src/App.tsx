@@ -13,6 +13,7 @@ import { Credits } from "./components/Credits";
 import { Leaderboard } from "./components/Leaderboard";
 import { Shop } from "./components/Shop";
 import { DailyChallenges } from "./components/DailyChallenges";
+import { SecretQuests } from "./components/SecretQuests";
 import {
     GameNotification,
     NotificationData,
@@ -23,6 +24,7 @@ import { GameProgress } from "./utils/GameValidation";
 import { audioManager } from "./utils/AudioManager";
 import LeaderboardService from "./services/LeaderboardService";
 import ShopService from "./services/ShopService";
+import SecretQuestService from "./services/SecretQuestService";
 
 function App() {
     const phaserRef = useRef<IRefPhaserGame | null>(null);
@@ -57,8 +59,10 @@ function App() {
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [showShop, setShowShop] = useState(false);
     const [showDailyChallenges, setShowDailyChallenges] = useState(false);
+    const [showSecretQuests, setShowSecretQuests] = useState(false);
     const leaderboardService = useRef(LeaderboardService.getInstance());
     const shopService = useRef(ShopService.getInstance());
+    const secretQuestService = useRef(SecretQuestService.getInstance());
 
     const currentScene = (scene: Phaser.Scene) => {
         console.log("Current scene:", scene.scene.key);
@@ -1036,48 +1040,43 @@ function App() {
                     >
                         {/* HUD - Top Left - Compact */}
                         <div className="absolute top-2 left-2 pointer-events-auto">
-                            <div className="flex space-x-1">
-                                {/* Player Name */}
-                                <div className="text-xs font-bold text-amber-800 game-element-border rounded px-1 py-0.5 text-center">
-                                    👤 {gameInfo.playerName || "Citizen"}
+                            <div className="flex flex-col space-y-1">
+                                <div className="flex space-x-1">
+                                    {/* Player Name & Title */}
+                                    <div className="text-xs font-bold text-amber-800 game-element-border rounded px-1 py-0.5 text-center">
+                                        👤 {gameInfo.playerName || "Citizen"}
+                                    </div>
+
+                                    {/* Level */}
+                                    <div className="text-xs font-bold text-amber-800 game-element-border rounded px-1 py-0.5 text-center">
+                                        ⭐ L{gameInfo.level}
+                                    </div>
                                 </div>
 
-                                {/* Level */}
-                                <div className="text-xs font-bold text-amber-800 game-element-border rounded px-1 py-0.5 text-center">
-                                    ⭐ L{gameInfo.level}
-                                </div>
+                                {/* Player Title */}
+                                {secretQuestService.current.getCurrentTitle() && (
+                                    <div className="text-xs font-bold text-purple-800 game-element-border rounded px-1 py-0.5 text-center bg-gradient-to-r from-purple-100 to-pink-100">
+                                        👑{" "}
+                                        {secretQuestService.current.getCurrentTitle()}
+                                    </div>
+                                )}
 
-                                {/* Badges */}
-                                <div className="text-xs font-bold text-amber-800 game-element-border rounded px-1 py-0.5 text-center">
-                                    🏆 {gameInfo.badges}/10
-                                </div>
+                                <div className="flex space-x-1">
+                                    {/* Badges */}
+                                    <div className="text-xs font-bold text-amber-800 game-element-border rounded px-1 py-0.5 text-center">
+                                        🏆 {gameInfo.badges}/10
+                                    </div>
 
-                                {/* Coins */}
-                                <div className="text-xs font-bold text-amber-800 game-element-border rounded px-1 py-0.5 text-center">
-                                    💰 {gameInfo.coins}
-                                </div>
+                                    {/* Coins */}
+                                    <div className="text-xs font-bold text-amber-800 game-element-border rounded px-1 py-0.5 text-center">
+                                        💰 {gameInfo.coins}
+                                    </div>
 
-                                {/* Score */}
-                                <div className="text-xs font-bold text-amber-800 game-element-border rounded px-1 py-0.5 text-center">
-                                    📊 {gameInfo.totalScore}
+                                    {/* Score */}
+                                    <div className="text-xs font-bold text-amber-800 game-element-border rounded px-1 py-0.5 text-center">
+                                        📊 {gameInfo.totalScore}
+                                    </div>
                                 </div>
-
-                                {/* Debug button - hidden on mobile */}
-                                {/* <button
-                                    onClick={() => {
-                                        console.log(
-                                            "Manual BarangayMap start..."
-                                        );
-                                        if (phaserRef.current?.game) {
-                                            phaserRef.current.game.scene.start(
-                                                "BarangayMap"
-                                            );
-                                        }
-                                    }}
-                                    className="hidden md:block text-xs font-bold text-amber-800 game-element-border rounded px-1 py-0.5 text-center hover:bg-red-600 hover:text-white transition-all duration-200"
-                                >
-                                    🔧
-                                </button> */}
                             </div>
                         </div>
 
@@ -1120,6 +1119,19 @@ function App() {
                                         <span>📅</span>
                                         <span className="hidden sm:inline">
                                             Daily
+                                        </span>
+                                    </div>
+                                </button>
+                                <button
+                                    onClick={() =>
+                                        setShowSecretQuests(!showSecretQuests)
+                                    }
+                                    className="game-button-frame px-2 py-1 rounded-lg transition-all duration-200 hover:scale-105 game-glow"
+                                >
+                                    <div className="text-white font-bold text-xs flex items-center space-x-1">
+                                        <span>🔐</span>
+                                        <span className="hidden sm:inline">
+                                            Secrets
                                         </span>
                                     </div>
                                 </button>
@@ -1224,6 +1236,18 @@ function App() {
                                                     <span>
                                                         Daily Challenges
                                                     </span>
+                                                </div>
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setShowPauseMenu(false);
+                                                    setShowSecretQuests(true);
+                                                }}
+                                                className="w-full game-button-frame py-2 sm:py-3 px-3 sm:px-6 rounded-lg transition-all duration-200 font-bold hover:scale-105 game-glow"
+                                            >
+                                                <div className="text-white flex items-center justify-center space-x-1 sm:space-x-2 text-sm sm:space-x-2 text-sm sm:text-base">
+                                                    <span>🔐</span>
+                                                    <span>Secret Quests</span>
                                                 </div>
                                             </button>
                                             <button
@@ -1609,6 +1633,15 @@ function App() {
                     setShowDailyChallenges(false);
                 }}
                 isVisible={showDailyChallenges}
+            />
+
+            {/* Secret Quests Modal */}
+            <SecretQuests
+                onClose={() => {
+                    audioManager.playEffect("menu-close");
+                    setShowSecretQuests(false);
+                }}
+                isVisible={showSecretQuests}
             />
 
             {/* Debug Panel for Development */}

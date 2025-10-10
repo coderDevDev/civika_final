@@ -25,6 +25,9 @@ export interface GameProgress {
     fastestQuizTime?: number; // Fastest quiz completion time
     purchasedItems?: string[]; // IDs of purchased shop items
     npcRewardsReceived?: string[]; // IDs of NPC rewards already claimed
+    currentTitle?: string; // Player's currently equipped title
+    totalCoinsEarned?: number; // Total coins earned throughout the game (for secret quest tracking)
+    totalStepsTaken?: number; // Total steps/distance walked (for wanderer title)
 }
 
 export interface MissionReward {
@@ -245,6 +248,11 @@ export class GameValidation {
                 goodAnswers: 0,
             },
             fastestQuizTime: Infinity,
+            purchasedItems: [],
+            npcRewardsReceived: [],
+            currentTitle: "Citizen", // Start with Citizen title
+            totalCoinsEarned: 0,
+            totalStepsTaken: 0,
         };
     }
 

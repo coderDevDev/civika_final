@@ -1,6 +1,7 @@
 import { GameObjects, Scene } from "phaser";
 import { EventBus } from "../EventBus";
 import { GameStateManager } from "../../utils/GameStateManager";
+import SecretQuestService from "../../services/SecretQuestService";
 
 export class BarangayMap extends Scene {
     player: Phaser.Physics.Arcade.Sprite;
@@ -2582,6 +2583,9 @@ export class BarangayMap extends Scene {
                 relativeX = Math.max(0, Math.min(100, relativeX));
                 relativeY = Math.max(0, Math.min(100, relativeY));
 
+                // Check for secret locations
+                this.checkSecretLocation(relativeX, relativeY);
+
                 // Determine area based on percentage position
                 if (relativeX < 25 && relativeY < 25) {
                     areaName = "Northwest District";
@@ -2647,6 +2651,36 @@ export class BarangayMap extends Scene {
             // Update font size based on screen size
             const fontSize = this.isMobile ? 10 : 12;
             this.locationDisplay.setStyle({ fontSize });
+        }
+    }
+
+    checkSecretLocation(percentX: number, percentY: number) {
+        const secretQuestService = SecretQuestService.getInstance();
+        const secretLocation = secretQuestService.checkLocation(
+            percentX,
+            percentY
+        );
+
+        if (secretLocation) {
+            // Show notification for discovered secret location
+            EventBus.emit("show-notification", {
+                type: "success",
+                title: "🗺️ Secret Location Discovered!",
+                message: `You found: ${secretLocation.name}!\n${
+                    secretLocation.hint || "A mysterious place..."
+                }`,
+                icon: "🔐",
+                actions: [
+                    {
+                        label: "Amazing!",
+                        action: () => {},
+                        style: "primary",
+                    },
+                ],
+            });
+
+            // Check for secret quest completions
+            secretQuestService.checkSecretQuestConditions();
         }
     }
 

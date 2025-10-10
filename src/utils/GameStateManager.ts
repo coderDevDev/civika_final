@@ -156,9 +156,15 @@ export class GameStateManager {
     public addCoins(amount: number, reason: string = "bonus"): void {
         if (!this.gameProgress || amount < 0) return;
 
+        // Initialize totalCoinsEarned if not exists
+        if (this.gameProgress.totalCoinsEarned === undefined) {
+            this.gameProgress.totalCoinsEarned = this.gameProgress.coins;
+        }
+
         this.gameProgress = {
             ...this.gameProgress,
             coins: this.gameProgress.coins + amount,
+            totalCoinsEarned: this.gameProgress.totalCoinsEarned + amount,
             lastPlayedDate: new Date().toISOString(),
         };
 
