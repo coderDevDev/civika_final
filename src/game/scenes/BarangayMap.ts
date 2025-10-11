@@ -5,6 +5,9 @@ import SecretQuestService from "../../services/SecretQuestService";
 import CollisionService from "../../services/CollisionService";
 
 export class BarangayMap extends Scene {
+    // 🎨 DEBUG MODE: Set to false to hide collision boundaries in production
+    private readonly DEBUG_SHOW_COLLISIONS: boolean = false;
+
     player: Phaser.Physics.Arcade.Sprite;
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     wasd: any;
@@ -163,8 +166,8 @@ export class BarangayMap extends Scene {
             value: 5,
             points: 10,
             rarity: "common",
-            percentX: 25,
-            percentY: 35,
+            percentX: 40,
+            percentY: 31,
             icon: "💰",
         },
         {
@@ -175,8 +178,8 @@ export class BarangayMap extends Scene {
             value: 5,
             points: 10,
             rarity: "common",
-            percentX: 75,
-            percentY: 65,
+            percentX: 56,
+            percentY: 39,
             icon: "💰",
         },
         {
@@ -187,8 +190,8 @@ export class BarangayMap extends Scene {
             value: 5,
             points: 10,
             rarity: "common",
-            percentX: 45,
-            percentY: 80,
+            percentX: 40,
+            percentY: 48,
             icon: "💰",
         },
         {
@@ -199,8 +202,8 @@ export class BarangayMap extends Scene {
             value: 10,
             points: 25,
             rarity: "uncommon",
-            percentX: 15,
-            percentY: 50,
+            percentX: 35,
+            percentY: 65,
             icon: "🏅",
         },
         {
@@ -211,8 +214,8 @@ export class BarangayMap extends Scene {
             value: 10,
             points: 25,
             rarity: "uncommon",
-            percentX: 85,
-            percentY: 35,
+            percentX: 52,
+            percentY: 73,
             icon: "🏅",
         },
         {
@@ -223,8 +226,8 @@ export class BarangayMap extends Scene {
             value: 25,
             points: 50,
             rarity: "rare",
-            percentX: 50,
-            percentY: 50,
+            percentX: 60,
+            percentY: 82,
             icon: "💎",
         },
         {
@@ -235,8 +238,8 @@ export class BarangayMap extends Scene {
             value: 15,
             points: 30,
             rarity: "uncommon",
-            percentX: 30,
-            percentY: 70,
+            percentX: 72,
+            percentY: 92,
             icon: "⚡",
         },
         {
@@ -247,8 +250,8 @@ export class BarangayMap extends Scene {
             value: 15,
             points: 30,
             rarity: "uncommon",
-            percentX: 70,
-            percentY: 30,
+            percentX: 92,
+            percentY: 73,
             icon: "⚡",
         },
     ];
@@ -1759,7 +1762,7 @@ export class BarangayMap extends Scene {
             // Create collectible sprite using emoji/icon
             const collectible = this.add
                 .text(coords.x, coords.y, item.icon, {
-                    fontSize: "48px", // Larger size for better visibility
+                    fontSize: "30px", // Larger size for better visibility
                     fontFamily: "Arial",
                 })
                 .setOrigin(0.5)
@@ -2310,25 +2313,26 @@ export class BarangayMap extends Scene {
 
     createUI() {
         // Only create the interaction prompt since other UI is handled by React
+        // Position relative to player (will be updated in update loop)
         this.interactionPrompt = this.add
             .text(
-                512,
-                600,
-                this.isMobile ? "Tap to interact" : "Press SPACE to interact",
+                this.player.x + 80, // Right side of player
+                this.player.y,
+                this.isMobile ? "Tap to interact" : "Tap to interact",
                 {
                     fontFamily: "Arial Black",
-                    fontSize: 16,
+                    fontSize: 14,
                     color: "#FFD700",
                     stroke: "#000000",
                     strokeThickness: 3,
                     align: "center",
                     backgroundColor: "#2E86AB",
-                    padding: { x: 10, y: 5 },
+                    padding: { x: 8, y: 4 },
                 }
             )
             .setOrigin(0.5)
             .setDepth(1000)
-            .setScrollFactor(0) // Don't scroll with camera
+            .setScrollFactor(1) // Follow camera with world
             .setVisible(false);
     }
 
@@ -2699,8 +2703,8 @@ export class BarangayMap extends Scene {
             return;
         }
 
-        // Player movement
-        const speed = 200;
+        // Player movement - reduced speed for more natural walking
+        const speed = 120; // Slower, more realistic walking speed
         let isMoving = false;
         let currentDirection = "";
         let velocityX = 0;
@@ -3016,7 +3020,14 @@ export class BarangayMap extends Scene {
             }
 
             this.nearbyNPC = nearestNPC;
+
+            // Update interaction prompt position to right side of player
+            this.interactionPrompt.setPosition(
+                this.player.x + 80, // Right side of player
+                this.player.y
+            );
             this.interactionPrompt.setVisible(true);
+
             console.log(
                 `Interaction prompt shown for ${
                     nearestNPC.getData("missionData")?.npc || "NPC"
@@ -3312,111 +3323,117 @@ export class BarangayMap extends Scene {
                 this.backgroundImage
             );
 
-            // 🎨 VISUAL DEBUG: Draw red outlines to see collision boundaries
-            collisionData.shapes.forEach((shape) => {
-                if (shape.type === "rectangle") {
-                    const box = shape as any;
-                    const coords = this.percentageToWorldCoordinates(
-                        box.percentX + box.percentWidth / 2,
-                        box.percentY + box.percentHeight / 2
-                    );
-                    const width =
-                        (box.percentWidth / 100) *
-                        this.backgroundImage.displayWidth;
-                    const height =
-                        (box.percentHeight / 100) *
-                        this.backgroundImage.displayHeight;
-
-                    // Draw visible red rectangle outline
-                    const debugRect = this.add.rectangle(
-                        coords.x,
-                        coords.y,
-                        width,
-                        height,
-                        0xff0000,
-                        0 // Transparent fill
-                    );
-                    debugRect.setStrokeStyle(3, 0xff0000); // Red outline
-                    debugRect.setDepth(1000); // Above everything
-
-                    console.log(
-                        `🎨 Visualized collision "${
-                            box.name
-                        }" at (${box.percentX.toFixed(
-                            1
-                        )}%, ${box.percentY.toFixed(1)}%)`
-                    );
-                } else if (shape.type === "polygon") {
-                    const poly = shape as any;
-
-                    // Calculate center for visualization
-                    const centerX =
-                        poly.points.reduce(
-                            (sum: number, p: any) => sum + p.percentX,
-                            0
-                        ) / poly.points.length;
-                    const centerY =
-                        poly.points.reduce(
-                            (sum: number, p: any) => sum + p.percentY,
-                            0
-                        ) / poly.points.length;
-
-                    // Draw polygon outline
-                    const graphics = this.add.graphics();
-                    graphics.lineStyle(3, 0x0000ff); // Blue outline
-                    graphics.setDepth(1000);
-
-                    const firstPoint = poly.points[0];
-                    const firstCoords = this.percentageToWorldCoordinates(
-                        firstPoint.percentX,
-                        firstPoint.percentY
-                    );
-                    graphics.beginPath();
-                    graphics.moveTo(firstCoords.x, firstCoords.y);
-
-                    for (let i = 1; i < poly.points.length; i++) {
-                        const point = poly.points[i];
+            // 🎨 VISUAL DEBUG: Draw colored outlines to see collision boundaries (only in debug mode)
+            if (this.DEBUG_SHOW_COLLISIONS) {
+                collisionData.shapes.forEach((shape) => {
+                    if (shape.type === "rectangle") {
+                        const box = shape as any;
                         const coords = this.percentageToWorldCoordinates(
-                            point.percentX,
-                            point.percentY
+                            box.percentX + box.percentWidth / 2,
+                            box.percentY + box.percentHeight / 2
                         );
-                        graphics.lineTo(coords.x, coords.y);
+                        const width =
+                            (box.percentWidth / 100) *
+                            this.backgroundImage.displayWidth;
+                        const height =
+                            (box.percentHeight / 100) *
+                            this.backgroundImage.displayHeight;
+
+                        // Draw visible red rectangle outline
+                        const debugRect = this.add.rectangle(
+                            coords.x,
+                            coords.y,
+                            width,
+                            height,
+                            0xff0000,
+                            0 // Transparent fill
+                        );
+                        debugRect.setStrokeStyle(3, 0xff0000); // Red outline
+                        debugRect.setDepth(1000); // Above everything
+
+                        console.log(
+                            `🎨 Visualized collision "${
+                                box.name
+                            }" at (${box.percentX.toFixed(
+                                1
+                            )}%, ${box.percentY.toFixed(1)}%)`
+                        );
+                    } else if (shape.type === "polygon") {
+                        const poly = shape as any;
+
+                        // Calculate center for visualization
+                        const centerX =
+                            poly.points.reduce(
+                                (sum: number, p: any) => sum + p.percentX,
+                                0
+                            ) / poly.points.length;
+                        const centerY =
+                            poly.points.reduce(
+                                (sum: number, p: any) => sum + p.percentY,
+                                0
+                            ) / poly.points.length;
+
+                        // Draw polygon outline
+                        const graphics = this.add.graphics();
+                        graphics.lineStyle(3, 0x0000ff); // Blue outline
+                        graphics.setDepth(1000);
+
+                        const firstPoint = poly.points[0];
+                        const firstCoords = this.percentageToWorldCoordinates(
+                            firstPoint.percentX,
+                            firstPoint.percentY
+                        );
+                        graphics.beginPath();
+                        graphics.moveTo(firstCoords.x, firstCoords.y);
+
+                        for (let i = 1; i < poly.points.length; i++) {
+                            const point = poly.points[i];
+                            const coords = this.percentageToWorldCoordinates(
+                                point.percentX,
+                                point.percentY
+                            );
+                            graphics.lineTo(coords.x, coords.y);
+                        }
+
+                        graphics.closePath();
+                        graphics.strokePath();
+
+                        console.log(
+                            `🎨 Visualized polygon "${poly.name}" with ${poly.points.length} points`
+                        );
+                    } else if (shape.type === "circle") {
+                        const circle = shape as any;
+                        const coords = this.percentageToWorldCoordinates(
+                            circle.percentX,
+                            circle.percentY
+                        );
+                        const radius =
+                            (circle.percentRadius / 100) *
+                            Math.min(
+                                this.backgroundImage.displayWidth,
+                                this.backgroundImage.displayHeight
+                            );
+
+                        // Draw circle outline
+                        const graphics = this.add.graphics();
+                        graphics.lineStyle(3, 0x00ff00); // Green outline
+                        graphics.setDepth(1000);
+                        graphics.strokeCircle(coords.x, coords.y, radius);
+
+                        console.log(
+                            `🎨 Visualized circle "${
+                                circle.name
+                            }" at (${circle.percentX.toFixed(
+                                1
+                            )}%, ${circle.percentY.toFixed(1)}%)`
+                        );
                     }
-
-                    graphics.closePath();
-                    graphics.strokePath();
-
-                    console.log(
-                        `🎨 Visualized polygon "${poly.name}" with ${poly.points.length} points`
-                    );
-                } else if (shape.type === "circle") {
-                    const circle = shape as any;
-                    const coords = this.percentageToWorldCoordinates(
-                        circle.percentX,
-                        circle.percentY
-                    );
-                    const radius =
-                        (circle.percentRadius / 100) *
-                        Math.min(
-                            this.backgroundImage.displayWidth,
-                            this.backgroundImage.displayHeight
-                        );
-
-                    // Draw circle outline
-                    const graphics = this.add.graphics();
-                    graphics.lineStyle(3, 0x00ff00); // Green outline
-                    graphics.setDepth(1000);
-                    graphics.strokeCircle(coords.x, coords.y, radius);
-
-                    console.log(
-                        `🎨 Visualized circle "${
-                            circle.name
-                        }" at (${circle.percentX.toFixed(
-                            1
-                        )}%, ${circle.percentY.toFixed(1)}%)`
-                    );
-                }
-            });
+                });
+            } else {
+                console.log(
+                    "🚫 Visual debug disabled - collision boundaries are invisible"
+                );
+            }
 
             // Add collision between player and collision bodies
             if (this.collisionBodies && this.player) {

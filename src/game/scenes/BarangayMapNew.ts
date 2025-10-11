@@ -351,7 +351,7 @@ export class BarangayMap extends Scene {
 
         // Interaction prompt
         this.interactionPrompt = this.add
-            .text(512, 600, "Press SPACE to interact", {
+            .text(512, 600, "Tap to interact", {
                 fontFamily: "Arial Black",
                 fontSize: 16,
                 color: "#FFD700",

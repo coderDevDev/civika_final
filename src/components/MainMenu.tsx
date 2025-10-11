@@ -63,18 +63,20 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                         {/* Logo - Mobile responsive */}
                         <div className="mb-4 sm:mb-6 md:mb-8">
                             <div className="relative inline-block">
-                                <div className="w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center shadow-2xl animate-bounce game-element-border">
-                                    <span className="text-2xl sm:text-4xl md:text-6xl">
-                                        🏛️
-                                    </span>
+                                <div className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center shadow-2xl animate-bounce game-element-border p-2 sm:p-3 md:p-4">
+                                    <img
+                                        src="/logo.png"
+                                        alt="CIVIKA Logo"
+                                        className="w-full h-full object-contain drop-shadow-lg"
+                                    />
                                 </div>
                                 {/* Glow effect - responsive */}
-                                <div className="absolute inset-0 w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 bg-amber-400/30 rounded-full animate-ping"></div>
+                                <div className="absolute inset-0 w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 bg-amber-400/30 rounded-full animate-ping"></div>
                             </div>
                         </div>
 
                         {/* Title - Mobile responsive */}
-                        <h1
+                        {/* <h1
                             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-amber-400 mb-3 sm:mb-4 drop-shadow-2xl rounded-md py-2 sm:py-3 md:py-4 px-3 sm:px-4 md:px-6"
                             style={{
                                 textShadow: `
@@ -92,7 +94,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                             }}
                         >
                             CIVIKA
-                        </h1>
+                        </h1> */}
                         {/* <div className="text-2xl font-bold text-amber-800 mb-12 drop-shadow-lg game-element-border rounded-md py-2 px-4">
                             🏰 A Civic Education Adventure 🏰
                         </div> */}

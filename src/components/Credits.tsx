@@ -128,10 +128,17 @@ export const Credits: React.FC<CreditsProps> = ({ onClose, isVisible }) => {
                         <h2 className="text-3xl font-bold text-amber-900 game-element-border rounded-md py-3 px-6 mb-4">
                             👥 Credits
                         </h2>
-                        <div className="text-amber-700 text-lg font-semibold">
-                            🏛️ CIVIKA - A Civic Education Adventure 🏛️
+                        <div className="flex items-center justify-center mb-4">
+                            <img
+                                src="/logo.png"
+                                alt="CIVIKA Logo"
+                                className="w-16 h-16 mr-4 drop-shadow-lg"
+                            />
+                            <div className="text-amber-200 text-lg font-semibold">
+                                CIVIKA - A Civic Education Adventure
+                            </div>
                         </div>
-                        <div className="text-amber-600 text-sm mt-2">
+                        <div className="text-amber-300 text-sm mt-2">
                             Version 1.0.0 • 2025 Capstone Project
                         </div>
                     </div>
@@ -139,7 +146,7 @@ export const Credits: React.FC<CreditsProps> = ({ onClose, isVisible }) => {
                     <div className="space-y-8">
                         {/* Development Team */}
                         <section>
-                            <h3 className="text-xl font-bold text-amber-800 border-b-2 border-amber-300 pb-2 mb-4 flex items-center">
+                            <h3 className="text-xl font-bold text-amber-300 border-b-2 border-amber-300 pb-2 mb-4 flex items-center">
                                 <span className="mr-2">👨‍💻</span>
                                 Development Team
                             </h3>
@@ -154,7 +161,7 @@ export const Credits: React.FC<CreditsProps> = ({ onClose, isVisible }) => {
                                                 {member.icon}
                                             </span>
                                             <div>
-                                                <h4 className="font-bold text-amber-800">
+                                                <h4 className="font-bold text-amber-300">
                                                     {member.role}
                                                 </h4>
                                                 <p className="font-semibold text-amber-700 text-sm">
@@ -172,7 +179,7 @@ export const Credits: React.FC<CreditsProps> = ({ onClose, isVisible }) => {
 
                         {/* Technologies Used */}
                         <section>
-                            <h3 className="text-xl font-bold text-amber-800 border-b-2 border-amber-300 pb-2 mb-4 flex items-center">
+                            <h3 className="text-xl font-bold text-amber-300 border-b-2 border-amber-300 pb-2 mb-4 flex items-center">
                                 <span className="mr-2">⚙️</span>
                                 Technologies Used
                             </h3>
@@ -202,7 +209,7 @@ export const Credits: React.FC<CreditsProps> = ({ onClose, isVisible }) => {
 
                         {/* Special Thanks */}
                         <section>
-                            <h3 className="text-xl font-bold text-amber-800 border-b-2 border-amber-300 pb-2 mb-4 flex items-center">
+                            <h3 className="text-xl font-bold text-amber-300 border-b-2 border-amber-300 pb-2 mb-4 flex items-center">
                                 <span className="mr-2">🙏</span>
                                 Special Thanks
                             </h3>
@@ -230,7 +237,7 @@ export const Credits: React.FC<CreditsProps> = ({ onClose, isVisible }) => {
 
                         {/* Educational Mission */}
                         <section>
-                            <h3 className="text-xl font-bold text-amber-800 border-b-2 border-amber-300 pb-2 mb-4 flex items-center">
+                            <h3 className="text-xl font-bold text-amber-300 border-b-2 border-amber-300 pb-2 mb-4 flex items-center">
                                 <span className="mr-2">🎓</span>
                                 Educational Mission
                             </h3>
@@ -273,18 +280,11 @@ export const Credits: React.FC<CreditsProps> = ({ onClose, isVisible }) => {
                                     © 2025 CIVIKA Development Team. Created for
                                     educational purposes.
                                 </div>
-                                <div className="text-amber-600 text-xs">
+                                <div className="text-amber-200 text-xs">
                                     This game is part of a university capstone
                                     project and is designed to promote civic
                                     education and democratic values in the
                                     Philippines.
-                                </div>
-                                <div className="mt-3 flex justify-center space-x-4 text-xs text-amber-600">
-                                    <span>🎓 Academic Project</span>
-                                    <span>•</span>
-                                    <span>🇵🇭 Made in Philippines</span>
-                                    <span>•</span>
-                                    <span>💖 Open Source</span>
                                 </div>
                             </div>
                         </section>

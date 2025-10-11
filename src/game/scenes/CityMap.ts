@@ -1,8 +1,12 @@
 import { GameObjects, Scene } from "phaser";
 import { EventBus } from "../EventBus";
 import { GameStateManager } from "../../utils/GameStateManager";
+import CollisionService from "../../services/CollisionService";
 
 export class CityMap extends Scene {
+    // 🎨 DEBUG MODE: Set to false to hide collision boundaries in production
+    private readonly DEBUG_SHOW_COLLISIONS: boolean = false;
+
     player: Phaser.Physics.Arcade.Sprite;
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     wasd: any;
@@ -24,6 +28,9 @@ export class CityMap extends Scene {
 
     // Background image reference
     backgroundImage: any = null;
+
+    // Collision bodies
+    collisionBodies: Phaser.Physics.Arcade.StaticGroup | null = null;
 
     // Mission indicators for real-time updates
     missionIndicators: Map<number, any> = new Map();
@@ -53,15 +60,17 @@ export class CityMap extends Scene {
             name: "City Ordinances 101",
             npc: "City Councilor",
             missionId: 11,
-            percentX: 50, // Background-relative percentage X
-            percentY: 50, // Background-relative percentage Y
+            percentX: 19, // Background-relative percentage X
+            percentY: 46, // Background-relative percentage Y
         },
         {
-            x: 15,
-            y: 8,
+            x: 21,
+            y: 46,
             name: "Municipal Budget",
             npc: "City Treasurer",
             missionId: 12,
+            percentX: 59, // Background-relative percentage X
+            percentY: 23, // Background-relative percentage Y
         },
         {
             x: 22,
@@ -69,6 +78,8 @@ export class CityMap extends Scene {
             name: "Public Works Planning",
             npc: "City Engineer",
             missionId: 13,
+            percentX: 81, // Background-relative percentage X
+            percentY: 23, // Background-relative percentage Y
         },
         {
             x: 10,
@@ -76,6 +87,8 @@ export class CityMap extends Scene {
             name: "Business Permits & Licensing",
             npc: "Business Permit Officer",
             missionId: 14,
+            percentX: 81, // Background-relative percentage X
+            percentY: 46, // Background-relative percentage Y
         },
         {
             x: 18,
@@ -83,6 +96,8 @@ export class CityMap extends Scene {
             name: "Urban Planning",
             npc: "City Planner",
             missionId: 15,
+            percentX: 79, // Background-relative percentage X
+            percentY: 67, // Background-relative percentage Y
         },
         {
             x: 5,
@@ -90,6 +105,8 @@ export class CityMap extends Scene {
             name: "Environmental Management",
             npc: "Environmental Officer",
             missionId: 16,
+            percentX: 60, // Background-relative percentage X
+            percentY: 90, // Background-relative percentage Y
         },
         {
             x: 20,
@@ -97,6 +114,8 @@ export class CityMap extends Scene {
             name: "Public Safety Coordination",
             npc: "Public Safety Officer",
             missionId: 17,
+            percentX: 50, // Background-relative percentage X
+            percentY: 78, // Background-relative percentage Y
         },
         {
             x: 12,
@@ -104,6 +123,8 @@ export class CityMap extends Scene {
             name: "Cultural Heritage",
             npc: "Tourism Officer",
             missionId: 18,
+            percentX: 19, // Background-relative percentage X
+            percentY: 89, // Background-relative percentage Y
         },
         {
             x: 25,
@@ -111,6 +132,8 @@ export class CityMap extends Scene {
             name: "Healthcare Systems",
             npc: "Health Officer",
             missionId: 19,
+            percentX: 41, // Background-relative percentage X
+            percentY: 24, // Background-relative percentage Y
         },
         {
             x: 16,
@@ -118,8 +141,8 @@ export class CityMap extends Scene {
             name: "City Leadership Summit",
             npc: "City Mayor",
             missionId: 20,
-            percentX: 60, // Background-relative percentage X
-            percentY: 45, // Background-relative percentage Y
+            percentX: 50, // Background-relative percentage X
+            percentY: 56, // Background-relative percentage Y
         },
     ];
 
@@ -133,8 +156,8 @@ export class CityMap extends Scene {
             value: 10,
             points: 20,
             rarity: "common",
-            percentX: 20,
-            percentY: 40,
+            percentX: 35,
+            percentY: 37,
             icon: "💰",
         },
         {
@@ -145,8 +168,8 @@ export class CityMap extends Scene {
             value: 10,
             points: 20,
             rarity: "common",
-            percentX: 80,
-            percentY: 60,
+            percentX: 35,
+            percentY: 9,
             icon: "💰",
         },
         {
@@ -157,8 +180,8 @@ export class CityMap extends Scene {
             value: 10,
             points: 20,
             rarity: "common",
-            percentX: 40,
-            percentY: 85,
+            percentX: 59,
+            percentY: 4,
             icon: "💰",
         },
         {
@@ -169,8 +192,8 @@ export class CityMap extends Scene {
             value: 20,
             points: 40,
             rarity: "uncommon",
-            percentX: 10,
-            percentY: 55,
+            percentX: 44,
+            percentY: 4,
             icon: "🏅",
         },
         {
@@ -181,8 +204,8 @@ export class CityMap extends Scene {
             value: 20,
             points: 40,
             rarity: "uncommon",
-            percentX: 90,
-            percentY: 30,
+            percentX: 5,
+            percentY: 42,
             icon: "🏅",
         },
         {
@@ -193,8 +216,8 @@ export class CityMap extends Scene {
             value: 50,
             points: 100,
             rarity: "rare",
-            percentX: 50,
-            percentY: 50,
+            percentX: 11,
+            percentY: 67,
             icon: "💎",
         },
         {
@@ -205,8 +228,8 @@ export class CityMap extends Scene {
             value: 25,
             points: 50,
             rarity: "uncommon",
-            percentX: 25,
-            percentY: 75,
+            percentX: 6,
+            percentY: 94,
             icon: "⚡",
         },
         {
@@ -217,8 +240,8 @@ export class CityMap extends Scene {
             value: 25,
             points: 50,
             rarity: "uncommon",
-            percentX: 75,
-            percentY: 25,
+            percentX: 30,
+            percentY: 95,
             icon: "⚡",
         },
         {
@@ -229,8 +252,8 @@ export class CityMap extends Scene {
             value: 40,
             points: 80,
             rarity: "rare",
-            percentX: 60,
-            percentY: 20,
+            percentX: 41,
+            percentY: 82,
             icon: "💠",
         },
         {
@@ -241,8 +264,8 @@ export class CityMap extends Scene {
             value: 35,
             points: 70,
             rarity: "rare",
-            percentX: 35,
-            percentY: 65,
+            percentX: 87,
+            percentY: 82,
             icon: "🎖️",
         },
     ];
@@ -478,6 +501,11 @@ export class CityMap extends Scene {
                 // Reposition NPCs relative to background if they already exist
                 this.repositionNPCsRelativeToBackground();
 
+                // Load collision data after background is ready
+                this.time.delayedCall(200, () => {
+                    this.loadCollisions();
+                });
+
                 // Create collectibles after background is ready
                 this.time.delayedCall(300, () => {
                     this.createCollectibles();
@@ -536,15 +564,13 @@ export class CityMap extends Scene {
         let playerX, playerY;
 
         if (this.backgroundImage) {
-            // Position relative to background image center
-            const bgX = this.backgroundImage.x;
-            const bgY = this.backgroundImage.y;
-
-            playerX = bgX;
-            playerY = bgY;
+            // Position at 30%, 50% of background image
+            const coords = this.percentageToWorldCoordinates(30, 50);
+            playerX = coords.x;
+            playerY = coords.y;
 
             console.log(
-                "City player spawning at background center:",
+                "City player spawning at (30%, 50%):",
                 playerX,
                 playerY
             );
@@ -909,26 +935,26 @@ export class CityMap extends Scene {
     }
 
     createUI() {
-        // Create interaction prompt
+        // Create interaction prompt positioned relative to player
         this.interactionPrompt = this.add
             .text(
-                512,
-                600,
-                this.isMobile ? "Tap to interact" : "Press SPACE to interact",
+                this.player.x + 80, // Right side of player
+                this.player.y,
+                this.isMobile ? "Tap to interact" : "Tap to interact",
                 {
                     fontFamily: "Arial Black",
-                    fontSize: 16,
+                    fontSize: 14,
                     color: "#87CEEB", // Sky blue for city theme
                     stroke: "#000080", // Navy blue stroke
                     strokeThickness: 3,
                     align: "center",
                     backgroundColor: "#2F4F4F", // Dark slate gray
-                    padding: { x: 10, y: 5 },
+                    padding: { x: 8, y: 4 },
                 }
             )
             .setOrigin(0.5)
             .setDepth(1000)
-            .setScrollFactor(0)
+            .setScrollFactor(1) // Follow camera with world
             .setVisible(false);
     }
 
@@ -967,16 +993,14 @@ export class CityMap extends Scene {
 
     repositionPlayerRelativeToBackground() {
         if (this.player && this.backgroundImage) {
-            // Position player at center of background image
-            const bgX = this.backgroundImage.x;
-            const bgY = this.backgroundImage.y;
-
-            this.player.setPosition(bgX, bgY);
+            // Position player at 30%, 50% of background image
+            const coords = this.percentageToWorldCoordinates(30, 50);
+            this.player.setPosition(coords.x, coords.y);
 
             console.log(
-                "City player repositioned to background center:",
-                bgX,
-                bgY
+                "City player repositioned to (30%, 50%):",
+                coords.x,
+                coords.y
             );
             console.log(
                 "City background dimensions:",
@@ -1006,6 +1030,139 @@ export class CityMap extends Scene {
         const worldY = bgY + (percentY - 50) * (bgHeight / 100);
 
         return { x: worldX, y: worldY };
+    }
+
+    async loadCollisions() {
+        const collisionService = CollisionService.getInstance();
+
+        // Try localStorage first (for editor testing), then JSON file
+        let collisionData = collisionService.loadCollisionData("CityMap");
+
+        if (!collisionData) {
+            // Try loading from public folder JSON file
+            collisionData = await collisionService.loadCollisionDataFromFile(
+                "CityMap"
+            );
+        }
+
+        if (collisionData && this.backgroundImage) {
+            console.log("✅ Loading collision data for CityMap...");
+            console.log(
+                `Found ${collisionData.shapes.length} collision shapes`
+            );
+
+            this.collisionBodies = collisionService.createCollisions(
+                this,
+                collisionData,
+                this.backgroundImage
+            );
+
+            // 🎨 VISUAL DEBUG: Draw colored outlines to see collision boundaries (only in debug mode)
+            if (this.DEBUG_SHOW_COLLISIONS) {
+                collisionData.shapes.forEach((shape) => {
+                    if (shape.type === "rectangle") {
+                        const box = shape as any;
+                        const coords = this.percentageToWorldCoordinates(
+                            box.percentX + box.percentWidth / 2,
+                            box.percentY + box.percentHeight / 2
+                        );
+                        const width =
+                            (box.percentWidth / 100) *
+                            this.backgroundImage.displayWidth;
+                        const height =
+                            (box.percentHeight / 100) *
+                            this.backgroundImage.displayHeight;
+
+                        const debugRect = this.add.rectangle(
+                            coords.x,
+                            coords.y,
+                            width,
+                            height,
+                            0xff0000,
+                            0 // Transparent fill
+                        );
+                        debugRect.setStrokeStyle(3, 0xff0000); // Red outline
+                        debugRect.setDepth(1000);
+
+                        console.log(
+                            `🎨 Visualized collision "${
+                                box.name
+                            }" at (${box.percentX.toFixed(
+                                1
+                            )}%, ${box.percentY.toFixed(1)}%)`
+                        );
+                    } else if (shape.type === "polygon") {
+                        const poly = shape as any;
+                        const graphics = this.add.graphics();
+                        graphics.lineStyle(3, 0x0000ff); // Blue outline
+                        graphics.setDepth(1000);
+
+                        const firstPoint = poly.points[0];
+                        const firstCoords = this.percentageToWorldCoordinates(
+                            firstPoint.percentX,
+                            firstPoint.percentY
+                        );
+                        graphics.beginPath();
+                        graphics.moveTo(firstCoords.x, firstCoords.y);
+
+                        for (let i = 1; i < poly.points.length; i++) {
+                            const point = poly.points[i];
+                            const coords = this.percentageToWorldCoordinates(
+                                point.percentX,
+                                point.percentY
+                            );
+                            graphics.lineTo(coords.x, coords.y);
+                        }
+
+                        graphics.closePath();
+                        graphics.strokePath();
+
+                        console.log(
+                            `🎨 Visualized polygon "${poly.name}" with ${poly.points.length} points`
+                        );
+                    } else if (shape.type === "circle") {
+                        const circle = shape as any;
+                        const coords = this.percentageToWorldCoordinates(
+                            circle.percentX,
+                            circle.percentY
+                        );
+                        const radius =
+                            (circle.percentRadius / 100) *
+                            Math.min(
+                                this.backgroundImage.displayWidth,
+                                this.backgroundImage.displayHeight
+                            );
+
+                        const graphics = this.add.graphics();
+                        graphics.lineStyle(3, 0x00ff00); // Green outline
+                        graphics.setDepth(1000);
+                        graphics.strokeCircle(coords.x, coords.y, radius);
+
+                        console.log(
+                            `🎨 Visualized circle "${
+                                circle.name
+                            }" at (${circle.percentX.toFixed(
+                                1
+                            )}%, ${circle.percentY.toFixed(1)}%)`
+                        );
+                    }
+                });
+            } else {
+                console.log(
+                    "🚫 Visual debug disabled - collision boundaries are invisible"
+                );
+            }
+
+            // Add collision between player and collision bodies
+            if (this.collisionBodies && this.player) {
+                this.physics.add.collider(this.player, this.collisionBodies);
+                console.log(
+                    `✅ Player collision enabled with ${collisionData.shapes.length} collision shapes`
+                );
+            }
+        } else {
+            console.log("⚠️ No collision data found for CityMap");
+        }
     }
 
     repositionNPCsRelativeToBackground() {
@@ -1196,8 +1353,8 @@ export class CityMap extends Scene {
     update() {
         if (!this.player) return;
 
-        // Player movement (same logic as Level 1)
-        const speed = 200;
+        // Player movement - reduced speed for more natural walking
+        const speed = 120; // Slower, more realistic walking speed (was 200)
         let isMoving = false;
         let currentDirection = "";
         let velocityX = 0;
@@ -1382,6 +1539,12 @@ export class CityMap extends Scene {
 
         if (nearestNPC && nearestDistance < 80) {
             this.nearbyNPC = nearestNPC;
+
+            // Update interaction prompt position to right side of player
+            this.interactionPrompt.setPosition(
+                this.player.x + 80, // Right side of player
+                this.player.y
+            );
             this.interactionPrompt.setVisible(true);
         } else {
             this.nearbyNPC = null;
@@ -1654,7 +1817,7 @@ export class CityMap extends Scene {
 
             const collectible = this.add
                 .text(coords.x, coords.y, item.icon, {
-                    fontSize: "48px",
+                    fontSize: "30px",
                     fontFamily: "Arial",
                 })
                 .setOrigin(0.5)

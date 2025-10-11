@@ -188,7 +188,7 @@ export class CollisionService {
             };
         });
 
-        // Calculate bounding box of polygon
+        // Calculate bounding box
         const minX = Math.min(...worldPoints.map((p: any) => p.x));
         const maxX = Math.max(...worldPoints.map((p: any) => p.x));
         const minY = Math.min(...worldPoints.map((p: any) => p.y));
@@ -196,33 +196,70 @@ export class CollisionService {
 
         const width = maxX - minX;
         const height = maxY - minY;
-        const centerX = minX + width / 2;
-        const centerY = minY + height / 2;
 
-        // For now, create a bounding box rectangle for the polygon
-        // This is simpler and more reliable than complex polygon physics
-        const collision = scene.add.rectangle(
-            centerX,
-            centerY,
-            width,
-            height,
-            0x000000,
-            0 // Invisible
-        );
+        // 🎯 ENHANCED: Create multiple small rectangles to follow polygon shape more accurately
+        // This gives much better collision detection than a single bounding box
 
-        // Add physics FIRST, then add to group
-        scene.physics.add.existing(collision, true);
-        group.add(collision);
+        const tileSize = 20; // Size of each collision tile
+        const tilesCreated: number[] = [];
 
-        if (collision.body) {
-            const body = collision.body as Phaser.Physics.Arcade.StaticBody;
-            body.setSize(width, height);
-            body.updateFromGameObject();
+        // Create a grid of small tiles that cover only the polygon area
+        for (let y = minY; y < maxY; y += tileSize) {
+            for (let x = minX; x < maxX; x += tileSize) {
+                const testX = x + tileSize / 2;
+                const testY = y + tileSize / 2;
+
+                // Check if this tile center is inside the polygon
+                if (this.isPointInPolygon(testX, testY, worldPoints)) {
+                    // Create a small collision rectangle for this tile
+                    const tile = scene.add.rectangle(
+                        testX,
+                        testY,
+                        tileSize,
+                        tileSize,
+                        0x000000,
+                        0 // Invisible
+                    );
+
+                    scene.physics.add.existing(tile, true);
+                    group.add(tile);
+
+                    if (tile.body) {
+                        const body =
+                            tile.body as Phaser.Physics.Arcade.StaticBody;
+                        body.setSize(tileSize, tileSize);
+                        body.updateFromGameObject();
+                    }
+
+                    tilesCreated.push(1);
+                }
+            }
         }
 
         console.log(
-            `✅ Created polygon collision "${poly.name}" with ${poly.points.length} points (using bounding box)`
+            `✅ Created polygon collision "${poly.name}" with ${tilesCreated.length} tiles covering ${poly.points.length} points`
         );
+    }
+
+    // Helper: Check if a point is inside a polygon using ray casting algorithm
+    private isPointInPolygon(
+        x: number,
+        y: number,
+        points: Array<{ x: number; y: number }>
+    ): boolean {
+        let inside = false;
+        for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+            const xi = points[i].x;
+            const yi = points[i].y;
+            const xj = points[j].x;
+            const yj = points[j].y;
+
+            const intersect =
+                yi > y !== yj > y &&
+                x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+            if (intersect) inside = !inside;
+        }
+        return inside;
     }
 
     private createCircleCollision(

@@ -25,16 +25,28 @@
         "dev": "node log.js dev & next dev -p 8080",
         "build": "node log.js build & next build",
         "dev-nolog": "next dev -p 8080",
-        "build-nolog": "next build"
+        "build-nolog": "next build",
+        "export": "next export",
+        "build:capacitor": "next build && npx cap sync",
+        "mobile:init": "npx cap init",
+        "mobile:add:android": "npx cap add android",
+        "mobile:sync": "npx cap sync",
+        "mobile:open:android": "npx cap open android",
+        "mobile:build:android": "npm run build:capacitor && cd android && gradlew assembleDebug",
+        "mobile:build:android:release": "npm run build:capacitor && cd android && gradlew assembleRelease"
     },
     "dependencies": {
+        "@capacitor/android": "^6.0.0",
+        "@capacitor/core": "^6.0.0",
         "@supabase/supabase-js": "^2.75.0",
+        "lucide-react": "^0.545.0",
         "next": "15.3.1",
         "phaser": "^3.90.0",
         "react": "19.0.0",
         "react-dom": "19.0.0"
     },
     "devDependencies": {
+        "@capacitor/cli": "^6.0.0",
         "@types/node": "^20",
         "@types/react": "^19",
         "@types/react-dom": "^19",

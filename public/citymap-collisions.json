@@ -1,0 +1,936 @@
+{
+  "mapName": "BarangayMap",
+  "version": "1.0.0",
+  "createdAt": "2025-10-11T21:13:04.233Z",
+  "updatedAt": "2025-10-11T22:47:02.762Z",
+  "shapes": [
+    {
+      "id": "polygon-1760217280533",
+      "type": "polygon",
+      "name": "Collision Polygon 1",
+      "points": [
+        {
+          "percentX": 11.432254437318784,
+          "percentY": 9.73858503248976
+        },
+        {
+          "percentX": 11.064065924800374,
+          "percentY": 22.07290020185648
+        },
+        {
+          "percentX": 25.97570068179596,
+          "percentY": 21.888805945597273
+        },
+        {
+          "percentX": 25.97570068179596,
+          "percentY": 12.684093132637036
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217332281",
+      "type": "polygon",
+      "name": "Collision Polygon 3",
+      "points": [
+        {
+          "percentX": 75.12886710300363,
+          "percentY": 9.73858503248976
+        },
+        {
+          "percentX": 74.576584334226,
+          "percentY": 22.9933714831525
+        },
+        {
+          "percentX": 89.30412483496238,
+          "percentY": 22.9933714831525
+        },
+        {
+          "percentX": 89.4882190912216,
+          "percentY": 10.290867801267375
+        },
+        {
+          "percentX": 87.64727652862955,
+          "percentY": 9.002208007452941
+        },
+        {
+          "percentX": 86.54271099107432,
+          "percentY": 6.793076932342486
+        },
+        {
+          "percentX": 84.14948565970465,
+          "percentY": 6.60898267608328
+        },
+        {
+          "percentX": 83.59720289092704,
+          "percentY": 9.73858503248976
+        },
+        {
+          "percentX": 75.31296135926283,
+          "percentY": 9.554490776230557
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217346843",
+      "type": "polygon",
+      "name": "Collision Polygon 4",
+      "points": [
+        {
+          "percentX": 11.248160181059578,
+          "percentY": 33.30264983366797
+        },
+        {
+          "percentX": 11.248160181059578,
+          "percentY": 45.268776490516274
+        },
+        {
+          "percentX": 25.42341791301834,
+          "percentY": 44.900587977997866
+        },
+        {
+          "percentX": 25.23932365675914,
+          "percentY": 33.48674408992717
+        },
+        {
+          "percentX": 22.29381555661186,
+          "percentY": 31.093518758557508
+        },
+        {
+          "percentX": 21.74153278783425,
+          "percentY": 28.884387683447056
+        },
+        {
+          "percentX": 17.323270637613337,
+          "percentY": 29.06848193970626
+        },
+        {
+          "percentX": 17.13917638135413,
+          "percentY": 31.277613014816712
+        },
+        {
+          "percentX": 11.616348693577988,
+          "percentY": 33.30264983366797
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217370622",
+      "type": "polygon",
+      "name": "Collision Polygon 5",
+      "points": [
+        {
+          "percentX": 50.27614250801098,
+          "percentY": 34.22312111496399
+        },
+        {
+          "percentX": 45.673786101530865,
+          "percentY": 39.56185454648093
+        },
+        {
+          "percentX": 34.81222498223778,
+          "percentY": 40.298231571517746
+        },
+        {
+          "percentX": 34.996319238496994,
+          "percentY": 49.502944384477985
+        },
+        {
+          "percentX": 35.5486020072746,
+          "percentY": 55.209866328513336
+        },
+        {
+          "percentX": 64.26730598371054,
+          "percentY": 56.13033760980935
+        },
+        {
+          "percentX": 65.00368300874736,
+          "percentY": 40.66642008403616
+        },
+        {
+          "percentX": 55.61487593952792,
+          "percentY": 39.93004305899934
+        },
+        {
+          "percentX": 54.14212188945429,
+          "percentY": 36.98453495885206
+        },
+        {
+          "percentX": 51.01251953304781,
+          "percentY": 34.7754038837416
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217383045",
+      "type": "polygon",
+      "name": "Collision Polygon 6",
+      "points": [
+        {
+          "percentX": 76.78571540933646,
+          "percentY": 32.934461321149556
+        },
+        {
+          "percentX": 76.41752689681806,
+          "percentY": 45.45287074677548
+        },
+        {
+          "percentX": 86.72680524733352,
+          "percentY": 45.45287074677548
+        },
+        {
+          "percentX": 87.64727652862955,
+          "percentY": 32.75036706489035
+        },
+        {
+          "percentX": 81.9403545845942,
+          "percentY": 30.7253302460391
+        },
+        {
+          "percentX": 76.96980966559566,
+          "percentY": 33.11855557740876
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217391926",
+      "type": "polygon",
+      "name": "Collision Polygon 7",
+      "points": [
+        {
+          "percentX": 13.089102743651626,
+          "percentY": 52.264358228366056
+        },
+        {
+          "percentX": 12.905008487392422,
+          "percentY": 63.310013603918335
+        },
+        {
+          "percentX": 23.950663862944705,
+          "percentY": 64.23048488521437
+        },
+        {
+          "percentX": 25.055229400499933,
+          "percentY": 52.264358228366056
+        },
+        {
+          "percentX": 13.641385512429242,
+          "percentY": 52.080263972106856
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217398836",
+      "type": "polygon",
+      "name": "Collision Polygon 8",
+      "points": [
+        {
+          "percentX": 76.04933838429965,
+          "percentY": 52.448452484625264
+        },
+        {
+          "percentX": 76.96980966559566,
+          "percentY": 64.59867339773278
+        },
+        {
+          "percentX": 88.01546504114796,
+          "percentY": 64.23048488521437
+        },
+        {
+          "percentX": 87.64727652862955,
+          "percentY": 52.080263972106856
+        },
+        {
+          "percentX": 75.68114987178124,
+          "percentY": 52.080263972106856
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217410995",
+      "type": "polygon",
+      "name": "Collision Polygon 9",
+      "points": [
+        {
+          "percentX": 13.089102743651626,
+          "percentY": 78.03755410465472
+        },
+        {
+          "percentX": 13.641385512429242,
+          "percentY": 88.34683245517019
+        },
+        {
+          "percentX": 25.23932365675914,
+          "percentY": 88.53092671142939
+        },
+        {
+          "percentX": 25.97570068179596,
+          "percentY": 76.38070579832188
+        },
+        {
+          "percentX": 16.586893612576517,
+          "percentY": 76.74889431084029
+        },
+        {
+          "percentX": 16.586893612576517,
+          "percentY": 74.17157472321142
+        },
+        {
+          "percentX": 13.825479768688446,
+          "percentY": 73.803386210693
+        },
+        {
+          "percentX": 13.27319699991083,
+          "percentY": 76.93298856709949
+        },
+        {
+          "percentX": 13.27319699991083,
+          "percentY": 78.22164836091392
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217418398",
+      "type": "polygon",
+      "name": "Collision Polygon 10",
+      "points": [
+        {
+          "percentX": 39.96686415749552,
+          "percentY": 76.74889431084029
+        },
+        {
+          "percentX": 39.782769901236314,
+          "percentY": 79.14211964220995
+        },
+        {
+          "percentX": 43.096466513902,
+          "percentY": 78.95802538595073
+        },
+        {
+          "percentX": 43.096466513902,
+          "percentY": 76.74889431084029
+        },
+        {
+          "percentX": 39.96686415749552,
+          "percentY": 76.56480005458108
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217425196",
+      "type": "polygon",
+      "name": "Collision Polygon 11",
+      "points": [
+        {
+          "percentX": 45.673786101530865,
+          "percentY": 73.6192919544338
+        },
+        {
+          "percentX": 45.12150333275325,
+          "percentY": 76.38070579832188
+        },
+        {
+          "percentX": 45.30559758901245,
+          "percentY": 77.4852713358771
+        },
+        {
+          "percentX": 55.61487593952792,
+          "percentY": 77.4852713358771
+        },
+        {
+          "percentX": 55.61487593952792,
+          "percentY": 73.98748046695222
+        },
+        {
+          "percentX": 45.85788035779007,
+          "percentY": 73.4351976981746
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217433536",
+      "type": "polygon",
+      "name": "Collision Polygon 12",
+      "points": [
+        {
+          "percentX": 59.480855320971216,
+          "percentY": 77.1170828233587
+        },
+        {
+          "percentX": 54.694404658231896,
+          "percentY": 78.95802538595073
+        },
+        {
+          "percentX": 55.062593170750304,
+          "percentY": 88.34683245517019
+        },
+        {
+          "percentX": 65.18777726500656,
+          "percentY": 88.34683245517019
+        },
+        {
+          "percentX": 65.18777726500656,
+          "percentY": 79.32621389846915
+        },
+        {
+          "percentX": 60.40132660226725,
+          "percentY": 76.74889431084029
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217448935",
+      "type": "polygon",
+      "name": "Collision Polygon 13",
+      "points": [
+        {
+          "percentX": 79.54712925322454,
+          "percentY": 75.46023451702585
+        },
+        {
+          "percentX": 76.78571540933646,
+          "percentY": 75.27614026076664
+        },
+        {
+          "percentX": 76.78571540933646,
+          "percentY": 78.22164836091392
+        },
+        {
+          "percentX": 79.54712925322454,
+          "percentY": 78.22164836091392
+        },
+        {
+          "percentX": 80.09941202200214,
+          "percentY": 75.82842302954425
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "box-1760217457370",
+      "type": "rectangle",
+      "name": "Collision Box 14",
+      "percentX": 81.9403545845942,
+      "percentY": 69.7533125729905,
+      "percentWidth": 6.44329896907216,
+      "percentHeight": 1.840942562592062,
+      "color": "#FF0000"
+    },
+    {
+      "id": "box-1760217480892",
+      "type": "rectangle",
+      "name": "Collision Box 15",
+      "percentX": 85.8063339660375,
+      "percentY": 93.86966014294632,
+      "percentWidth": 2.7614138438880644,
+      "percentHeight": 0.920471281296031,
+      "color": "#FF0000"
+    },
+    {
+      "id": "polygon-1760217494721",
+      "type": "polygon",
+      "name": "Collision Polygon 16",
+      "points": [
+        {
+          "percentX": 40.33505267001393,
+          "percentY": 92.9491888616503
+        },
+        {
+          "percentX": 40.51914692627313,
+          "percentY": 95.15831993676076
+        },
+        {
+          "percentX": 46.77835163908609,
+          "percentY": 95.15831993676076
+        },
+        {
+          "percentX": 46.59425738282689,
+          "percentY": 92.5810003491319
+        },
+        {
+          "percentX": 40.33505267001393,
+          "percentY": 92.7650946053911
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217507727",
+      "type": "polygon",
+      "name": "Collision Polygon 17",
+      "points": [
+        {
+          "percentX": 38.310015851162674,
+          "percentY": 26.307068095818188
+        },
+        {
+          "percentX": 38.310015851162674,
+          "percentY": 28.884387683447056
+        },
+        {
+          "percentX": 45.673786101530865,
+          "percentY": 28.516199170928648
+        },
+        {
+          "percentX": 45.12150333275325,
+          "percentY": 26.307068095818188
+        },
+        {
+          "percentX": 38.49411010742188,
+          "percentY": 26.307068095818188
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217531463",
+      "type": "polygon",
+      "name": "Collision Polygon 18",
+      "points": [
+        {
+          "percentX": 6.461709518320256,
+          "percentY": 34.03902685870479
+        },
+        {
+          "percentX": 6.461709518320256,
+          "percentY": 39.37776029022172
+        },
+        {
+          "percentX": 8.670840593430713,
+          "percentY": 39.56185454648093
+        },
+        {
+          "percentX": 8.854934849689917,
+          "percentY": 34.03902685870479
+        },
+        {
+          "percentX": 6.829898030838666,
+          "percentY": 33.67083834618638
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217541118",
+      "type": "polygon",
+      "name": "Collision Polygon 19",
+      "points": [
+        {
+          "percentX": 3.700295674432185,
+          "percentY": 58.339468684919815
+        },
+        {
+          "percentX": 3.5162014181729804,
+          "percentY": 62.57363657888152
+        },
+        {
+          "percentX": 6.093521005801846,
+          "percentY": 63.310013603918335
+        },
+        {
+          "percentX": 7.01399228709787,
+          "percentY": 67.17599298536165
+        },
+        {
+          "percentX": 9.03902910594912,
+          "percentY": 67.72827575413926
+        },
+        {
+          "percentX": 9.03902910594912,
+          "percentY": 63.49410786017754
+        },
+        {
+          "percentX": 7.566275055875485,
+          "percentY": 62.57363657888152
+        },
+        {
+          "percentX": 5.909426749542641,
+          "percentY": 60.364505503771056
+        },
+        {
+          "percentX": 6.093521005801846,
+          "percentY": 58.52356294117902
+        },
+        {
+          "percentX": 4.068484186950593,
+          "percentY": 58.339468684919815
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217546859",
+      "type": "polygon",
+      "name": "Collision Polygon 20",
+      "points": [
+        {
+          "percentX": 13.089102743651626,
+          "percentY": 69.93740682924971
+        },
+        {
+          "percentX": 13.089102743651626,
+          "percentY": 71.96244364810096
+        },
+        {
+          "percentX": 20.084684481501405,
+          "percentY": 72.33063216061937
+        },
+        {
+          "percentX": 19.9005902252422,
+          "percentY": 69.7533125729905
+        },
+        {
+          "percentX": 13.27319699991083,
+          "percentY": 69.93740682924971
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217552926",
+      "type": "polygon",
+      "name": "Collision Polygon 21",
+      "points": [
+        {
+          "percentX": 67.76509685263544,
+          "percentY": 61.284976785067094
+        },
+        {
+          "percentX": 67.58100259637622,
+          "percentY": 65.703238935288
+        },
+        {
+          "percentX": 70.7106049527827,
+          "percentY": 65.703238935288
+        },
+        {
+          "percentX": 70.89469920904192,
+          "percentY": 61.284976785067094
+        },
+        {
+          "percentX": 67.94919110889464,
+          "percentY": 61.10088252880789
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217559222",
+      "type": "polygon",
+      "name": "Collision Polygon 22",
+      "points": [
+        {
+          "percentX": 67.39690834011702,
+          "percentY": 16.734166770339538
+        },
+        {
+          "percentX": 67.94919110889464,
+          "percentY": 21.152428920560453
+        },
+        {
+          "percentX": 70.5265106965235,
+          "percentY": 21.152428920560453
+        },
+        {
+          "percentX": 70.7106049527827,
+          "percentY": 16.36597825782113
+        },
+        {
+          "percentX": 67.94919110889464,
+          "percentY": 16.734166770339538
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217568105",
+      "type": "polygon",
+      "name": "Collision Polygon 23",
+      "points": [
+        {
+          "percentX": 69.79013367148669,
+          "percentY": 39.93004305899934
+        },
+        {
+          "percentX": 69.42194515896828,
+          "percentY": 44.34830520922025
+        },
+        {
+          "percentX": 71.99926474659715,
+          "percentY": 44.34830520922025
+        },
+        {
+          "percentX": 73.47201879667078,
+          "percentY": 39.74594880274013
+        },
+        {
+          "percentX": 70.1583221840051,
+          "percentY": 39.56185454648093
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217579236",
+      "type": "polygon",
+      "name": "Collision Polygon 24",
+      "points": [
+        {
+          "percentX": 49.17157697045575,
+          "percentY": 62.02135381010391
+        },
+        {
+          "percentX": 48.803388457937345,
+          "percentY": 65.5191446790288
+        },
+        {
+          "percentX": 51.748896558084624,
+          "percentY": 65.5191446790288
+        },
+        {
+          "percentX": 51.748896558084624,
+          "percentY": 62.75773083514073
+        },
+        {
+          "percentX": 51.748896558084624,
+          "percentY": 61.284976785067094
+        },
+        {
+          "percentX": 49.53976548297416,
+          "percentY": 61.6531652975855
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217593358",
+      "type": "polygon",
+      "name": "Collision Polygon 25",
+      "points": [
+        {
+          "percentX": 97.03608359784899,
+          "percentY": 2.7430032946399807
+        },
+        {
+          "percentX": 97.03608359784899,
+          "percentY": 98.84020506194486
+        },
+        {
+          "percentX": 99.98159169799627,
+          "percentY": 99.39248783072246
+        },
+        {
+          "percentX": 99.61340318547785,
+          "percentY": 3.1111918071583906
+        },
+        {
+          "percentX": 97.03608359784899,
+          "percentY": 2.558909038380776
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217605852",
+      "type": "polygon",
+      "name": "Collision Polygon 26",
+      "points": [
+        {
+          "percentX": 3.700295674432185,
+          "percentY": 98.47201654942644
+        },
+        {
+          "percentX": 4.068484186950593,
+          "percentY": 99.76067634324087
+        },
+        {
+          "percentX": 99.61340318547785,
+          "percentY": 99.76067634324087
+        },
+        {
+          "percentX": 95.93151806029375,
+          "percentY": 98.28792229316724
+        },
+        {
+          "percentX": 4.068484186950593,
+          "percentY": 98.47201654942644
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217626532",
+      "type": "polygon",
+      "name": "Collision Polygon 27",
+      "points": [
+        {
+          "percentX": 0.5706933180257042,
+          "percentY": 9.002208007452941
+        },
+        {
+          "percentX": 3.148012905654571,
+          "percentY": 13.420470157673856
+        },
+        {
+          "percentX": 3.148012905654571,
+          "percentY": 98.10382803690804
+        },
+        {
+          "percentX": 4.068484186950593,
+          "percentY": 99.76067634324087
+        },
+        {
+          "percentX": 0.3865990617664995,
+          "percentY": 99.76067634324087
+        },
+        {
+          "percentX": 0.754787574284909,
+          "percentY": 9.73858503248976
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217636700",
+      "type": "polygon",
+      "name": "Collision Polygon 28",
+      "points": [
+        {
+          "percentX": 33.707659444682555,
+          "percentY": 0.9020607320479336
+        },
+        {
+          "percentX": 33.523565188423355,
+          "percentY": 2.006626269603162
+        },
+        {
+          "percentX": 96.85198934158979,
+          "percentY": 2.006626269603162
+        },
+        {
+          "percentX": 99.61340318547785,
+          "percentY": 3.1111918071583906
+        },
+        {
+          "percentX": 99.61340318547785,
+          "percentY": 0.34977796327031946
+        },
+        {
+          "percentX": 34.81222498223778,
+          "percentY": 0.34977796327031946
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217648176",
+      "type": "polygon",
+      "name": "Collision Polygon 29",
+      "points": [
+        {
+          "percentX": 0.20250480550729477,
+          "percentY": 0.34977796327031946
+        },
+        {
+          "percentX": 33.89175370094176,
+          "percentY": 1.8225320133439575
+        },
+        {
+          "percentX": 33.33947093216415,
+          "percentY": 0.1656837070111147
+        },
+        {
+          "percentX": 1.1229760868033183,
+          "percentY": 0.34977796327031946
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760217655182",
+      "type": "polygon",
+      "name": "Collision Polygon 30",
+      "points": [
+        {
+          "percentX": 0.3865990617664995,
+          "percentY": 0.9020607320479336
+        },
+        {
+          "percentX": -0.1656837070111147,
+          "percentY": 7.345359701120099
+        },
+        {
+          "percentX": 0.3865990617664995,
+          "percentY": 0.5338722195295241
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760222822762",
+      "type": "polygon",
+      "name": "Collision Polygon 30",
+      "points": [
+        {
+          "percentX": 36.28497903231142,
+          "percentY": 11.027244826304194
+        },
+        {
+          "percentX": 65.74006003378418,
+          "percentY": 10.659056313785785
+        },
+        {
+          "percentX": 65.00368300874736,
+          "percentY": 23.913842764448525
+        },
+        {
+          "percentX": 55.79897019578712,
+          "percentY": 23.72974850818932
+        },
+        {
+          "percentX": 53.589839120676665,
+          "percentY": 14.70912995148829
+        },
+        {
+          "percentX": 48.803388457937345,
+          "percentY": 14.156847182710674
+        },
+        {
+          "percentX": 47.330634407863705,
+          "percentY": 14.893224207747494
+        },
+        {
+          "percentX": 46.59425738282689,
+          "percentY": 18.943297845449997
+        },
+        {
+          "percentX": 45.85788035779007,
+          "percentY": 22.44108871437489
+        },
+        {
+          "percentX": 36.83726180108904,
+          "percentY": 21.888805945597273
+        },
+        {
+          "percentX": 36.46907328857063,
+          "percentY": 17.83873230789477
+        },
+        {
+          "percentX": 35.91679051979301,
+          "percentY": 11.395433338822604
+        }
+      ],
+      "color": "#0000FF"
+    }
+  ]
+}

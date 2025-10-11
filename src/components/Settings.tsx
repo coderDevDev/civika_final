@@ -207,13 +207,13 @@ export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible }) => {
                         {/* Audio Settings */}
                         {activeTab === "audio" && (
                             <div className="space-y-4">
-                                <h3 className="text-lg font-bold text-amber-800 border-b border-amber-300 pb-2">
+                                <h3 className="text-lg font-bold text-amber-300 border-b border-amber-300 pb-2">
                                     🎵 Audio Settings
                                 </h3>
 
                                 {/* Master Volume */}
                                 <div className="flex justify-between items-center">
-                                    <label className="text-amber-700 font-semibold">
+                                    <label className="text-amber-200 font-semibold">
                                         Master Volume:
                                     </label>
                                     <div className="flex items-center space-x-2">
@@ -231,7 +231,7 @@ export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible }) => {
                                             }
                                             className="w-32"
                                         />
-                                        <span className="w-12 text-amber-800 font-bold">
+                                        <span className="w-12 text-amber-300 font-bold">
                                             {Math.round(
                                                 settings.masterVolume * 100
                                             )}
@@ -242,7 +242,7 @@ export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible }) => {
 
                                 {/* Music Volume */}
                                 <div className="flex justify-between items-center">
-                                    <label className="text-amber-700 font-semibold">
+                                    <label className="text-amber-200 font-semibold">
                                         Music Volume:
                                     </label>
                                     <div className="flex items-center space-x-2">
@@ -261,7 +261,7 @@ export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible }) => {
                                             className="w-32"
                                             disabled={!settings.enableMusic}
                                         />
-                                        <span className="w-12 text-amber-800 font-bold">
+                                        <span className="w-12 text-amber-300 font-bold">
                                             {Math.round(
                                                 settings.musicVolume * 100
                                             )}
@@ -272,7 +272,7 @@ export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible }) => {
 
                                 {/* Effects Volume */}
                                 <div className="flex justify-between items-center">
-                                    <label className="text-amber-700 font-semibold">
+                                    <label className="text-amber-200 font-semibold">
                                         Sound Effects:
                                     </label>
                                     <div className="flex items-center space-x-2">
@@ -291,7 +291,7 @@ export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible }) => {
                                             className="w-32"
                                             disabled={!settings.enableEffects}
                                         />
-                                        <span className="w-12 text-amber-800 font-bold">
+                                        <span className="w-12 text-amber-300 font-bold">
                                             {Math.round(
                                                 settings.effectsVolume * 100
                                             )}
@@ -302,7 +302,7 @@ export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible }) => {
 
                                 {/* Enable Music */}
                                 <div className="flex justify-between items-center">
-                                    <label className="text-amber-700 font-semibold">
+                                    <label className="text-amber-200 font-semibold">
                                         Enable Music:
                                     </label>
                                     <label className="flex items-center space-x-2 cursor-pointer">
@@ -317,7 +317,7 @@ export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible }) => {
                                             }
                                             className="form-checkbox h-5 w-5 text-amber-600"
                                         />
-                                        <span className="text-amber-800">
+                                        <span className="text-amber-300">
                                             {settings.enableMusic
                                                 ? "On"
                                                 : "Off"}
@@ -327,7 +327,7 @@ export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible }) => {
 
                                 {/* Enable Effects */}
                                 <div className="flex justify-between items-center">
-                                    <label className="text-amber-700 font-semibold">
+                                    <label className="text-amber-200 font-semibold">
                                         Enable Sound Effects:
                                     </label>
                                     <label className="flex items-center space-x-2 cursor-pointer">
@@ -342,7 +342,7 @@ export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible }) => {
                                             }
                                             className="form-checkbox h-5 w-5 text-amber-600"
                                         />
-                                        <span className="text-amber-800">
+                                        <span className="text-amber-300">
                                             {settings.enableEffects
                                                 ? "On"
                                                 : "Off"}
@@ -355,13 +355,13 @@ export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible }) => {
                         {/* Graphics Settings */}
                         {activeTab === "graphics" && (
                             <div className="space-y-4">
-                                <h3 className="text-lg font-bold text-amber-800 border-b border-amber-300 pb-2">
+                                <h3 className="text-lg font-bold text-amber-300 border-b border-amber-300 pb-2">
                                     🎨 Graphics Settings
                                 </h3>
 
                                 {/* Fullscreen */}
                                 <div className="flex justify-between items-center">
-                                    <label className="text-amber-700 font-semibold">
+                                    <label className="text-amber-200 font-semibold">
                                         Fullscreen Mode:
                                     </label>
                                     <label className="flex items-center space-x-2 cursor-pointer">
@@ -376,7 +376,7 @@ export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible }) => {
                                             }
                                             className="form-checkbox h-5 w-5 text-amber-600"
                                         />
-                                        <span className="text-amber-800">
+                                        <span className="text-amber-300">
                                             {settings.fullscreen ? "On" : "Off"}
                                         </span>
                                     </label>
@@ -393,13 +393,13 @@ export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible }) => {
                         {/* Gameplay Settings */}
                         {activeTab === "gameplay" && (
                             <div className="space-y-4">
-                                <h3 className="text-lg font-bold text-amber-800 border-b border-amber-300 pb-2">
+                                <h3 className="text-lg font-bold text-amber-300 border-b border-amber-300 pb-2">
                                     ⚙️ Gameplay Settings
                                 </h3>
 
                                 {/* Language */}
                                 <div className="flex justify-between items-center">
-                                    <label className="text-amber-700 font-semibold">
+                                    <label className="text-amber-200 font-semibold">
                                         Language:
                                     </label>
                                     <select
@@ -410,7 +410,7 @@ export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible }) => {
                                                 e.target.value
                                             )
                                         }
-                                        className="px-3 py-1 rounded border border-amber-300 bg-white text-amber-800"
+                                        className="px-3 py-1 rounded border border-amber-300 bg-white text-amber-300"
                                     >
                                         <option value="en">🇺🇸 English</option>
                                         <option value="fil">🇵🇭 Filipino</option>
@@ -421,7 +421,7 @@ export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible }) => {
 
                                 {/* Difficulty */}
                                 <div className="flex justify-between items-center">
-                                    <label className="text-amber-700 font-semibold">
+                                    <label className="text-amber-200 font-semibold">
                                         Difficulty:
                                     </label>
                                     <select
@@ -432,7 +432,7 @@ export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible }) => {
                                                 e.target.value
                                             )
                                         }
-                                        className="px-3 py-1 rounded border border-amber-300 bg-white text-amber-800"
+                                        className="px-3 py-1 rounded border border-amber-300 bg-white text-amber-300"
                                     >
                                         <option value="easy">😊 Easy</option>
                                         <option value="normal">
@@ -447,7 +447,7 @@ export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible }) => {
 
                                 {/* Show Tutorials */}
                                 <div className="flex justify-between items-center">
-                                    <label className="text-amber-700 font-semibold">
+                                    <label className="text-amber-200 font-semibold">
                                         Show Tutorials:
                                     </label>
                                     <label className="flex items-center space-x-2 cursor-pointer">
@@ -462,7 +462,7 @@ export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible }) => {
                                             }
                                             className="form-checkbox h-5 w-5 text-amber-600"
                                         />
-                                        <span className="text-amber-800">
+                                        <span className="text-amber-300">
                                             {settings.showTutorials
                                                 ? "On"
                                                 : "Off"}
@@ -506,3 +506,4 @@ declare global {
         };
     }
 }
+

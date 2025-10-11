@@ -60,26 +60,33 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({
 
                     {/* Parchment content */}
                     <div className=" rounded-md p-4 relative">
-                        {/* Title */}
-                        <h1
-                            className="text-2xl sm:text-3xl font-black text-amber-400 mb-3 text-center drop-shadow-lg"
-                            style={{
-                                textShadow: `
-                                -2px -2px 0px #8B4513,
-                                2px -2px 0px #8B4513,
-                                -2px 2px 0px #8B4513,
-                                2px 2px 0px #8B4513,
-                                -1px -1px 0px #A0522D,
-                                1px -1px 0px #A0522D,
-                                -1px 1px 0px #A0522D,
-                                1px 1px 0px #A0522D,
-                                0px 0px 8px rgba(139, 69, 19, 0.5)
-                            `,
-                                WebkitTextStroke: "1.5px #8B4513",
-                            }}
-                        >
-                            Create Your Character
-                        </h1>
+                        {/* Title with Logo */}
+                        <div className="flex items-center justify-center mb-3">
+                            <img
+                                src="/logo.png"
+                                alt="CIVIKA Logo"
+                                className="w-10 h-10 mr-3 drop-shadow-lg"
+                            />
+                            <h1
+                                className="text-2xl sm:text-3xl font-black text-amber-400 text-center drop-shadow-lg"
+                                style={{
+                                    textShadow: `
+                                    -2px -2px 0px #8B4513,
+                                    2px -2px 0px #8B4513,
+                                    -2px 2px 0px #8B4513,
+                                    2px 2px 0px #8B4513,
+                                    -1px -1px 0px #A0522D,
+                                    1px -1px 0px #A0522D,
+                                    -1px 1px 0px #A0522D,
+                                    1px 1px 0px #A0522D,
+                                    0px 0px 8px rgba(139, 69, 19, 0.5)
+                                `,
+                                    WebkitTextStroke: "1.5px #8B4513",
+                                }}
+                            >
+                                Create Your Character
+                            </h1>
+                        </div>
                         {/* <p className="text-lg sm:text-xl text-amber-700 mb-6 sm:mb-8 text-center font-medium game-element-border rounded-md py-2 px-4">
                             🏰 Customize your civic hero 🏰
                         </p> */}

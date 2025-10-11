@@ -15,6 +15,8 @@ import { Shop } from "./components/Shop";
 import { DailyChallenges } from "./components/DailyChallenges";
 import { SecretQuests } from "./components/SecretQuests";
 import { CollisionEditor } from "./components/CollisionEditor";
+import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
+import { LandscapePrompt } from "./components/LandscapePrompt";
 import {
     GameNotification,
     NotificationData,
@@ -962,6 +964,9 @@ function App() {
 
     return (
         <div className="relative w-screen h-screen overflow-hidden bg-gradient-to-br from-sky-300 via-blue-200 to-green-300">
+            {/* Landscape Orientation Overlay - Blocks game until rotated */}
+            <LandscapePrompt />
+
             {/* React UI Components */}
             {showMainMenu && (
                 <MainMenu
@@ -1290,6 +1295,42 @@ function App() {
                                                     <span>🎨</span>
                                                     <span>
                                                         Collision Editor
+                                                    </span>
+                                                </div>
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    // Switch between BarangayMap and CityMap
+                                                    const targetScene =
+                                                        gameInfo.currentScene ===
+                                                        "BarangayMap"
+                                                            ? "CityMap"
+                                                            : "BarangayMap";
+                                                    const scene =
+                                                        phaserRef.current
+                                                            ?.scene;
+                                                    if (scene) {
+                                                        scene.scene.stop(
+                                                            gameInfo.currentScene
+                                                        );
+                                                        scene.scene.start(
+                                                            targetScene
+                                                        );
+                                                        setShowPauseMenu(false);
+                                                    }
+                                                }}
+                                                className="w-full game-button-frame py-2 sm:py-3 px-3 sm:px-6 rounded-lg transition-all duration-200 font-bold hover:scale-105 game-glow border-2 border-blue-600"
+                                            >
+                                                <div className="text-white flex items-center justify-center space-x-1 sm:space-x-2 text-sm sm:text-base">
+                                                    <span>🗺️</span>
+                                                    <span>
+                                                        {gameInfo.currentScene ===
+                                                        "BarangayMap"
+                                                            ? "Go to City Map"
+                                                            : gameInfo.currentScene ===
+                                                              "CityMap"
+                                                            ? "Go to Barangay Map"
+                                                            : "Switch Map"}
                                                     </span>
                                                 </div>
                                             </button>
@@ -1686,12 +1727,15 @@ function App() {
                 backgroundImage={
                     currentMapForEditor === "BarangayMap"
                         ? "/barangay-background.png"
-                        : "/city-background.png"
+                        : "/assets/city-background.png"
                 }
             />
 
             {/* Debug Panel for Development */}
             <GameDebugPanel />
+
+            {/* PWA Install Prompt */}
+            <PWAInstallPrompt />
         </div>
     );
 }
