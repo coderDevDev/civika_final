@@ -14,6 +14,7 @@ import { Leaderboard } from "./components/Leaderboard";
 import { Shop } from "./components/Shop";
 import { DailyChallenges } from "./components/DailyChallenges";
 import { SecretQuests } from "./components/SecretQuests";
+import { CollisionEditor } from "./components/CollisionEditor";
 import {
     GameNotification,
     NotificationData,
@@ -60,6 +61,10 @@ function App() {
     const [showShop, setShowShop] = useState(false);
     const [showDailyChallenges, setShowDailyChallenges] = useState(false);
     const [showSecretQuests, setShowSecretQuests] = useState(false);
+    const [showCollisionEditor, setShowCollisionEditor] = useState(false);
+    const [currentMapForEditor, setCurrentMapForEditor] = useState<
+        "BarangayMap" | "CityMap"
+    >("BarangayMap");
     const leaderboardService = useRef(LeaderboardService.getInstance());
     const shopService = useRef(ShopService.getInstance());
     const secretQuestService = useRef(SecretQuestService.getInstance());
@@ -70,6 +75,16 @@ function App() {
             ...prev,
             currentScene: scene.scene.key,
         }));
+
+        // Track current map for collision editor
+        if (
+            scene.scene.key === "BarangayMap" ||
+            scene.scene.key === "CityMap"
+        ) {
+            setCurrentMapForEditor(
+                scene.scene.key as "BarangayMap" | "CityMap"
+            );
+        }
 
         // Update game data from Phaser registry
         if (scene.game && scene.game.registry) {
@@ -1263,6 +1278,22 @@ function App() {
                                                 </div>
                                             </button>
                                             <button
+                                                onClick={() => {
+                                                    setShowPauseMenu(false);
+                                                    setShowCollisionEditor(
+                                                        true
+                                                    );
+                                                }}
+                                                className="w-full game-button-frame py-2 sm:py-3 px-3 sm:px-6 rounded-lg transition-all duration-200 font-bold hover:scale-105 game-glow border-2 border-purple-600"
+                                            >
+                                                <div className="text-white flex items-center justify-center space-x-1 sm:space-x-2 text-sm sm:text-base">
+                                                    <span>🎨</span>
+                                                    <span>
+                                                        Collision Editor
+                                                    </span>
+                                                </div>
+                                            </button>
+                                            <button
                                                 onClick={() =>
                                                     window.location.reload()
                                                 }
@@ -1642,6 +1673,21 @@ function App() {
                     setShowSecretQuests(false);
                 }}
                 isVisible={showSecretQuests}
+            />
+
+            {/* Collision Editor Modal */}
+            <CollisionEditor
+                onClose={() => {
+                    audioManager.playEffect("menu-close");
+                    setShowCollisionEditor(false);
+                }}
+                isVisible={showCollisionEditor}
+                mapName={currentMapForEditor}
+                backgroundImage={
+                    currentMapForEditor === "BarangayMap"
+                        ? "/barangay-background.png"
+                        : "/city-background.png"
+                }
             />
 
             {/* Debug Panel for Development */}

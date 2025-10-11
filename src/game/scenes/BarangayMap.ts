@@ -2,6 +2,7 @@ import { GameObjects, Scene } from "phaser";
 import { EventBus } from "../EventBus";
 import { GameStateManager } from "../../utils/GameStateManager";
 import SecretQuestService from "../../services/SecretQuestService";
+import CollisionService from "../../services/CollisionService";
 
 export class BarangayMap extends Scene {
     player: Phaser.Physics.Arcade.Sprite;
@@ -54,6 +55,9 @@ export class BarangayMap extends Scene {
     minimapPlayerDot: GameObjects.Circle | null = null;
     minimapNPCDots: GameObjects.Circle[] = [];
     minimapCollectibleDots: GameObjects.Circle[] = [];
+
+    // Collision system
+    collisionBodies: Phaser.Physics.Arcade.StaticGroup | null = null;
 
     // Mission locations with tile coordinates
     missionLocations = [
@@ -703,6 +707,11 @@ export class BarangayMap extends Scene {
                 // Create collectibles after background is ready
                 this.time.delayedCall(300, () => {
                     this.createCollectibles();
+                });
+
+                // Load collisions after background is ready
+                this.time.delayedCall(400, () => {
+                    this.loadCollisions();
                 });
                 console.log(
                     "Game canvas dimensions:",
@@ -3276,4 +3285,149 @@ export class BarangayMap extends Scene {
         this.isUIVisible = !this.isUIVisible;
         this.ui.setVisible(this.isUIVisible);
     }
+
+    async loadCollisions() {
+        // Load collision data from collision editor
+        const collisionService = CollisionService.getInstance();
+
+        // Try localStorage first, then JSON file
+        let collisionData = collisionService.loadCollisionData("BarangayMap");
+
+        if (!collisionData) {
+            // Try loading from public folder JSON file
+            collisionData = await collisionService.loadCollisionDataFromFile(
+                "BarangayMap"
+            );
+        }
+
+        if (collisionData && this.backgroundImage) {
+            console.log("✅ Loading collision data...");
+            console.log(
+                `Found ${collisionData.shapes.length} collision shapes`
+            );
+
+            this.collisionBodies = collisionService.createCollisions(
+                this,
+                collisionData,
+                this.backgroundImage
+            );
+
+            // 🎨 VISUAL DEBUG: Draw red outlines to see collision boundaries
+            collisionData.shapes.forEach((shape) => {
+                if (shape.type === "rectangle") {
+                    const box = shape as any;
+                    const coords = this.percentageToWorldCoordinates(
+                        box.percentX + box.percentWidth / 2,
+                        box.percentY + box.percentHeight / 2
+                    );
+                    const width =
+                        (box.percentWidth / 100) *
+                        this.backgroundImage.displayWidth;
+                    const height =
+                        (box.percentHeight / 100) *
+                        this.backgroundImage.displayHeight;
+
+                    // Draw visible red rectangle outline
+                    const debugRect = this.add.rectangle(
+                        coords.x,
+                        coords.y,
+                        width,
+                        height,
+                        0xff0000,
+                        0 // Transparent fill
+                    );
+                    debugRect.setStrokeStyle(3, 0xff0000); // Red outline
+                    debugRect.setDepth(1000); // Above everything
+
+                    console.log(
+                        `🎨 Visualized collision "${
+                            box.name
+                        }" at (${box.percentX.toFixed(
+                            1
+                        )}%, ${box.percentY.toFixed(1)}%)`
+                    );
+                } else if (shape.type === "polygon") {
+                    const poly = shape as any;
+
+                    // Calculate center for visualization
+                    const centerX =
+                        poly.points.reduce(
+                            (sum: number, p: any) => sum + p.percentX,
+                            0
+                        ) / poly.points.length;
+                    const centerY =
+                        poly.points.reduce(
+                            (sum: number, p: any) => sum + p.percentY,
+                            0
+                        ) / poly.points.length;
+
+                    // Draw polygon outline
+                    const graphics = this.add.graphics();
+                    graphics.lineStyle(3, 0x0000ff); // Blue outline
+                    graphics.setDepth(1000);
+
+                    const firstPoint = poly.points[0];
+                    const firstCoords = this.percentageToWorldCoordinates(
+                        firstPoint.percentX,
+                        firstPoint.percentY
+                    );
+                    graphics.beginPath();
+                    graphics.moveTo(firstCoords.x, firstCoords.y);
+
+                    for (let i = 1; i < poly.points.length; i++) {
+                        const point = poly.points[i];
+                        const coords = this.percentageToWorldCoordinates(
+                            point.percentX,
+                            point.percentY
+                        );
+                        graphics.lineTo(coords.x, coords.y);
+                    }
+
+                    graphics.closePath();
+                    graphics.strokePath();
+
+                    console.log(
+                        `🎨 Visualized polygon "${poly.name}" with ${poly.points.length} points`
+                    );
+                } else if (shape.type === "circle") {
+                    const circle = shape as any;
+                    const coords = this.percentageToWorldCoordinates(
+                        circle.percentX,
+                        circle.percentY
+                    );
+                    const radius =
+                        (circle.percentRadius / 100) *
+                        Math.min(
+                            this.backgroundImage.displayWidth,
+                            this.backgroundImage.displayHeight
+                        );
+
+                    // Draw circle outline
+                    const graphics = this.add.graphics();
+                    graphics.lineStyle(3, 0x00ff00); // Green outline
+                    graphics.setDepth(1000);
+                    graphics.strokeCircle(coords.x, coords.y, radius);
+
+                    console.log(
+                        `🎨 Visualized circle "${
+                            circle.name
+                        }" at (${circle.percentX.toFixed(
+                            1
+                        )}%, ${circle.percentY.toFixed(1)}%)`
+                    );
+                }
+            });
+
+            // Add collision between player and collision bodies
+            if (this.collisionBodies && this.player) {
+                this.physics.add.collider(this.player, this.collisionBodies);
+                console.log(
+                    `✅ Player collision enabled with ${collisionData.shapes.length} collision shapes`
+                );
+            }
+        } else {
+            console.log("⚠️ No collision data found for BarangayMap");
+        }
+    }
 }
+

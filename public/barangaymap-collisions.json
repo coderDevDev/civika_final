@@ -1,0 +1,64 @@
+{
+  "mapName": "BarangayMap",
+  "version": "1.0.0",
+  "createdAt": "2025-10-11T02:58:35.657Z",
+  "updatedAt": "2025-10-11T09:35:09.050Z",
+  "shapes": [
+    {
+      "id": "polygon-1760151573485",
+      "type": "polygon",
+      "name": "Collision Polygon 1",
+      "points": [
+        {
+          "percentX": 42.544183745124386,
+          "percentY": 9.002208007452941
+        },
+        {
+          "percentX": 42.17599523260597,
+          "percentY": 21.520617433078865
+        },
+        {
+          "percentX": 58.37628978341599,
+          "percentY": 21.70471168933807
+        },
+        {
+          "percentX": 58.56038403967519,
+          "percentY": 8.634019494934533
+        },
+        {
+          "percentX": 43.096466513902,
+          "percentY": 9.186302263712147
+        }
+      ],
+      "color": "#0000FF"
+    },
+    {
+      "id": "polygon-1760175309050",
+      "type": "polygon",
+      "name": "Collision Polygon 2",
+      "points": [
+        {
+          "percentX": 66.476437058821,
+          "percentY": 11.579527595081808
+        },
+        {
+          "percentX": 67.02871982759862,
+          "percentY": 22.44108871437489
+        },
+        {
+          "percentX": 79.54712925322454,
+          "percentY": 22.8092772268933
+        },
+        {
+          "percentX": 79.36303499696533,
+          "percentY": 11.395433338822604
+        },
+        {
+          "percentX": 66.476437058821,
+          "percentY": 11.579527595081808
+        }
+      ],
+      "color": "#0000FF"
+    }
+  ]
+}
