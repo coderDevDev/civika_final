@@ -1,14 +1,14 @@
 {
-    "appId": "com.civika.game",
-    "appName": "CIVIKA",
-    "webDir": "dist",
-    "bundledWebRuntime": false,
-    "android": {
-        "allowMixedContent": true,
-        "captureInput": true,
-        "webContentsDebuggingEnabled": true
-    },
-    "server": {
-        "androidScheme": "https"
-    }
+  "appId": "com.civika.game",
+  "appName": "CIVIKA",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": true
+  },
+  "server": {
+    "androidScheme": "https"
+  }
 }

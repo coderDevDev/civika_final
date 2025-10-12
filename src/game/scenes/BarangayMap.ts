@@ -55,9 +55,9 @@ export class BarangayMap extends Scene {
     // Minimap/Radar system
     minimap: GameObjects.Container | null = null;
     minimapBackground: GameObjects.Graphics | null = null;
-    minimapPlayerDot: GameObjects.Circle | null = null;
-    minimapNPCDots: GameObjects.Circle[] = [];
-    minimapCollectibleDots: GameObjects.Circle[] = [];
+    minimapPlayerDot: GameObjects.Arc | null = null;
+    minimapNPCDots: GameObjects.Arc[] = [];
+    minimapCollectibleDots: GameObjects.Arc[] = [];
 
     // Collision system
     collisionBodies: Phaser.Physics.Arcade.StaticGroup | null = null;

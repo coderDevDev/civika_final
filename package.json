@@ -36,8 +36,8 @@
         "mobile:build:android:release": "npm run build:capacitor && cd android && gradlew assembleRelease"
     },
     "dependencies": {
-        "@capacitor/android": "^6.0.0",
-        "@capacitor/core": "^6.0.0",
+        "@capacitor/android": "^6.2.1",
+        "@capacitor/core": "^6.2.1",
         "@supabase/supabase-js": "^2.75.0",
         "lucide-react": "^0.545.0",
         "next": "15.3.1",
@@ -46,7 +46,7 @@
         "react-dom": "19.0.0"
     },
     "devDependencies": {
-        "@capacitor/cli": "^6.0.0",
+        "@capacitor/cli": "^6.2.1",
         "@types/node": "^20",
         "@types/react": "^19",
         "@types/react-dom": "^19",

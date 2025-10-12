@@ -48,9 +48,9 @@ export class CityMap extends Scene {
     // Minimap/Radar system
     minimap: GameObjects.Container | null = null;
     minimapBackground: GameObjects.Graphics | null = null;
-    minimapPlayerDot: GameObjects.Circle | null = null;
-    minimapNPCDots: GameObjects.Circle[] = [];
-    minimapCollectibleDots: GameObjects.Circle[] = [];
+    minimapPlayerDot: GameObjects.Arc | null = null;
+    minimapNPCDots: GameObjects.Arc[] = [];
+    minimapCollectibleDots: GameObjects.Arc[] = [];
 
     // Level 2 City Mission locations
     missionLocations = [
@@ -359,7 +359,7 @@ export class CityMap extends Scene {
             const indicator = this.missionIndicators.get(location.missionId);
 
             if (indicator) {
-                let indicatorText = "!";
+                let indicatorText = `Mission #${location.missionId}`;
                 let indicatorColor = "#FFD700"; // Gold for available
 
                 if (gameStateManager.isMissionCompleted(location.missionId)) {
@@ -856,7 +856,7 @@ export class CityMap extends Scene {
 
             // Add mission indicator with validation-based styling
             const gameStateManager = GameStateManager.getInstance();
-            let indicatorText = "!";
+            let indicatorText = `Mission #${location.missionId}`;
             let indicatorColor = "#FFD700"; // Gold for available
 
             if (gameStateManager.isMissionCompleted(location.missionId)) {
