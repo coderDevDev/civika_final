@@ -132,7 +132,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                             </button>
 
                             {/* Continue/Load Game Button */}
-                            <button
+                            {/* <button
                                 onClick={handleLoadGame}
                                 className="game-button-frame px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-full transition-all duration-200 hover:scale-105 game-glow w-full"
                             >
@@ -143,7 +143,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                                     </span>
                                     <span className="sm:hidden">Load</span>
                                 </div>
-                            </button>
+                            </button> */}
 
                             {/* Settings Button */}
                             <button
@@ -168,7 +168,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                             </button>
 
                             {/* Extras Button */}
-                            <button
+                            {/* <button
                                 onClick={() => onShowExtras?.()}
                                 className="game-button-frame px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-full transition-all duration-200 hover:scale-105 game-glow w-full"
                             >
@@ -176,7 +176,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                                     <span>🎨</span>
                                     <span>Extras</span>
                                 </div>
-                            </button>
+                            </button> */}
 
                             {/* Tutorial Button */}
                             <button

@@ -123,8 +123,10 @@ export function LoadingScreen({ progress, onComplete }: LoadingScreenProps) {
                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer"></div>
                                 </div>
                             </div>
-                            <p className="text-amber-800 text-center mt-2 font-bold text-base sm:text-lg">
-                                {progress < 100 ? `⏳ Loading... ${Math.round(progress)}%` : "✓ Ready!"}
+                            <p className="text-amber-200 text-center mt-2 font-bold text-base sm:text-lg">
+                                {progress < 100
+                                    ? `⏳ Loading... ${Math.round(progress)}%`
+                                    : "✓ Ready!"}
                             </p>
                         </div>
 
@@ -151,3 +153,4 @@ export function LoadingScreen({ progress, onComplete }: LoadingScreenProps) {
         </div>
     );
 }
+
