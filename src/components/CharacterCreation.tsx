@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { BackButton } from "./BackButton";
 
 interface CharacterCreationProps {
     onCharacterCreated: (name: string, color: string) => void;
+    onBack?: () => void; // Optional back handler
 }
 
 const colorOptions = [
@@ -15,6 +17,7 @@ const colorOptions = [
 
 export const CharacterCreation: React.FC<CharacterCreationProps> = ({
     onCharacterCreated,
+    onBack,
 }) => {
     const [playerName, setPlayerName] = useState("");
     const [selectedColor, setSelectedColor] = useState("#00ff00");
@@ -40,6 +43,15 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({
 
     return (
         <div className="fixed inset-0 bg-gradient-to-br from-amber-100 via-yellow-50 to-amber-200 flex items-center justify-center z-50 overflow-y-auto">
+            {/* Back Button */}
+            {onBack && (
+                <BackButton
+                    onBack={onBack}
+                    label="Back to Menu"
+                    confirmMessage={playerName.trim() ? "Are you sure? Your character name will be lost." : undefined}
+                />
+            )}
+            
             {/* Background decorative elements */}
             <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute top-20 left-20 w-16 h-16 bg-amber-400/30 rounded-full animate-pulse"></div>

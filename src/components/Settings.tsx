@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 interface SettingsProps {
     onClose: () => void;
     isVisible: boolean;
+    onShowTutorial?: () => void; // Optional tutorial replay handler
 }
 
 interface GameSettings {
@@ -29,7 +30,7 @@ const defaultSettings: GameSettings = {
     showTutorials: true,
 };
 
-export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible }) => {
+export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible, onShowTutorial }) => {
     const [settings, setSettings] = useState<GameSettings>(defaultSettings);
     const [activeTab, setActiveTab] = useState<
         "audio" | "graphics" | "gameplay"
@@ -469,6 +470,25 @@ export const Settings: React.FC<SettingsProps> = ({ onClose, isVisible }) => {
                                         </span>
                                     </label>
                                 </div>
+
+                                {/* View Tutorial Button */}
+                                {onShowTutorial && (
+                                    <div className="pt-4 border-t border-amber-300/30">
+                                        <button
+                                            onClick={() => {
+                                                onShowTutorial();
+                                                onClose();
+                                            }}
+                                            className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 shadow-lg"
+                                        >
+                                            <span>📚</span>
+                                            <span>View Tutorial Again</span>
+                                        </button>
+                                        <p className="text-xs text-amber-200 text-center mt-2">
+                                            Replay the game tutorial anytime
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>

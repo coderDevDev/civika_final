@@ -7,6 +7,7 @@ interface MainMenuProps {
     onShowExtras?: () => void;
     onShowCredits?: () => void;
     onShowLeaderboard?: () => void;
+    onShowTutorial?: () => void;
     onExit?: () => void;
 }
 
@@ -17,6 +18,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     onShowExtras,
     onShowCredits,
     onShowLeaderboard,
+    onShowTutorial,
     onExit,
 }) => {
     const [showSubMenu, setShowSubMenu] = useState<string | null>(null);
@@ -75,29 +77,46 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                             </div>
                         </div>
 
-                        {/* Title - Mobile responsive */}
-                        {/* <h1
-                            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-amber-400 mb-3 sm:mb-4 drop-shadow-2xl rounded-md py-2 sm:py-3 md:py-4 px-3 sm:px-4 md:px-6"
-                            style={{
-                                textShadow: `
-                                -2px -2px 0px #8B4513,
-                                2px -2px 0px #8B4513,
-                                -2px 2px 0px #8B4513,
-                                2px 2px 0px #8B4513,
-                                -1px -1px 0px #A0522D,
-                                1px -1px 0px #A0522D,
-                                -1px 1px 0px #A0522D,
-                                1px 1px 0px #A0522D,
-                                0px 0px 8px rgba(139, 69, 19, 0.5)
-                            `,
-                                WebkitTextStroke: "1px #8B4513",
-                            }}
-                        >
-                            CIVIKA
-                        </h1> */}
-                        {/* <div className="text-2xl font-bold text-amber-800 mb-12 drop-shadow-lg game-element-border rounded-md py-2 px-4">
-                            🏰 A Civic Education Adventure 🏰
-                        </div> */}
+                        {/* Title - Mobile responsive with Philippine Flag Colors */}
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-3 sm:mb-4 py-2 sm:py-3 md:py-4 px-3 sm:px-4 md:px-6 leading-tight">
+                            <span
+                                className="inline-block"
+                                style={{
+                                    color: "#0038A8",
+                                    textShadow: `
+                                        -2px -2px 0px #FCD116,
+                                        2px -2px 0px #FCD116,
+                                        -2px 2px 0px #FCD116,
+                                        2px 2px 0px #FCD116,
+                                        0px 0px 15px rgba(0, 56, 168, 0.6)
+                                    `,
+                                    WebkitTextStroke: "2px #FCD116",
+                                    filter: "drop-shadow(0 4px 8px rgba(0, 56, 168, 0.4))",
+                                }}
+                            >
+                                CIV
+                            </span>
+                            <span
+                                className="inline-block"
+                                style={{
+                                    color: "#CE1126",
+                                    textShadow: `
+                                        -2px -2px 0px #FCD116,
+                                        2px -2px 0px #FCD116,
+                                        -2px 2px 0px #FCD116,
+                                        2px 2px 0px #FCD116,
+                                        0px 0px 15px rgba(206, 17, 38, 0.6)
+                                    `,
+                                    WebkitTextStroke: "2px #FCD116",
+                                    filter: "drop-shadow(0 4px 8px rgba(206, 17, 38, 0.4))",
+                                }}
+                            >
+                                IKA
+                            </span>
+                        </h1>
+                        <div className="text-lg sm:text-xl md:text-2xl font-bold text-amber-800 mb-6 sm:mb-8 md:mb-12 drop-shadow-lg game-element-border rounded-md py-2 px-4">
+                            🏛️ A Civic Education Adventure 🏛️
+                        </div>
 
                         {/* Game Menu Buttons - Mobile responsive grid */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 md:gap-4 mb-6 sm:mb-8 md:mb-12 w-full max-w-xs sm:max-w-md md:max-w-lg mx-auto">
@@ -156,6 +175,17 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                                 <div className="text-white font-bold text-sm sm:text-base md:text-lg flex items-center justify-center space-x-1 sm:space-x-2">
                                     <span>🎨</span>
                                     <span>Extras</span>
+                                </div>
+                            </button>
+
+                            {/* Tutorial Button */}
+                            <button
+                                onClick={() => onShowTutorial?.()}
+                                className="game-button-frame px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-full transition-all duration-200 hover:scale-105 game-glow w-full"
+                            >
+                                <div className="text-white font-bold text-sm sm:text-base md:text-lg flex items-center justify-center space-x-1 sm:space-x-2">
+                                    <span>📚</span>
+                                    <span>Tutorial</span>
                                 </div>
                             </button>
 

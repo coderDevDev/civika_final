@@ -150,3 +150,133 @@ body {
     border-radius: 5px;
     margin: 10px;
 }
+
+/* ========================================
+   CUSTOM ANIMATIONS FOR NEW FEATURES
+   ======================================== */
+
+/* Fade In Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Scale In Animation */
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.animate-scaleIn {
+    animation: scaleIn 0.3s ease-out;
+}
+
+/* Float Animation (for loading screen decorations) */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.animate-float-delay {
+    animation: float 3s ease-in-out infinite;
+    animation-delay: 1s;
+}
+
+.animate-float-slow {
+    animation: float 4s ease-in-out infinite;
+    animation-delay: 0.5s;
+}
+
+/* Pulse Slow Animation (for logo) */
+@keyframes pulse-slow {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.9;
+        transform: scale(1.02);
+    }
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 2s ease-in-out infinite;
+}
+
+/* Shimmer Effect (for progress bar) */
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.animate-shimmer {
+    animation: shimmer 2s ease-in-out infinite;
+}
+
+/* Bounce Slow Animation (for tutorial icons) */
+@keyframes bounce-slow {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.animate-bounce-slow {
+    animation: bounce-slow 2s ease-in-out infinite;
+}
+
+/* Glow Animations (for CIVIKA logo) */
+@keyframes glow-blue {
+    0%, 100% {
+        filter: drop-shadow(0 0 10px rgba(0, 56, 168, 0.5));
+    }
+    50% {
+        filter: drop-shadow(0 0 20px rgba(0, 56, 168, 0.8));
+    }
+}
+
+.animate-glow-blue {
+    animation: glow-blue 2s ease-in-out infinite;
+}
+
+@keyframes glow-red {
+    0%, 100% {
+        filter: drop-shadow(0 0 10px rgba(206, 17, 38, 0.5));
+    }
+    50% {
+        filter: drop-shadow(0 0 20px rgba(206, 17, 38, 0.8));
+    }
+}
+
+.animate-glow-red {
+    animation: glow-red 2s ease-in-out infinite;
+    animation-delay: 1s;
+}

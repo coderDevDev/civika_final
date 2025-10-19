@@ -17,6 +17,8 @@ import { SecretQuests } from "./components/SecretQuests";
 import { CollisionEditor } from "./components/CollisionEditor";
 import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 import { LandscapePrompt } from "./components/LandscapePrompt";
+import { LoadingScreen } from "./components/LoadingScreen";
+import { Tutorial } from "./components/Tutorial";
 import {
     GameNotification,
     NotificationData,
@@ -70,6 +72,11 @@ function App() {
     const leaderboardService = useRef(LeaderboardService.getInstance());
     const shopService = useRef(ShopService.getInstance());
     const secretQuestService = useRef(SecretQuestService.getInstance());
+    
+    // New feature states
+    const [isLoading, setIsLoading] = useState(true);
+    const [loadingProgress, setLoadingProgress] = useState(0);
+    const [showTutorial, setShowTutorial] = useState(false);
 
     const currentScene = (scene: Phaser.Scene) => {
         console.log("Current scene:", scene.scene.key);
@@ -154,6 +161,42 @@ function App() {
         };
     }, []);
 
+    // Simulate loading screen with progress
+    useEffect(() => {
+        // Simulate asset loading progress
+        const progressInterval = setInterval(() => {
+            setLoadingProgress((prev) => {
+                if (prev >= 100) {
+                    clearInterval(progressInterval);
+                    return 100;
+                }
+                // Random progress increment for realistic loading feel
+                return Math.min(prev + Math.random() * 15 + 5, 100);
+            });
+        }, 200);
+
+        // Minimum loading time of 2 seconds for UX
+        const minLoadTime = setTimeout(() => {
+            setLoadingProgress(100);
+        }, 2000);
+
+        return () => {
+            clearInterval(progressInterval);
+            clearTimeout(minLoadTime);
+        };
+    }, []);
+
+    // Handle loading complete
+    const handleLoadingComplete = () => {
+        setIsLoading(false);
+        // Check if user has seen tutorial before
+        const hasSeenTutorial = localStorage.getItem("civika-hasSeenTutorial");
+        if (!hasSeenTutorial && !showTutorial) {
+            // Don't show tutorial immediately, wait for character creation
+            console.log("First-time player detected - tutorial will show after character creation");
+        }
+    };
+
     // Game flow handlers
     const handleStartGame = () => {
         audioManager.playEffect("button-click");
@@ -199,6 +242,11 @@ function App() {
         setShowLeaderboard(true);
     };
 
+    const handleShowTutorial = () => {
+        audioManager.playEffect("menu-open");
+        setShowTutorial(true);
+    };
+
     const handleExit = () => {
         audioManager.playEffect("button-click");
         // Exit functionality is handled in MainMenu component
@@ -207,6 +255,13 @@ function App() {
     const handleCharacterCreated = (name: string, color: string) => {
         console.log("Character created:", name, color);
         setShowCharacterCreation(false);
+
+        // Check if first-time player and show tutorial
+        const hasSeenTutorial = localStorage.getItem("civika-hasSeenTutorial");
+        if (!hasSeenTutorial) {
+            setShowTutorial(true);
+            return; // Wait for tutorial to complete before starting game
+        }
 
         // Stop any current music to ensure clean transition
         audioManager.stopMusic();
@@ -303,6 +358,95 @@ function App() {
         };
 
         // Start the game world with retry logic
+        startGameWorld();
+    };
+
+    // Tutorial handlers
+    const handleTutorialComplete = () => {
+        console.log("Tutorial completed");
+        setShowTutorial(false);
+        localStorage.setItem("civika-hasSeenTutorial", "true");
+        
+        // Now proceed with game initialization
+        const savedProgress = localStorage.getItem("civika-game-progress");
+        if (savedProgress) {
+            try {
+                const progress = JSON.parse(savedProgress);
+                const playerName = progress.playerName || "Citizen";
+                // Re-trigger character creation flow but skip tutorial check
+                audioManager.stopMusic();
+                const updatedProgress = gameStateManager.current.initializeGame(playerName);
+                updateGameInfoFromProgress(updatedProgress);
+                startGameAfterTutorial(playerName, "default");
+            } catch (error) {
+                console.error("Failed to load after tutorial:", error);
+            }
+        }
+    };
+
+    const handleTutorialSkip = () => {
+        console.log("Tutorial skipped");
+        setShowTutorial(false);
+        localStorage.setItem("civika-hasSeenTutorial", "true");
+        
+        // Proceed with game initialization
+        const savedProgress = localStorage.getItem("civika-game-progress");
+        if (savedProgress) {
+            try {
+                const progress = JSON.parse(savedProgress);
+                const playerName = progress.playerName || "Citizen";
+                audioManager.stopMusic();
+                const updatedProgress = gameStateManager.current.initializeGame(playerName);
+                updateGameInfoFromProgress(updatedProgress);
+                startGameAfterTutorial(playerName, "default");
+            } catch (error) {
+                console.error("Failed to load after skipping tutorial:", error);
+            }
+        }
+    };
+
+    const startGameAfterTutorial = (name: string, color: string) => {
+        const progress = gameStateManager.current.getProgress();
+        if (!progress) return;
+
+        // Show welcome notification for new players
+        if (progress.completedMissions.length === 0) {
+            setTimeout(() => {
+                showGameNotification({
+                    type: "info",
+                    title: `Welcome to CIVIKA, ${name}! 👋`,
+                    message: `Welcome to the barangay! You're about to embark on an exciting journey to become a civic leader. Look for NPCs with "!" symbols to start missions and learn about community governance. Good luck!`,
+                    icon: "🏛️",
+                    actions: [
+                        {
+                            label: "Start My Journey!",
+                            action: closeNotification,
+                            style: "primary",
+                        },
+                    ],
+                });
+            }, 2000);
+        }
+
+        // Start game world
+        let retryCount = 0;
+        const maxRetries = 50;
+
+        const startGameWorld = () => {
+            if (phaserRef.current?.game) {
+                phaserRef.current.game.registry.set("playerName", name);
+                phaserRef.current.game.registry.set("playerColor", color);
+                syncGameStateWithPhaser(progress);
+
+                const startScene = progress.level >= 2 ? "CityMap" : "BarangayMap";
+                audioManager.crossfadeToLevel(startScene as "BarangayMap" | "CityMap");
+                phaserRef.current.game.scene.start(startScene);
+            } else if (retryCount < maxRetries) {
+                retryCount++;
+                setTimeout(startGameWorld, 100);
+            }
+        };
+
         startGameWorld();
     };
 
@@ -964,11 +1108,27 @@ function App() {
 
     return (
         <div className="relative w-screen h-screen overflow-hidden bg-gradient-to-br from-sky-300 via-blue-200 to-green-300">
+            {/* Loading Screen - Shows first on app load */}
+            {isLoading && (
+                <LoadingScreen
+                    progress={loadingProgress}
+                    onComplete={handleLoadingComplete}
+                />
+            )}
+
+            {/* Tutorial - Shows after character creation for first-time players */}
+            {showTutorial && (
+                <Tutorial
+                    onComplete={handleTutorialComplete}
+                    onSkip={handleTutorialSkip}
+                />
+            )}
+
             {/* Landscape Orientation Overlay - Blocks game until rotated */}
             <LandscapePrompt />
 
             {/* React UI Components */}
-            {showMainMenu && (
+            {!isLoading && showMainMenu && (
                 <MainMenu
                     onStartGame={handleStartGame}
                     onLoadGame={handleLoadGame}
@@ -976,19 +1136,18 @@ function App() {
                     onShowExtras={handleShowExtras}
                     onShowCredits={handleShowCredits}
                     onShowLeaderboard={handleShowLeaderboard}
+                    onShowTutorial={handleShowTutorial}
                     onExit={handleExit}
                 />
             )}
             {showCharacterCreation && (
-                <div>
-                    <div className="fixed top-4 left-4 bg-red-500 text-white p-2 rounded z-50">
-                        Character Creation Active:{" "}
-                        {showCharacterCreation.toString()}
-                    </div>
-                    <CharacterCreation
-                        onCharacterCreated={handleCharacterCreated}
-                    />
-                </div>
+                <CharacterCreation
+                    onCharacterCreated={handleCharacterCreated}
+                    onBack={() => {
+                        setShowCharacterCreation(false);
+                        setShowMainMenu(true);
+                    }}
+                />
             )}
             {showQuiz && currentQuiz && (
                 <QuizSystem
@@ -1660,6 +1819,7 @@ function App() {
                     setShowSettings(false);
                 }}
                 isVisible={showSettings}
+                onShowTutorial={handleShowTutorial}
             />
 
             {/* Extras Modal */}
