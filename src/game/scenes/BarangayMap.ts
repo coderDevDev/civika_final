@@ -6,7 +6,7 @@ import CollisionService from "../../services/CollisionService";
 
 export class BarangayMap extends Scene {
     // 🎨 DEBUG MODE: Set to false to hide collision boundaries in production
-    private readonly DEBUG_SHOW_COLLISIONS: boolean = false;
+    private readonly DEBUG_SHOW_COLLISIONS: boolean = false; // ✅ ENABLED - Shows collision shapes
 
     player: Phaser.Physics.Arcade.Sprite;
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -1324,6 +1324,19 @@ export class BarangayMap extends Scene {
         // Remove world bounds collision for unlimited movement
         this.player.setCollideWorldBounds(false);
         this.player.setScale(0.2); // Much smaller scale for student sprites
+        
+        // 🎯 OPTIMIZE: Reduce player collision body for more realistic collision
+        // Make collision body smaller (60% of sprite) and centered
+        if (this.player.body) {
+            this.player.body.setSize(this.player.width * 0.6, this.player.height * 0.6);
+            this.player.body.setOffset(this.player.width * 0.2, this.player.height * 0.2);
+            console.log('Player collision body optimized:', {
+                width: this.player.body.width,
+                height: this.player.body.height,
+                offsetX: this.player.body.offset.x,
+                offsetY: this.player.body.offset.y
+            });
+        }
 
         console.log(
             "Player created with UNLIMITED movement - no world bounds collision"
@@ -1585,8 +1598,9 @@ export class BarangayMap extends Scene {
             npc.setInteractive();
 
             // Set up collision body for NPC - make it static from the start
-            npc.body.setSize(npc.width * 0.8, npc.height * 0.8); // Slightly smaller collision box
-            npc.body.setOffset(npc.width * 0.1, npc.height * 0.1); // Center the collision box
+            // 🎯 OPTIMIZE: Reduce NPC collision to 10% for ultra-minimal blocking
+            npc.body.setSize(npc.width * 0.1, npc.height * 0.1); // Ultra-small collision box - barely blocks
+            npc.body.setOffset(npc.width * 0.45, npc.height * 0.45); // Center the collision box
             npc.body.setImmovable(true); // Make NPCs static so they don't move when player collides
             npc.body.setGravity(0, 0); // Remove gravity
             npc.body.setVelocity(0, 0); // Stop any movement
@@ -2686,7 +2700,9 @@ export class BarangayMap extends Scene {
                 actions: [
                     {
                         label: "Amazing!",
-                        action: () => {},
+                        action: () => {
+                            EventBus.emit("close-notification");
+                        },
                         style: "primary",
                     },
                 ],

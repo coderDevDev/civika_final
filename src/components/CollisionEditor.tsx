@@ -459,13 +459,32 @@ export const CollisionEditor: React.FC<CollisionEditorProps> = ({
         alert(`Collision data saved to ${filename}!`);
     };
 
-    const loadCollisionData = () => {
+    const loadCollisionData = async () => {
         try {
+            // First try localStorage (for editor testing)
             const saved = localStorage.getItem(`civika-collision-${mapName}`);
             if (saved) {
                 const data = JSON.parse(saved);
                 setCollisionData(data);
+                console.log(`✅ Loaded collision data from localStorage for ${mapName}:`, data.shapes.length, 'shapes');
+                return;
             }
+            
+            // If not in localStorage, try loading from public folder JSON file
+            const filename = `${mapName.toLowerCase()}-collisions.json`;
+            try {
+                const response = await fetch(`/${filename}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setCollisionData(data);
+                    console.log(`✅ Loaded collision data from file ${filename}:`, data.shapes.length, 'shapes');
+                    return;
+                }
+            } catch (fileError) {
+                console.log(`No collision file found: ${filename}`);
+            }
+            
+            console.log(`No existing collision data found for ${mapName}`);
         } catch (error) {
             console.error("Failed to load collision data:", error);
         }

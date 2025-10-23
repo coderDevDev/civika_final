@@ -6,3 +6,4 @@ A top-down RPG game built with Next.js, React, and Phaser 3 that teaches civic e
 2. npm run build:capacitor
 3. npm run mobile:build:android
 
+ 

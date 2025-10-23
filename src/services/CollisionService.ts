@@ -143,6 +143,14 @@ export class CollisionService {
         const worldY = bgTop + (box.percentY / 100) * bgHeight;
         const worldWidth = (box.percentWidth / 100) * bgWidth;
         const worldHeight = (box.percentHeight / 100) * bgHeight;
+        
+        // 🎯 OPTIMIZE: Add padding to make collision less sensitive
+        // Reduce collision body by 20% on each side (40% total reduction)
+        const COLLISION_PADDING = 0.2; // 20% padding for more walkable space
+        const paddedWidth = worldWidth * (1 - COLLISION_PADDING * 2);
+        const paddedHeight = worldHeight * (1 - COLLISION_PADDING * 2);
+        const paddingX = worldWidth * COLLISION_PADDING;
+        const paddingY = worldHeight * COLLISION_PADDING;
 
         // Create invisible rectangle
         const collision = scene.add.rectangle(
@@ -160,7 +168,9 @@ export class CollisionService {
 
         if (collision.body) {
             const body = collision.body as Phaser.Physics.Arcade.StaticBody;
-            body.setSize(worldWidth, worldHeight);
+            // Apply padded size for more realistic collision
+            body.setSize(paddedWidth, paddedHeight);
+            body.setOffset(paddingX, paddingY);
             body.updateFromGameObject();
         }
 
@@ -202,6 +212,10 @@ export class CollisionService {
 
         const tileSize = 20; // Size of each collision tile
         const tilesCreated: number[] = [];
+        
+        // 🎯 OPTIMIZE: Add padding to polygon tiles for less sensitive collision
+        const TILE_PADDING = 0.35; // 35% padding on each tile for maximum walkable space
+        const paddedTileSize = tileSize * (1 - TILE_PADDING * 2);
 
         // Create a grid of small tiles that cover only the polygon area
         for (let y = minY; y < maxY; y += tileSize) {
@@ -227,7 +241,9 @@ export class CollisionService {
                     if (tile.body) {
                         const body =
                             tile.body as Phaser.Physics.Arcade.StaticBody;
-                        body.setSize(tileSize, tileSize);
+                        // Apply padded size for more realistic collision
+                        body.setSize(paddedTileSize, paddedTileSize);
+                        body.setOffset(tileSize * TILE_PADDING, tileSize * TILE_PADDING);
                         body.updateFromGameObject();
                     }
 

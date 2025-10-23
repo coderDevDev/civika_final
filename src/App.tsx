@@ -77,6 +77,9 @@ function App() {
     const [isLoading, setIsLoading] = useState(true);
     const [loadingProgress, setLoadingProgress] = useState(0);
     const [showTutorial, setShowTutorial] = useState(false);
+    
+    // Developer/Testing Mode - allows bypassing level requirements
+    const [developerMode, setDeveloperMode] = useState(false);
 
     const currentScene = (scene: Phaser.Scene) => {
         console.log("Current scene:", scene.scene.key);
@@ -212,7 +215,7 @@ function App() {
             try {
                 const progress = JSON.parse(savedProgress);
                 const playerName = progress.playerName || "Citizen";
-                handleCharacterCreated(playerName, "default");
+                handleCharacterCreated(playerName, "male"); // Default gender
             } catch (error) {
                 console.error("Failed to load game:", error);
                 alert("Failed to load saved game. Please start a new game.");
@@ -252,8 +255,8 @@ function App() {
         // Exit functionality is handled in MainMenu component
     };
 
-    const handleCharacterCreated = (name: string, color: string) => {
-        console.log("Character created:", name, color);
+    const handleCharacterCreated = (name: string, gender: string) => {
+        console.log("Character created:", name, gender);
         setShowCharacterCreation(false);
 
         // Check if first-time player and show tutorial
@@ -297,7 +300,7 @@ function App() {
             if (phaserRef.current?.game) {
                 console.log("Phaser game found, setting registry...");
                 phaserRef.current.game.registry.set("playerName", name);
-                phaserRef.current.game.registry.set("playerColor", color);
+                phaserRef.current.game.registry.set("playerGender", gender);
 
                 // Sync game state with Phaser registry
                 syncGameStateWithPhaser(progress);
@@ -435,7 +438,7 @@ function App() {
         const startGameWorld = () => {
             if (phaserRef.current?.game) {
                 phaserRef.current.game.registry.set("playerName", name);
-                phaserRef.current.game.registry.set("playerColor", color);
+                phaserRef.current.game.registry.set("playerGender", gender);
                 syncGameStateWithPhaser(progress);
 
                 const startScene = progress.level >= 2 ? "CityMap" : "BarangayMap";
@@ -1097,12 +1100,14 @@ function App() {
         EventBus.on("show-notification", handleGameNotification);
         EventBus.on("open-quest-log", handleOpenQuestLog);
         EventBus.on("update-daily-challenge", handleDailyChallengeUpdate);
+        EventBus.on("close-notification", closeNotification);
 
         return () => {
             EventBus.off("show-mission", handleShowMission);
             EventBus.off("show-notification", handleGameNotification);
             EventBus.off("open-quest-log", handleOpenQuestLog);
             EventBus.off("update-daily-challenge", handleDailyChallengeUpdate);
+            EventBus.off("close-notification", closeNotification);
         };
     }, []);
 
@@ -1454,6 +1459,26 @@ function App() {
                                                     <span>🎨</span>
                                                     <span>
                                                         Collision Editor
+                                                    </span>
+                                                </div>
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    const newMode = !developerMode;
+                                                    setDeveloperMode(newMode);
+                                                    gameStateManager.current.setDeveloperMode(newMode);
+                                                    audioManager.playEffect("button-click");
+                                                }}
+                                                className={`w-full game-button-frame py-2 sm:py-3 px-3 sm:px-6 rounded-lg transition-all duration-200 font-bold hover:scale-105 game-glow border-2 ${
+                                                    developerMode
+                                                        ? "border-green-500 bg-green-900/30"
+                                                        : "border-orange-600"
+                                                }`}
+                                            >
+                                                <div className="text-white flex items-center justify-center space-x-1 sm:space-x-2 text-sm sm:text-base">
+                                                    <span>{developerMode ? "✅" : "🔧"}</span>
+                                                    <span>
+                                                        Developer Mode: {developerMode ? "ON" : "OFF"}
                                                     </span>
                                                 </div>
                                             </button>

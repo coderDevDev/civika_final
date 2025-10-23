@@ -2,17 +2,13 @@ import React, { useState } from "react";
 import { BackButton } from "./BackButton";
 
 interface CharacterCreationProps {
-    onCharacterCreated: (name: string, color: string) => void;
+    onCharacterCreated: (name: string, gender: string) => void;
     onBack?: () => void; // Optional back handler
 }
 
-const colorOptions = [
-    { name: "Green", value: "#00ff00", bg: "bg-green-500" },
-    { name: "Blue", value: "#0066ff", bg: "bg-blue-500" },
-    { name: "Red", value: "#ff0000", bg: "bg-red-500" },
-    { name: "Yellow", value: "#ffff00", bg: "bg-yellow-500" },
-    { name: "Purple", value: "#9900ff", bg: "bg-purple-500" },
-    { name: "Orange", value: "#ff6600", bg: "bg-orange-500" },
+const genderOptions = [
+    { name: "Male", value: "male", icon: "👨", sprite: "/assets/student-sprites/front/front-1-removebg-preview.png" },
+    { name: "Female", value: "female", icon: "👩", sprite: "/assets/student-sprites/front/front-1-removebg-preview.png" },
 ];
 
 export const CharacterCreation: React.FC<CharacterCreationProps> = ({
@@ -20,25 +16,17 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({
     onBack,
 }) => {
     const [playerName, setPlayerName] = useState("");
-    const [selectedColor, setSelectedColor] = useState("#00ff00");
-
-    // Function to convert hex color to hue rotation for CSS filter
-    const getHueRotation = (hexColor: string) => {
-        const colorMap: { [key: string]: number } = {
-            "#00ff00": 0, // Green - no rotation
-            "#0066ff": 240, // Blue
-            "#ff0000": 0, // Red - no rotation
-            "#ffff00": 60, // Yellow
-            "#9900ff": 270, // Purple
-            "#ff6600": 30, // Orange
-        };
-        return colorMap[hexColor] || 0;
-    };
+    const [selectedGender, setSelectedGender] = useState("male");
 
     const handleSubmit = () => {
         if (playerName.trim()) {
-            onCharacterCreated(playerName.trim(), selectedColor);
+            onCharacterCreated(playerName.trim(), selectedGender);
         }
+    };
+
+    const getCurrentSprite = () => {
+        const gender = genderOptions.find(g => g.value === selectedGender);
+        return gender?.sprite || genderOptions[0].sprite;
     };
 
     return (
@@ -109,21 +97,15 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({
                                 <div className="game-element-border rounded-lg p-2 shadow-2xl">
                                     <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg border-3 border-amber-800 shadow-2xl overflow-hidden">
                                         <img
-                                            src="/assets/student-sprites/front/front-1-removebg-preview.png"
+                                            src={getCurrentSprite()}
                                             alt="Character Preview"
                                             className="w-full h-full object-cover"
-                                            style={{
-                                                filter: `hue-rotate(${getHueRotation(
-                                                    selectedColor
-                                                )}deg)`,
-                                            }}
                                         />
                                     </div>
                                 </div>
                                 {/* Glow effect */}
                                 <div
-                                    className="absolute inset-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg animate-ping opacity-20"
-                                    style={{ backgroundColor: selectedColor }}
+                                    className="absolute inset-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg animate-ping opacity-20 bg-amber-400"
                                 ></div>
                             </div>
                         </div>
@@ -152,7 +134,7 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({
                             </div> */}
                         </div>
 
-                        {/* Color Selection */}
+                        {/* Gender Selection */}
                         <div className="mb-4">
                             <label
                                 className="block text-sm font-bold 
@@ -160,26 +142,26 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({
                           
                               rounded-md py-1 px-2 text-center"
                             >
-                                Choose your color:
+                                Choose your gender:
                             </label>
-                            <div className="grid grid-cols-3 gap-2">
-                                {colorOptions.map((color) => (
+                            <div className="grid grid-cols-2 gap-3">
+                                {genderOptions.map((gender) => (
                                     <button
-                                        key={color.value}
+                                        key={gender.value}
                                         onClick={() =>
-                                            setSelectedColor(color.value)
+                                            setSelectedGender(gender.value)
                                         }
-                                        className={`p-2 rounded-lg border-3 transition-all duration-200 hover:scale-105 game-element-border ${
-                                            selectedColor === color.value
+                                        className={`p-4 rounded-lg border-3 transition-all duration-200 hover:scale-105 game-element-border ${
+                                            selectedGender === gender.value
                                                 ? "border-amber-400 shadow-lg bg-amber-100"
                                                 : "border-amber-700 hover:border-amber-500 bg-amber-50"
                                         }`}
                                     >
-                                        <div
-                                            className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full ${color.bg} mx-auto mb-1 shadow-md border-2 border-amber-800`}
-                                        ></div>
-                                        <div className="text-xs font-medium text-amber-800">
-                                            {color.name}
+                                        <div className="text-3xl sm:text-4xl mb-2">
+                                            {gender.icon}
+                                        </div>
+                                        <div className="text-sm sm:text-base font-bold text-amber-800">
+                                            {gender.name}
                                         </div>
                                     </button>
                                 ))}

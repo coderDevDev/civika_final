@@ -10,6 +10,7 @@ export class GameStateManager {
     private gameProgress: GameProgress | null = null;
     private listeners: Array<(progress: GameProgress) => void> = [];
     private quizStartTime: number = 0;
+    private developerMode: boolean = false; // Developer/Testing mode to bypass requirements
 
     private constructor() {}
 
@@ -128,10 +129,27 @@ export class GameStateManager {
      */
     public canAccessMission(missionId: number): boolean {
         if (!this.gameProgress) return false;
+        // Developer mode bypasses all mission requirements
+        if (this.developerMode) return true;
         return GameValidation.canAccessMission(
             missionId,
             this.gameProgress.completedMissions
         );
+    }
+
+    /**
+     * Set developer/testing mode (bypasses level requirements)
+     */
+    public setDeveloperMode(enabled: boolean): void {
+        this.developerMode = enabled;
+        console.log(`Developer mode ${enabled ? 'ENABLED' : 'DISABLED'}`);
+    }
+
+    /**
+     * Get developer mode status
+     */
+    public getDeveloperMode(): boolean {
+        return this.developerMode;
     }
 
     /**
