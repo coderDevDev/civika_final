@@ -131,10 +131,8 @@ export const GameNotification: React.FC<GameNotificationProps> = ({
                                     <button
                                         key={index}
                                         onClick={() => {
-                                            // Execute the action
+                                            // Execute the action (which should handle closing if needed)
                                             action.action();
-                                            // Close the notification
-                                            onClose();
                                         }}
                                         className={`w-full py-2 sm:py-3 px-4 sm:px-6 rounded-lg transition-all duration-200 font-bold text-sm sm:text-base ${getButtonStyles(
                                             action.style
