@@ -426,7 +426,7 @@ export class SecretQuestService {
     public checkLocation(
         percentX: number,
         percentY: number
-    ): SecretLocation | null {
+    ): { location: SecretLocation; newlyDiscovered: boolean } | null {
         const PROXIMITY = 5; // 5% proximity threshold
 
         for (const location of this.secretLocations) {
@@ -434,10 +434,11 @@ export class SecretQuestService {
             const distanceY = Math.abs(location.percentY - percentY);
 
             if (distanceX <= PROXIMITY && distanceY <= PROXIMITY) {
+                const wasDiscovered = location.discovered;
                 if (!location.discovered) {
                     this.discoverLocation(location.id);
                 }
-                return location;
+                return { location, newlyDiscovered: !wasDiscovered };
             }
         }
 

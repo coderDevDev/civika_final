@@ -2683,18 +2683,19 @@ export class BarangayMap extends Scene {
 
     checkSecretLocation(percentX: number, percentY: number) {
         const secretQuestService = SecretQuestService.getInstance();
-        const secretLocation = secretQuestService.checkLocation(
+        const result = secretQuestService.checkLocation(
             percentX,
             percentY
         );
 
-        if (secretLocation) {
+        // Only show notification for NEWLY discovered locations
+        if (result && result.newlyDiscovered) {
             // Show notification for discovered secret location
             EventBus.emit("show-notification", {
                 type: "success",
                 title: "🗺️ Secret Location Discovered!",
-                message: `You found: ${secretLocation.name}!\n${
-                    secretLocation.hint || "A mysterious place..."
+                message: `You found: ${result.location.name}!\n${
+                    result.location.hint || "A mysterious place..."
                 }`,
                 icon: "🔐",
                 actions: [
