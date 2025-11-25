@@ -681,269 +681,1264 @@ function App() {
     };
 
     const getQuizForMission = (missionId: string) => {
-        const quizzes = {
-            // Level 1: Barangay Quizzes (1-10)
-            "1": {
-                question:
-                    "What is the main purpose of waste segregation in the barangay?",
-                options: [
-                    "To make the area look cleaner",
-                    "To reduce environmental pollution and promote recycling",
-                    "To save money on garbage collection",
-                    "To follow government orders",
-                ],
-                correctAnswer: 1,
-                explanation:
-                    "Waste segregation helps reduce environmental pollution, promotes recycling, and creates a healthier community environment.",
-            },
-            "2": {
-                question:
-                    "What is the minimum age requirement for voter registration in the Philippines?",
-                options: [
-                    "16 years old",
-                    "17 years old",
-                    "18 years old",
-                    "21 years old",
-                ],
-                correctAnswer: 2,
-                explanation:
-                    "The minimum age for voter registration in the Philippines is 18 years old, as stated in the 1987 Constitution.",
-            },
-            "3": {
-                question:
-                    "What is the best way to help elderly residents in your community?",
-                options: [
-                    "Ignore them and focus on younger people",
-                    "Provide assistance with daily tasks and show respect",
-                    "Only help during emergencies",
-                    "Let their families handle everything",
-                ],
-                correctAnswer: 1,
-                explanation:
-                    "Helping elderly residents with daily tasks, showing respect, and maintaining regular contact strengthens community bonds and shows civic responsibility.",
-            },
-            "4": {
-                question: "What is a barangay ordinance?",
-                options: [
-                    "A national law passed by Congress",
-                    "A local law passed by the barangay council",
-                    "A rule made by the mayor",
-                    "A suggestion from residents",
-                ],
-                correctAnswer: 1,
-                explanation:
-                    "A barangay ordinance is a local law passed by the barangay council to address specific needs and issues within the barangay.",
-            },
-            "5": {
-                question:
-                    "What is the first step in fact-checking information?",
-                options: [
-                    "Share it immediately on social media",
-                    "Verify the source and check multiple reliable sources",
-                    "Ask friends for their opinion",
-                    "Assume it's true if it sounds reasonable",
-                ],
-                correctAnswer: 1,
-                explanation:
-                    "Fact-checking requires verifying the source and cross-referencing information with multiple reliable and credible sources.",
-            },
-            "6": {
-                question:
-                    "What is the primary goal of community infrastructure projects?",
-                options: [
-                    "To spend government budget",
-                    "To improve the quality of life for residents",
-                    "To create jobs for politicians",
-                    "To make the area look modern",
-                ],
-                correctAnswer: 1,
-                explanation:
-                    "Community infrastructure projects aim to improve the quality of life for residents by providing better facilities, services, and living conditions.",
-            },
-            "7": {
-                question:
-                    "What is the best approach to resolve community conflicts?",
-                options: [
-                    "Ignore the problem until it goes away",
-                    "Use mediation and peaceful dialogue",
-                    "Let the police handle everything",
-                    "Take sides and support one party",
-                ],
-                correctAnswer: 1,
-                explanation:
-                    "Mediation and peaceful dialogue are the most effective ways to resolve community conflicts while maintaining harmony and understanding.",
-            },
-            "8": {
-                question:
-                    "What is the significance of knowing Philippine history for civic engagement?",
-                options: [
-                    "It's not important for modern civic life",
-                    "It helps understand democratic principles and civic responsibilities",
-                    "It's only useful for history students",
-                    "It's required by law",
-                ],
-                correctAnswer: 1,
-                explanation:
-                    "Understanding Philippine history helps citizens appreciate democratic principles, learn from past experiences, and better understand their civic responsibilities.",
-            },
-            "9": {
-                question:
-                    "What is the most effective way to promote health in the community?",
-                options: [
-                    "Only during health emergencies",
-                    "Through regular health campaigns and education",
-                    "By building more hospitals",
-                    "By hiring more doctors",
-                ],
-                correctAnswer: 1,
-                explanation:
-                    "Regular health campaigns, education, and preventive measures are the most effective ways to promote community health and wellness.",
-            },
-            "10": {
-                question: "What is the main purpose of barangay meetings?",
-                options: [
-                    "To socialize with neighbors",
-                    "To discuss and decide on community issues",
-                    "To collect fees from residents",
-                    "To announce new rules",
-                ],
-                correctAnswer: 1,
-                explanation:
-                    "Barangay meetings serve as a platform for residents to discuss community issues, participate in decision-making, and exercise democratic participation at the local level.",
-            },
+        // Progressive quiz system: Mission N has N questions
+        const progressiveQuizzes = {
+            // Mission 1: 1 question
+            "1": [
+                {
+                    question: "Which of the following is classified as biodegradable waste?",
+                    options: [
+                        "Plastic bottle",
+                        "Banana peel",
+                        "Aluminum can",
+                        "Glass jar",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Banana peel is biodegradable waste that can decompose naturally and be composted.",
+                }
+            ],
+            // Mission 2: 2 questions
+            "2": [
+                {
+                    question: "What is the minimum age to register and vote in the Philippines?",
+                    options: ["16", "17", "18", "21"],
+                    correctAnswer: 2,
+                    explanation: "The minimum age for voter registration in the Philippines is 18 years old.",
+                },
+                {
+                    question: "What document is required for voter registration?",
+                    options: [
+                        "Birth Certificate",
+                        "Valid ID with photo and address",
+                        "Passport only",
+                        "Driver's license only",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "A valid ID with photo and address is required for voter registration.",
+                }
+            ],
+            // Mission 3: 3 questions
+            "3": [
+                {
+                    question: "What is the main duty of a Barangay Captain?",
+                    options: [
+                        "Clean streets",
+                        "Approve national laws",
+                        "Lead barangay governance and implement ordinances",
+                        "Collect taxes for the BIR",
+                    ],
+                    correctAnswer: 2,
+                    explanation: "The Barangay Captain leads barangay governance and implements local ordinances.",
+                },
+                {
+                    question: "Who assists the Barangay Captain in governance?",
+                    options: [
+                        "Barangay Kagawads",
+                        "City Mayor",
+                        "Police Chief",
+                        "School Principal",
+                    ],
+                    correctAnswer: 0,
+                    explanation: "Barangay Kagawads assist the Barangay Captain in local governance.",
+                },
+                {
+                    question: "What is the role of the Barangay Secretary?",
+                    options: [
+                        "Clean the barangay hall",
+                        "Keep records and prepare reports",
+                        "Collect garbage",
+                        "Teach students",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "The Barangay Secretary keeps records and prepares official reports.",
+                }
+            ],
+            // Mission 4: 4 questions
+            "4": [
+                {
+                    question: "Which of the following is an example of a barangay ordinance?",
+                    options: [
+                        "Increase in national income tax",
+                        "Road widening for highways", 
+                        "Curfew for minors",
+                        "National ID registration",
+                    ],
+                    correctAnswer: 2,
+                    explanation: "Curfew for minors is an example of a barangay ordinance that addresses local community safety.",
+                },
+                {
+                    question: "Who can propose a barangay ordinance?",
+                    options: [
+                        "Any resident",
+                        "Barangay Kagawads",
+                        "City Mayor only",
+                        "President",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Barangay Kagawads have the authority to propose ordinances for their community.",
+                },
+                {
+                    question: "How are barangay ordinances approved?",
+                    options: [
+                        "By the President",
+                        "By majority vote of Sangguniang Barangay",
+                        "By the City Mayor",
+                        "Automatically",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Barangay ordinances must be approved by majority vote of the Sangguniang Barangay.",
+                },
+                {
+                    question: "What happens if you violate a barangay ordinance?",
+                    options: [
+                        "Nothing",
+                        "Imprisonment only",
+                        "Fine or community service",
+                        "Deportation",
+                    ],
+                    correctAnswer: 2,
+                    explanation: "Violating barangay ordinances typically results in fines or community service as penalties.",
+                }
+            ],
+            // Mission 5: 5 questions
+            "5": [
+                {
+                    question: "How can you verify if news online is fake?",
+                    options: [
+                        "If it has many likes",
+                        "If a celebrity shares it",
+                        "By checking official sources or fact-checking websites",
+                        "If it matches your opinion",
+                    ],
+                    correctAnswer: 2,
+                    explanation: "Fact-checking requires verifying the source and cross-referencing information with multiple reliable and credible sources.",
+                },
+                {
+                    question: "What is a common sign of fake news?",
+                    options: [
+                        "Professional website design",
+                        "Sensational headlines and emotional language",
+                        "Multiple credible sources",
+                        "Author credentials listed",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Fake news often uses sensational headlines and emotional language to manipulate readers.",
+                },
+                {
+                    question: "What should you do before sharing news online?",
+                    options: [
+                        "Share immediately if it's shocking",
+                        "Verify the source and check facts",
+                        "Share only if friends shared it",
+                        "Add your own opinion first",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Always verify the source and check facts before sharing any news online.",
+                },
+                {
+                    question: "Which website helps verify fake news in the Philippines?",
+                    options: [
+                        "Facebook",
+                        "Vera Files or Rappler fact-check",
+                        "Twitter",
+                        "Instagram",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Vera Files and Rappler have dedicated fact-checking sections for Filipino news.",
+                },
+                {
+                    question: "Why is spreading fake news harmful?",
+                    options: [
+                        "It's not harmful",
+                        "It misinforms people and can cause panic",
+                        "It makes you popular",
+                        "It's just entertainment",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Fake news misinforms people, can cause unnecessary panic, and undermines trust in legitimate information.",
+                }
+            ],
+            // Mission 6: 6 questions
+            "6": [
+                {
+                    question: "Which barangay official is responsible for implementing local projects?",
+                    options: [
+                        "Barangay Treasurer",
+                        "Barangay Kagawad",
+                        "City Mayor",
+                        "Barangay Clerk",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Barangay Kagawads are responsible for implementing local projects and programs.",
+                },
+                {
+                    question: "What is the role of the Barangay Treasurer?",
+                    options: [
+                        "Fix roads",
+                        "Manage barangay funds and budget",
+                        "Arrest criminals",
+                        "Teach children",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "The Barangay Treasurer manages barangay funds and budget allocation.",
+                },
+                {
+                    question: "Who maintains peace and order in the barangay?",
+                    options: [
+                        "Barangay Tanod",
+                        "Teachers",
+                        "Doctors",
+                        "Engineers",
+                    ],
+                    correctAnswer: 0,
+                    explanation: "Barangay Tanods are responsible for maintaining peace and order in the community.",
+                },
+                {
+                    question: "What service does the barangay provide for infrastructure?",
+                    options: [
+                        "Building airports",
+                        "Road repairs and street lighting",
+                        "Building malls",
+                        "Operating trains",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Barangays provide basic infrastructure services like road repairs and street lighting.",
+                },
+                {
+                    question: "How can residents request barangay services?",
+                    options: [
+                        "Through social media only",
+                        "By filing a request at the barangay hall",
+                        "By calling the President",
+                        "Services are not available",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Residents can request services by filing formal requests at the barangay hall.",
+                },
+                {
+                    question: "What is 'Bayanihan' in community service?",
+                    options: [
+                        "A type of food",
+                        "Community cooperation and helping each other",
+                        "A government office",
+                        "A type of tax",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Bayanihan represents the Filipino spirit of community cooperation and mutual assistance.",
+                }
+            ],
+            // Mission 7: 7 questions
+            "7": [
+                {
+                    question: "What is the best first step in resolving neighbor conflicts?",
+                    options: [
+                        "Shout at them",
+                        "Post on social media",
+                        "Talk calmly or seek mediation",
+                        "Ignore it completely",
+                    ],
+                    correctAnswer: 2,
+                    explanation: "Calm dialogue and mediation are the most effective first steps in resolving conflicts.",
+                },
+                {
+                    question: "What is the role of a barangay mediator?",
+                    options: [
+                        "Punish wrongdoers",
+                        "Help parties reach peaceful agreement",
+                        "Take sides",
+                        "Call the police immediately",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Barangay mediators help conflicting parties reach peaceful agreements.",
+                },
+                {
+                    question: "What is 'Katarungang Pambarangay'?",
+                    options: [
+                        "A barangay festival",
+                        "Barangay justice system for settling disputes",
+                        "A type of food",
+                        "A barangay official",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Katarungang Pambarangay is the barangay-level justice system for dispute resolution.",
+                },
+                {
+                    question: "What should you bring to a barangay mediation?",
+                    options: [
+                        "Weapons",
+                        "Evidence and witnesses",
+                        "Angry friends",
+                        "Nothing",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Bring relevant evidence and witnesses to support your case in mediation.",
+                },
+                {
+                    question: "What happens if mediation fails?",
+                    options: [
+                        "Nothing can be done",
+                        "Case can be brought to court",
+                        "Fight it out",
+                        "Move away",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "If barangay mediation fails, the case can be escalated to formal court proceedings.",
+                },
+                {
+                    question: "Why is mediation better than going to court?",
+                    options: [
+                        "It's not better",
+                        "It's faster, cheaper, and preserves relationships",
+                        "You always win",
+                        "It's more expensive",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Mediation is faster, cheaper, and helps preserve community relationships.",
+                },
+                {
+                    question: "What attitude should you have during mediation?",
+                    options: [
+                        "Aggressive and demanding",
+                        "Open-minded and willing to compromise",
+                        "Defensive and angry",
+                        "Silent and uncooperative",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "An open-minded and compromising attitude leads to successful mediation outcomes.",
+                }
+            ],
+            // Mission 8: 8 questions
+            "8": [
+                {
+                    question: "What year was the current Philippine Constitution ratified?",
+                    options: ["1898", "1945", "1973", "1987"],
+                    correctAnswer: 3,
+                    explanation: "The current Philippine Constitution was ratified in 1987.",
+                },
+                {
+                    question: "Who is known as the 'Father of the Philippine Constitution'?",
+                    options: [
+                        "Jose Rizal",
+                        "Claro M. Recto",
+                        "Emilio Aguinaldo",
+                        "Andres Bonifacio",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Claro M. Recto is known as the Father of the Philippine Constitution.",
+                },
+                {
+                    question: "What is the Bill of Rights?",
+                    options: [
+                        "A list of government officials",
+                        "Constitutional provisions protecting individual freedoms",
+                        "A tax document",
+                        "A barangay ordinance",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "The Bill of Rights contains constitutional provisions that protect individual freedoms.",
+                },
+                {
+                    question: "How many articles are in the 1987 Philippine Constitution?",
+                    options: ["10", "15", "18", "20"],
+                    correctAnswer: 2,
+                    explanation: "The 1987 Philippine Constitution contains 18 articles.",
+                },
+                {
+                    question: "What is the national language of the Philippines?",
+                    options: ["English", "Spanish", "Filipino", "Tagalog only"],
+                    correctAnswer: 2,
+                    explanation: "Filipino is the national language of the Philippines.",
+                },
+                {
+                    question: "What does 'sovereignty resides in the people' mean?",
+                    options: [
+                        "The President has all power",
+                        "The people are the source of government authority",
+                        "Only rich people have power",
+                        "Foreigners control the country",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "This means the people are the ultimate source of government authority and power.",
+                },
+                {
+                    question: "What is the term of office for a Philippine President?",
+                    options: [
+                        "4 years, renewable",
+                        "6 years, no re-election",
+                        "5 years, renewable once",
+                        "Lifetime",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "The Philippine President serves a 6-year term with no re-election allowed.",
+                },
+                {
+                    question: "What are the three branches of Philippine government?",
+                    options: [
+                        "Federal, State, Local",
+                        "Executive, Legislative, Judicial",
+                        "President, Senate, Mayor",
+                        "Army, Navy, Air Force",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "The three branches are Executive, Legislative, and Judicial.",
+                }
+            ],
+            // Mission 9: 9 questions
+            "9": [
+                {
+                    question: "Which of the following is a common barangay health service?",
+                    options: [
+                        "Surgery",
+                        "Blood donation and immunization",
+                        "Ambulance repair",
+                        "Pharmacy sales",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Blood donation drives and immunization are common barangay health services.",
+                },
+                {
+                    question: "What is the purpose of barangay health centers?",
+                    options: [
+                        "Sell medicine for profit",
+                        "Provide basic healthcare and preventive services",
+                        "Replace hospitals",
+                        "Train doctors",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Barangay health centers provide basic healthcare and preventive services to the community.",
+                },
+                {
+                    question: "What does 'Oplan Bakuna' promote?",
+                    options: [
+                        "Exercise programs",
+                        "Vaccination and immunization",
+                        "Healthy eating only",
+                        "Sports competitions",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Oplan Bakuna promotes vaccination and immunization programs.",
+                },
+                {
+                    question: "Who are Barangay Health Workers (BHWs)?",
+                    options: [
+                        "Doctors from hospitals",
+                        "Volunteer community health advocates",
+                        "Government soldiers",
+                        "Foreign health experts",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "BHWs are volunteer community health advocates who serve their barangays.",
+                },
+                {
+                    question: "What is the importance of pre-natal care?",
+                    options: [
+                        "It's not important",
+                        "Ensures health of mother and baby during pregnancy",
+                        "Only for rich families",
+                        "Only needed after birth",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Pre-natal care ensures the health of both mother and baby during pregnancy.",
+                },
+                {
+                    question: "What is 'Nutrition Month' in the Philippines?",
+                    options: [
+                        "December",
+                        "July",
+                        "January",
+                        "October",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Nutrition Month in the Philippines is celebrated in July.",
+                },
+                {
+                    question: "What service helps prevent dengue in barangays?",
+                    options: [
+                        "Building more roads",
+                        "Mosquito control and clean-up drives",
+                        "Planting more trees only",
+                        "Building more houses",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Mosquito control and clean-up drives help prevent dengue outbreaks.",
+                },
+                {
+                    question: "What is the '4Ps' health component?",
+                    options: [
+                        "A sports program",
+                        "Health check-ups and deworming for beneficiaries",
+                        "A scholarship program",
+                        "A housing program",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "The 4Ps program includes health check-ups and deworming for beneficiaries.",
+                },
+                {
+                    question: "Why is handwashing important?",
+                    options: [
+                        "It's not important",
+                        "Prevents spread of diseases and infections",
+                        "Makes hands smell good only",
+                        "Wastes water",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Handwashing prevents the spread of diseases and infections.",
+                }
+            ],
+            // Mission 10: 10 questions
+            "10": [
+                {
+                    question: "What should you do during a barangay meeting?",
+                    options: [
+                        "Shout your opinions",
+                        "Sleep silently",
+                        "Listen, respect turns, and speak politely",
+                        "Record secretly without consent",
+                    ],
+                    correctAnswer: 2,
+                    explanation: "Effective participation requires listening, respecting others' turns, and speaking politely.",
+                },
+                {
+                    question: "What is a barangay assembly?",
+                    options: [
+                        "A party",
+                        "A meeting where residents discuss community issues",
+                        "A sports event",
+                        "A religious gathering",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "A barangay assembly is a meeting where residents discuss community issues.",
+                },
+                {
+                    question: "How often should barangay assemblies be held?",
+                    options: [
+                        "Once a year",
+                        "At least twice a year",
+                        "Never",
+                        "Every day",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Barangay assemblies should be held at least twice a year.",
+                },
+                {
+                    question: "Who can attend barangay assemblies?",
+                    options: [
+                        "Only officials",
+                        "All residents of voting age",
+                        "Only men",
+                        "Only property owners",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "All residents of voting age can attend barangay assemblies.",
+                },
+                {
+                    question: "What topics are discussed in barangay assemblies?",
+                    options: [
+                        "Celebrity gossip",
+                        "Community problems, projects, and budget",
+                        "Personal issues only",
+                        "National politics only",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Assemblies discuss community problems, projects, and budget matters.",
+                },
+                {
+                    question: "Can residents propose projects in assemblies?",
+                    options: [
+                        "No, never",
+                        "Yes, residents can suggest community projects",
+                        "Only if they pay",
+                        "Only officials can propose",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Residents can suggest and propose community projects during assemblies.",
+                },
+                {
+                    question: "What is a quorum in barangay assemblies?",
+                    options: [
+                        "A type of food",
+                        "Minimum number of attendees needed for valid decisions",
+                        "A barangay official",
+                        "A voting machine",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "A quorum is the minimum number of attendees needed to make valid decisions.",
+                },
+                {
+                    question: "Why is citizen participation important in assemblies?",
+                    options: [
+                        "It's not important",
+                        "It ensures community voices are heard in governance",
+                        "To waste time",
+                        "Only for entertainment",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Citizen participation ensures community voices are heard in local governance.",
+                },
+                {
+                    question: "What is 'transparency' in barangay governance?",
+                    options: [
+                        "Invisible walls",
+                        "Open and honest sharing of information with residents",
+                        "Secret meetings",
+                        "Hiding documents",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Transparency means open and honest sharing of information with residents.",
+                },
+                {
+                    question: "How can youth participate in barangay governance?",
+                    options: [
+                        "They cannot participate",
+                        "Through Sangguniang Kabataan and attending assemblies",
+                        "Only by watching",
+                        "Only when they're old",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Youth can participate through Sangguniang Kabataan and by attending assemblies.",
+                }
+            ],
 
-            // Level 2: City Government Quizzes (11-20)
-            "11": {
-                question: "What is the primary function of city ordinances?",
-                options: [
-                    "To replace national laws",
-                    "To regulate local affairs and implement policies",
-                    "To collect more taxes from residents",
-                    "To create jobs for city officials",
-                ],
-                correctAnswer: 1,
-                explanation:
-                    "City ordinances are local laws that regulate specific affairs within the city's jurisdiction and implement policies for the welfare of residents.",
-            },
-            "12": {
-                question:
-                    "What is the main source of municipal revenue in Philippine cities?",
-                options: [
-                    "Donations from private companies",
-                    "Local taxes, fees, and national government allocations",
-                    "International aid",
-                    "Loans from banks only",
-                ],
-                correctAnswer: 1,
-                explanation:
-                    "Municipal revenue comes from local taxes (real property tax, business permits), fees, and the Internal Revenue Allotment (IRA) from the national government.",
-            },
-            "13": {
-                question:
-                    "Who is primarily responsible for city infrastructure planning?",
-                options: [
-                    "Private construction companies",
-                    "City Engineer and Planning Office",
-                    "National government only",
-                    "Local business owners",
-                ],
-                correctAnswer: 1,
-                explanation:
-                    "The City Engineer and Planning Office are responsible for infrastructure planning, ensuring projects meet safety standards and development needs.",
-            },
-            "14": {
-                question:
-                    "What is required to operate a business legally in a city?",
-                options: [
-                    "Only a national business registration",
-                    "Mayor's personal approval only",
-                    "Business permit and compliance with local regulations",
-                    "Recommendation from local politicians",
-                ],
-                correctAnswer: 2,
-                explanation:
-                    "Businesses must obtain proper permits and comply with local regulations including zoning, health, and safety requirements to operate legally.",
-            },
-            "15": {
-                question:
-                    "What is the purpose of urban zoning in city planning?",
-                options: [
-                    "To segregate people by income level",
-                    "To organize land use for orderly development",
-                    "To increase property prices",
-                    "To limit population growth",
-                ],
-                correctAnswer: 1,
-                explanation:
-                    "Urban zoning organizes land use (residential, commercial, industrial) to ensure orderly development, reduce conflicts, and promote sustainable growth.",
-            },
-            "16": {
-                question:
-                    "What is a city's primary environmental responsibility?",
-                options: [
-                    "Monitoring global climate change only",
-                    "Managing local waste, air, and water quality",
-                    "Protecting wildlife in other countries",
-                    "Regulating international trade",
-                ],
-                correctAnswer: 1,
-                explanation:
-                    "Cities are responsible for local environmental management including waste disposal, air quality monitoring, and water resource protection.",
-            },
-            "17": {
-                question:
-                    "How should cities coordinate public safety effectively?",
-                options: [
-                    "Rely only on national police",
-                    "Integrate local police, fire, medical, and emergency services",
-                    "Hire private security companies only",
-                    "Depend on volunteer groups exclusively",
-                ],
-                correctAnswer: 1,
-                explanation:
-                    "Effective public safety requires coordinated integration of police, fire departments, medical services, and emergency response systems.",
-            },
-            "18": {
-                question:
-                    "Why is cultural heritage preservation important for cities?",
-                options: [
-                    "It only benefits tourists",
-                    "It preserves identity, promotes tourism, and educates citizens",
-                    "It increases construction costs",
-                    "It prevents modern development",
-                ],
-                correctAnswer: 1,
-                explanation:
-                    "Cultural heritage preservation maintains local identity, attracts tourism, provides educational value, and contributes to community pride.",
-            },
-            "19": {
-                question: "What is the city government's role in healthcare?",
-                options: [
-                    "Replace all private hospitals",
-                    "Provide basic health services and coordinate public health programs",
-                    "Only handle medical emergencies",
-                    "Focus solely on health insurance",
-                ],
-                correctAnswer: 1,
-                explanation:
-                    "City governments provide basic health services, operate public health facilities, and coordinate disease prevention and health promotion programs.",
-            },
-            "20": {
-                question: "What demonstrates effective city leadership?",
-                options: [
-                    "Making all decisions without consultation",
-                    "Transparent governance, citizen participation, and inter-agency coordination",
-                    "Focusing only on economic development",
-                    "Avoiding difficult decisions",
-                ],
-                correctAnswer: 1,
-                explanation:
-                    "Effective city leadership involves transparent governance, meaningful citizen participation, and coordinated efforts across all city departments.",
-            },
+            // Level 2: City Government Quizzes (11-20) - Progressive format
+            // Mission 11: 1 question
+            "11": [
+                {
+                    question: "What is the primary function of city ordinances?",
+                    options: [
+                        "To replace national laws",
+                        "To regulate local affairs and implement policies",
+                        "To collect more taxes from residents",
+                        "To create jobs for city officials",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "City ordinances are local laws that regulate specific affairs within the city's jurisdiction.",
+                }
+            ],
+            // Mission 12: 2 questions  
+            "12": [
+                {
+                    question: "What is the main source of municipal revenue in Philippine cities?",
+                    options: [
+                        "Donations from private companies",
+                        "Local taxes, fees, and national government allocations",
+                        "International aid",
+                        "Loans from banks only",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Municipal revenue comes from local taxes, fees, and the Internal Revenue Allotment (IRA).",
+                },
+                {
+                    question: "What is the Internal Revenue Allotment (IRA)?",
+                    options: [
+                        "A city tax",
+                        "National government fund allocation to local governments",
+                        "A business permit fee",
+                        "A property tax",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "IRA is the national government's fund allocation to local government units.",
+                }
+            ],
+            // Mission 13: 3 questions
+            "13": [
+                {
+                    question: "Who is primarily responsible for city infrastructure planning?",
+                    options: [
+                        "Private construction companies",
+                        "City Engineer and Planning Office",
+                        "National government only",
+                        "Local business owners",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "The City Engineer and Planning Office are responsible for infrastructure planning.",
+                },
+                {
+                    question: "What is urban infrastructure?",
+                    options: [
+                        "Only roads",
+                        "Roads, bridges, water systems, and public facilities",
+                        "Only buildings",
+                        "Only parks",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Urban infrastructure includes roads, bridges, water systems, and public facilities.",
+                },
+                {
+                    question: "Why is infrastructure maintenance important?",
+                    options: [
+                        "It's not important",
+                        "Ensures safety and functionality of public facilities",
+                        "To spend money",
+                        "To create jobs only",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Infrastructure maintenance ensures safety and functionality of public facilities.",
+                }
+            ],
+            // Mission 14: 4 questions
+            "14": [
+                {
+                    question: "What is required to operate a business legally in a city?",
+                    options: [
+                        "Only a national business registration",
+                        "Mayor's personal approval only",
+                        "Business permit and compliance with local regulations",
+                        "Recommendation from local politicians",
+                    ],
+                    correctAnswer: 2,
+                    explanation: "Businesses must obtain proper permits and comply with local regulations.",
+                },
+                {
+                    question: "What is a business permit?",
+                    options: [
+                        "A suggestion",
+                        "Official authorization to operate a business",
+                        "A loan",
+                        "An advertisement",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "A business permit is official authorization to operate a business.",
+                },
+                {
+                    question: "Which office issues business permits?",
+                    options: [
+                        "Police station",
+                        "Business Permits and Licensing Office",
+                        "Fire department",
+                        "Hospital",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "The Business Permits and Licensing Office issues business permits.",
+                },
+                {
+                    question: "What happens if you operate without a permit?",
+                    options: [
+                        "Nothing",
+                        "You get a reward",
+                        "Penalties, fines, or closure",
+                        "Free advertising",
+                    ],
+                    correctAnswer: 2,
+                    explanation: "Operating without a permit can result in penalties, fines, or closure.",
+                }
+            ],
+            // Mission 15: 5 questions
+            "15": [
+                {
+                    question: "What is the purpose of urban zoning?",
+                    options: [
+                        "To segregate people by income",
+                        "To organize land use for orderly development",
+                        "To increase property prices",
+                        "To limit population",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Urban zoning organizes land use for orderly development.",
+                },
+                {
+                    question: "What are the main zoning types?",
+                    options: [
+                        "Rich and poor",
+                        "Residential, commercial, and industrial",
+                        "Old and new",
+                        "Big and small",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Main zoning types are residential, commercial, and industrial.",
+                },
+                {
+                    question: "Why is city planning important?",
+                    options: [
+                        "To make cities pretty",
+                        "To ensure sustainable development",
+                        "To spend money",
+                        "To create jobs",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "City planning ensures sustainable development and quality of life.",
+                },
+                {
+                    question: "What is a comprehensive land use plan?",
+                    options: [
+                        "A map",
+                        "A long-term development guide",
+                        "A list of owners",
+                        "A tax plan",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "A comprehensive land use plan is a long-term development guide.",
+                },
+                {
+                    question: "Who approves city development plans?",
+                    options: [
+                        "The President",
+                        "City Council",
+                        "Barangay Captain",
+                        "Business owners",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "The City Council approves city development plans.",
+                }
+            ],
+            // Mission 16: 6 questions
+            "16": [
+                {
+                    question: "What is a city's environmental responsibility?",
+                    options: [
+                        "Monitor global climate only",
+                        "Manage local waste, air, and water quality",
+                        "Protect foreign wildlife",
+                        "Regulate international trade",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Cities manage local waste, air, and water quality.",
+                },
+                {
+                    question: "What is solid waste management?",
+                    options: [
+                        "Throwing garbage anywhere",
+                        "Systematic collection and disposal of waste",
+                        "Burning all waste",
+                        "Burying waste anywhere",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Solid waste management involves systematic collection and disposal.",
+                },
+                {
+                    question: "What is the 3Rs principle?",
+                    options: [
+                        "Read, Write, Recite",
+                        "Reduce, Reuse, Recycle",
+                        "Run, Rest, Repeat",
+                        "Rich, Rare, Royal",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "The 3Rs are Reduce, Reuse, and Recycle.",
+                },
+                {
+                    question: "What is water quality monitoring?",
+                    options: [
+                        "Counting bottles",
+                        "Testing water safety standards",
+                        "Measuring temperature only",
+                        "Checking color only",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Water quality monitoring tests water safety standards.",
+                },
+                {
+                    question: "What is air quality management?",
+                    options: [
+                        "Ignoring pollution",
+                        "Monitoring and controlling air pollution",
+                        "Only for factories",
+                        "Only for vehicles",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Air quality management monitors and controls air pollution.",
+                },
+                {
+                    question: "Why do cities need environmental ordinances?",
+                    options: [
+                        "To make money",
+                        "To protect public health and environment",
+                        "To punish residents",
+                        "To create jobs",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Environmental ordinances protect public health and the environment.",
+                }
+            ],
+            // Mission 17: 7 questions
+            "17": [
+                {
+                    question: "How should cities coordinate public safety?",
+                    options: [
+                        "Rely only on police",
+                        "Integrate police, fire, medical, and emergency services",
+                        "Hire private security only",
+                        "Depend on volunteers only",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Cities integrate police, fire, medical, and emergency services.",
+                },
+                {
+                    question: "What is the PNP's role?",
+                    options: [
+                        "Collect taxes",
+                        "Maintain peace and order",
+                        "Build roads",
+                        "Manage hospitals",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "The PNP maintains peace and order.",
+                },
+                {
+                    question: "What is the BFP's main function?",
+                    options: [
+                        "Prevent and suppress fires",
+                        "Arrest criminals",
+                        "Collect garbage",
+                        "Issue permits",
+                    ],
+                    correctAnswer: 0,
+                    explanation: "The BFP prevents and suppresses fires.",
+                },
+                {
+                    question: "What is disaster risk reduction?",
+                    options: [
+                        "Ignoring disasters",
+                        "Preparing for and minimizing disaster impacts",
+                        "Causing disasters",
+                        "Moving away",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Disaster risk reduction prepares for and minimizes disaster impacts.",
+                },
+                {
+                    question: "What should cities do during emergencies?",
+                    options: [
+                        "Panic",
+                        "Activate emergency response plans",
+                        "Do nothing",
+                        "Wait for help",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Cities activate emergency response plans during emergencies.",
+                },
+                {
+                    question: "What is community-based policing?",
+                    options: [
+                        "Police working alone",
+                        "Police partnering with communities",
+                        "Police avoiding communities",
+                        "Communities policing alone",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Community-based policing involves police partnering with communities.",
+                },
+                {
+                    question: "Why is emergency preparedness important?",
+                    options: [
+                        "It's not important",
+                        "To quickly respond and save lives",
+                        "To spend money",
+                        "To create fear",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Emergency preparedness enables quick response to save lives.",
+                }
+            ],
+            // Mission 18: 8 questions
+            "18": [
+                {
+                    question: "Why is cultural heritage preservation important?",
+                    options: [
+                        "Only for tourists",
+                        "Preserves identity and educates citizens",
+                        "Increases costs",
+                        "Prevents development",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Cultural heritage preserves identity and educates citizens.",
+                },
+                {
+                    question: "What are examples of cultural heritage?",
+                    options: [
+                        "Only old buildings",
+                        "Historic sites, traditions, and festivals",
+                        "Only museums",
+                        "Only statues",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Cultural heritage includes historic sites, traditions, and festivals.",
+                },
+                {
+                    question: "What is the National Cultural Heritage Act?",
+                    options: [
+                        "A tax law",
+                        "A law protecting Philippine cultural heritage",
+                        "A business regulation",
+                        "A traffic law",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "The Act protects Philippine cultural heritage.",
+                },
+                {
+                    question: "How can cities promote local culture?",
+                    options: [
+                        "Ban cultural activities",
+                        "Support festivals and cultural programs",
+                        "Ignore traditions",
+                        "Copy other cities",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Cities support festivals and cultural programs.",
+                },
+                {
+                    question: "What is cultural tourism?",
+                    options: [
+                        "Any travel",
+                        "Tourism focused on experiencing local culture",
+                        "Only beaches",
+                        "Only malls",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Cultural tourism focuses on experiencing local culture.",
+                },
+                {
+                    question: "Why preserve historical buildings?",
+                    options: [
+                        "They're old and useless",
+                        "They represent history and identity",
+                        "They take up space",
+                        "They're expensive",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Historical buildings represent history and identity.",
+                },
+                {
+                    question: "What is intangible cultural heritage?",
+                    options: [
+                        "Buildings",
+                        "Traditions and knowledge passed down",
+                        "Money",
+                        "Technology",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Intangible heritage includes traditions and knowledge.",
+                },
+                {
+                    question: "How can youth participate in cultural preservation?",
+                    options: [
+                        "Ignore traditions",
+                        "Learn and share cultural traditions",
+                        "Focus on modern culture only",
+                        "Move away",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Youth learn and share cultural traditions.",
+                }
+            ],
+            // Mission 19: 9 questions
+            "19": [
+                {
+                    question: "What is the city's role in healthcare?",
+                    options: [
+                        "Replace private hospitals",
+                        "Provide basic health services",
+                        "Only handle emergencies",
+                        "Focus on insurance only",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Cities provide basic health services and coordinate programs.",
+                },
+                {
+                    question: "What are city health centers?",
+                    options: [
+                        "Private hospitals",
+                        "Government facilities providing basic healthcare",
+                        "Pharmacies",
+                        "Fitness gyms",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "City health centers provide basic healthcare services.",
+                },
+                {
+                    question: "What is public health?",
+                    options: [
+                        "Individual treatment",
+                        "Protecting community health through prevention",
+                        "Private healthcare",
+                        "Hospital management",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Public health protects community health through prevention.",
+                },
+                {
+                    question: "What is disease surveillance?",
+                    options: [
+                        "Spying on sick people",
+                        "Monitoring disease patterns",
+                        "Treating patients",
+                        "Selling medicine",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Disease surveillance monitors disease patterns.",
+                },
+                {
+                    question: "What is immunization?",
+                    options: [
+                        "Taking vitamins",
+                        "Vaccination to prevent diseases",
+                        "Exercise programs",
+                        "Eating healthy",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Immunization involves vaccination to prevent diseases.",
+                },
+                {
+                    question: "What is maternal and child health care?",
+                    options: [
+                        "Only for rich families",
+                        "Healthcare services for mothers and children",
+                        "Only for emergencies",
+                        "Only for fathers",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Maternal and child health care serves mothers and children.",
+                },
+                {
+                    question: "What is health promotion?",
+                    options: [
+                        "Selling products",
+                        "Educating about healthy lifestyles",
+                        "Building hospitals",
+                        "Hiring doctors",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Health promotion educates about healthy lifestyles.",
+                },
+                {
+                    question: "What is PhilHealth?",
+                    options: [
+                        "A fitness program",
+                        "National health insurance program",
+                        "A hospital chain",
+                        "A medicine brand",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "PhilHealth is the national health insurance program.",
+                },
+                {
+                    question: "Why is preventive healthcare important?",
+                    options: [
+                        "It's not important",
+                        "Prevents diseases before they occur",
+                        "It's expensive",
+                        "Only for rich people",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Preventive healthcare prevents diseases before they occur.",
+                }
+            ],
+            // Mission 20: 10 questions
+            "20": [
+                {
+                    question: "What demonstrates effective city leadership?",
+                    options: [
+                        "Making decisions without consultation",
+                        "Transparent governance and citizen participation",
+                        "Focusing only on economy",
+                        "Avoiding difficult decisions",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Effective leadership involves transparent governance and citizen participation.",
+                },
+                {
+                    question: "What is good governance?",
+                    options: [
+                        "Doing whatever you want",
+                        "Accountable, transparent, and participatory leadership",
+                        "Secret decision-making",
+                        "Ignoring citizens",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Good governance is accountable, transparent, and participatory.",
+                },
+                {
+                    question: "What is transparency in government?",
+                    options: [
+                        "Invisible walls",
+                        "Open sharing of information with citizens",
+                        "Secret meetings",
+                        "Hiding documents",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Transparency means open sharing of information with citizens.",
+                },
+                {
+                    question: "What is accountability?",
+                    options: [
+                        "Blaming others",
+                        "Taking responsibility for actions and decisions",
+                        "Avoiding responsibility",
+                        "Making excuses",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Accountability means taking responsibility for actions and decisions.",
+                },
+                {
+                    question: "Why is citizen participation important?",
+                    options: [
+                        "It's not important",
+                        "Ensures government serves the people's needs",
+                        "To waste time",
+                        "For entertainment",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Citizen participation ensures government serves the people's needs.",
+                },
+                {
+                    question: "What is participatory governance?",
+                    options: [
+                        "Government working alone",
+                        "Citizens actively involved in decision-making",
+                        "Only officials decide",
+                        "No citizen input",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Participatory governance involves citizens in decision-making.",
+                },
+                {
+                    question: "What is inter-agency coordination?",
+                    options: [
+                        "Agencies working separately",
+                        "Government agencies working together",
+                        "Competing with each other",
+                        "Ignoring each other",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Inter-agency coordination means government agencies working together.",
+                },
+                {
+                    question: "Why is long-term planning important for cities?",
+                    options: [
+                        "It's not important",
+                        "Ensures sustainable development for future generations",
+                        "To spend more money",
+                        "To delay projects",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Long-term planning ensures sustainable development for future generations.",
+                },
+                {
+                    question: "What is inclusive governance?",
+                    options: [
+                        "Only for certain groups",
+                        "Ensuring all citizens can participate regardless of background",
+                        "Excluding minorities",
+                        "Only for the wealthy",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Inclusive governance ensures all citizens can participate.",
+                },
+                {
+                    question: "How can citizens hold leaders accountable?",
+                    options: [
+                        "They cannot",
+                        "Through voting, participation, and monitoring government actions",
+                        "By complaining only",
+                        "By doing nothing",
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Citizens hold leaders accountable through voting, participation, and monitoring.",
+                }
+            ]
         };
 
         return (
-            quizzes[missionId as keyof typeof quizzes] || {
+            progressiveQuizzes[missionId as keyof typeof progressiveQuizzes] || [{
                 question: "What is the primary purpose of a barangay?",
                 options: [
                     "To collect taxes",
@@ -954,7 +1949,7 @@ function App() {
                 correctAnswer: 1,
                 explanation:
                     "A barangay is the smallest administrative unit in the Philippines and provides basic services to its residents.",
-            }
+            }]
         );
     };
 

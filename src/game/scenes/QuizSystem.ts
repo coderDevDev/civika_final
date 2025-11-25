@@ -12,13 +12,34 @@ export class QuizSystem extends Scene {
     quizData: any;
     missionId: number;
 
+    // NEW: Multiple questions support
+    quizQuestions: any[] = [];
+    currentQuestionIndex: number = 0;
+    correctAnswersCount: number = 0;
+    totalQuestions: number = 0;
+    progressText: GameObjects.Text | null = null;
+
     constructor() {
         super("QuizSystem");
     }
 
     init(data: any) {
-        this.quizData = data.quiz;
         this.missionId = data.missionId;
+        
+        // Support both array and single object for backward compatibility
+        if (Array.isArray(data.quiz)) {
+            this.quizQuestions = data.quiz;
+        } else {
+            // Convert single question to array for backward compatibility
+            this.quizQuestions = [data.quiz];
+        }
+        
+        this.totalQuestions = this.quizQuestions.length;
+        this.currentQuestionIndex = 0;
+        this.correctAnswersCount = 0;
+        this.quizData = this.quizQuestions[0];
+        
+        console.log(`Quiz initialized: ${this.totalQuestions} questions for Mission ${this.missionId}`);
     }
 
     create() {
@@ -47,6 +68,24 @@ export class QuizSystem extends Scene {
         // Panel shadow
         const shadow = this.add.rectangle(515, 387, 750, 650, 0x000000, 0.3);
         shadow.setDepth(99);
+
+        // Progress indicator
+        this.progressText = this.add
+            .text(
+                512,
+                150,
+                `Question ${this.currentQuestionIndex + 1} of ${this.totalQuestions}`,
+                {
+                    fontFamily: "Arial Black",
+                    fontSize: 18,
+                    color: "#4ECDC4",
+                    stroke: "#000000",
+                    strokeThickness: 3,
+                    align: "center",
+                }
+            )
+            .setOrigin(0.5)
+            .setDepth(101);
 
         // Question with Pokémon styling
         this.questionText = this.add
@@ -235,38 +274,76 @@ export class QuizSystem extends Scene {
     }
 
     handleCorrectAnswer() {
-        // Show success message
-        this.resultText = this.add
-            .text(512, 350, "Correct! Well done!", {
-                fontFamily: "Arial Black",
-                fontSize: 24,
-                color: "#00FF00",
-                stroke: "#000000",
-                strokeThickness: 2,
-                align: "center",
-            })
-            .setOrigin(0.5);
-
-        // Award badge and coins
-        this.awardReward();
-
-        // Close quiz after delay
-        this.time.delayedCall(2000, () => {
-            this.scene.stop();
-        });
+        this.correctAnswersCount++;
+        
+        // Check if there are more questions
+        if (this.currentQuestionIndex < this.totalQuestions - 1) {
+            // Show "Correct!" message with progress
+            this.resultText = this.add
+                .text(
+                    512,
+                    350,
+                    `Correct! (${this.currentQuestionIndex + 1}/${this.totalQuestions})`,
+                    {
+                        fontFamily: "Arial Black",
+                        fontSize: 24,
+                        color: "#00FF00",
+                        stroke: "#000000",
+                        strokeThickness: 2,
+                        align: "center",
+                    }
+                )
+                .setOrigin(0.5)
+                .setDepth(102);
+            
+            // Move to next question after delay
+            this.time.delayedCall(1500, () => {
+                this.loadNextQuestion();
+            });
+        } else {
+            // All questions completed - show final success
+            this.resultText = this.add
+                .text(
+                    512,
+                    350,
+                    `Perfect! ${this.correctAnswersCount}/${this.totalQuestions} Correct!`,
+                    {
+                        fontFamily: "Arial Black",
+                        fontSize: 24,
+                        color: "#00FF00",
+                        stroke: "#000000",
+                        strokeThickness: 2,
+                        align: "center",
+                    }
+                )
+                .setOrigin(0.5);
+            
+            // Award badge and coins
+            this.awardReward();
+            
+            // Close quiz after delay
+            this.time.delayedCall(2000, () => {
+                this.scene.stop();
+            });
+        }
     }
 
     handleIncorrectAnswer() {
         // Show failure message
         this.resultText = this.add
-            .text(512, 350, "Incorrect. Try again!", {
-                fontFamily: "Arial Black",
-                fontSize: 24,
-                color: "#FF0000",
-                stroke: "#000000",
-                strokeThickness: 2,
-                align: "center",
-            })
+            .text(
+                512,
+                350,
+                `Incorrect! Score: ${this.correctAnswersCount}/${this.totalQuestions}`,
+                {
+                    fontFamily: "Arial Black",
+                    fontSize: 24,
+                    color: "#FF0000",
+                    stroke: "#000000",
+                    strokeThickness: 2,
+                    align: "center",
+                }
+            )
             .setOrigin(0.5);
 
         // Show correct answer
@@ -288,10 +365,37 @@ export class QuizSystem extends Scene {
             )
             .setOrigin(0.5);
 
-        // Close quiz after delay
+        // Fail the mission - close quiz after delay
         this.time.delayedCall(3000, () => {
             this.scene.stop();
         });
+    }
+
+    loadNextQuestion() {
+        // Clear previous UI elements
+        this.children.removeAll();
+        
+        // Reset selection
+        this.selectedOption = -1;
+        this.options = [];
+        this.optionBackgrounds = [];
+        
+        // Move to next question
+        this.currentQuestionIndex++;
+        this.quizData = this.quizQuestions[this.currentQuestionIndex];
+        
+        console.log(`Loading question ${this.currentQuestionIndex + 1}/${this.totalQuestions}`);
+        
+        // Recreate the quiz panel with new question
+        this.background = this.add.rectangle(
+            512,
+            384,
+            1024,
+            768,
+            0x000000,
+            0.8
+        );
+        this.createPokemonQuizPanel();
     }
 
     awardReward() {

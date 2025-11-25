@@ -8,7 +8,7 @@ interface QuizQuestion {
 }
 
 interface QuizSystemProps {
-    question: QuizQuestion;
+    question: QuizQuestion | QuizQuestion[];
     onAnswer: (isCorrect: boolean) => void;
     onClose: () => void;
     missionId?: string;
@@ -20,6 +20,12 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({
     onClose,
     missionId,
 }) => {
+    // Progressive quiz support
+    const [questions] = useState<QuizQuestion[]>(Array.isArray(question) ? question : [question]);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
+    const currentQuestion = questions[currentQuestionIndex];
+    
     const [selectedOption, setSelectedOption] = useState<number | null>(null);
     const [showResult, setShowResult] = useState(false);
     const [isCorrect, setIsCorrect] = useState(false);
@@ -82,7 +88,7 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({
             // Stop the timer
             setIsTimerRunning(false);
 
-            const correct = selectedOption === question.correctAnswer;
+            const correct = selectedOption === currentQuestion.correctAnswer;
             const timeSpent = (Date.now() - startTime) / 1000;
 
             // Calculate time bonus
@@ -97,19 +103,43 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({
             console.log("Quiz submission:", {
                 missionId,
                 selectedOption,
-                correctAnswer: question.correctAnswer,
+                correctAnswer: currentQuestion.correctAnswer,
                 isCorrect: correct,
                 timeSpent: Math.round(timeSpent),
                 timeRemaining,
                 timeBonus: bonus,
             });
 
-            onAnswer(correct);
+            if (correct) {
+                setCorrectAnswersCount(prev => prev + 1);
+            }
+
+            // Don't call onAnswer immediately - wait for handleNext
+            // onAnswer(correct);
         }
     };
 
     const handleNext = () => {
-        onClose();
+        if (!isCorrect) {
+            // Wrong answer - fail the mission
+            onAnswer(false);
+            onClose();
+            return;
+        }
+
+        // Check if there are more questions
+        if (currentQuestionIndex < questions.length - 1) {
+            // Move to next question
+            setCurrentQuestionIndex(prev => prev + 1);
+            setSelectedOption(null);
+            setShowResult(false);
+            setTimeRemaining(QUIZ_TIME_LIMIT);
+            setIsTimerRunning(true);
+        } else {
+            // All questions completed successfully
+            onAnswer(true);
+            onClose();
+        }
     };
 
     // Helper function to get timer color based on time remaining
@@ -200,6 +230,13 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({
                             </button>
                         </div>
 
+                        {/* Progress Indicator */}
+                        <div className="text-center mb-4">
+                            <span className="text-sm text-amber-700 bg-amber-100 px-3 py-1 rounded-full border border-amber-300">
+                                Question {currentQuestionIndex + 1} of {questions.length}
+                            </span>
+                        </div>
+
                         {/* Question */}
                         <div className="mb-4 sm:mb-6">
                             <div className="game-element-border rounded-lg p-3 sm:p-4 bg-gradient-to-r from-amber-100 to-amber-200">
@@ -208,19 +245,19 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({
                                     <span>Question:</span>
                                 </h3>
                                 <p className="text-amber-800 leading-relaxed text-sm sm:text-base">
-                                    {question.question}
+                                    {currentQuestion.question}
                                 </p>
                             </div>
                         </div>
 
                         {/* Options */}
                         <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
-                            {question.options.map((option, index) => {
+                            {currentQuestion.options.map((option: string, index: number) => {
                                 let optionClass =
                                     "p-2 sm:p-3 rounded-lg border-2 sm:border-3 transition-all duration-200 cursor-pointer hover:scale-105 game-element-border ";
 
                                 if (showResult) {
-                                    if (index === question.correctAnswer) {
+                                    if (index === currentQuestion.correctAnswer) {
                                         optionClass +=
                                             "bg-green-100 border-green-500 text-green-800";
                                     } else if (
@@ -326,8 +363,8 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({
                                                     : timeRemaining === 0
                                                     ? "⏰ Time's up! The quiz failed due to timeout."
                                                     : `The correct answer was: ${
-                                                          question.options[
-                                                              question
+                                                          currentQuestion.options[
+                                                              currentQuestion
                                                                   .correctAnswer
                                                           ]
                                                       }`}
@@ -365,7 +402,7 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({
                                         📚 Explanation:
                                     </h5>
                                     <p className="text-amber-700 text-sm sm:text-base">
-                                        {question.explanation}
+                                        {currentQuestion.explanation}
                                     </p>
                                 </div>
                             </div>
@@ -390,8 +427,8 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({
                                     className="game-button-frame px-4 sm:px-6 py-2 sm:py-3 text-white text-sm sm:text-base font-bold rounded-full shadow-lg hover:scale-105 transition-all duration-300 game-glow"
                                 >
                                     <div className="flex items-center justify-center space-x-1 sm:space-x-2">
-                                        <span>➡️</span>
-                                        <span>Continue</span>
+                                        <span>{currentQuestionIndex < questions.length - 1 ? "➡️" : "🎉"}</span>
+                                        <span>{currentQuestionIndex < questions.length - 1 ? "Next Question" : "Complete Mission"}</span>
                                     </div>
                                 </button>
                             )}
