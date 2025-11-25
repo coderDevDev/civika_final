@@ -26,6 +26,11 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({
     const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
     const currentQuestion = questions[currentQuestionIndex];
     
+    // Retry system
+    const [questionRetries, setQuestionRetries] = useState<number[]>(new Array(questions.length).fill(0));
+    const [totalScore, setTotalScore] = useState(0);
+    const MAX_RETRIES_PER_QUESTION = 2; // Allow 2 retries per question
+    
     const [selectedOption, setSelectedOption] = useState<number | null>(null);
     const [showResult, setShowResult] = useState(false);
     const [isCorrect, setIsCorrect] = useState(false);
@@ -121,11 +126,39 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({
 
     const handleNext = () => {
         if (!isCorrect) {
-            // Wrong answer - fail the mission
-            onAnswer(false);
-            onClose();
-            return;
+            // Wrong answer - check if retries available
+            const currentRetries = questionRetries[currentQuestionIndex];
+            
+            if (currentRetries < MAX_RETRIES_PER_QUESTION) {
+                // Allow retry
+                const newRetries = [...questionRetries];
+                newRetries[currentQuestionIndex] = currentRetries + 1;
+                setQuestionRetries(newRetries);
+                
+                // Reset question state for retry
+                setSelectedOption(null);
+                setShowResult(false);
+                setTimeRemaining(QUIZ_TIME_LIMIT);
+                setIsTimerRunning(true);
+                return;
+            } else {
+                // No more retries - fail the mission
+                onAnswer(false);
+                onClose();
+                return;
+            }
         }
+
+        // Correct answer - calculate score for this question
+        const currentRetries = questionRetries[currentQuestionIndex];
+        let questionScore = 100; // Base score
+        
+        // Apply retry penalty
+        if (currentRetries === 1) questionScore = 80; // 1 retry = 80%
+        else if (currentRetries === 2) questionScore = 60; // 2 retries = 60%
+        
+        setTotalScore(prev => prev + questionScore);
+        setCorrectAnswersCount(prev => prev + 1);
 
         // Check if there are more questions
         if (currentQuestionIndex < questions.length - 1) {
@@ -137,6 +170,8 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({
             setIsTimerRunning(true);
         } else {
             // All questions completed successfully
+            const finalScore = Math.round(totalScore / questions.length);
+            console.log(`Mission completed! Final score: ${finalScore}%`);
             onAnswer(true);
             onClose();
         }
@@ -231,10 +266,16 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({
                         </div>
 
                         {/* Progress Indicator */}
-                        <div className="text-center mb-4">
+                        <div className="text-center mb-4 space-y-2">
                             <span className="text-sm text-amber-700 bg-amber-100 px-3 py-1 rounded-full border border-amber-300">
                                 Question {currentQuestionIndex + 1} of {questions.length}
                             </span>
+                            {/* Retry Indicator */}
+                            {questionRetries[currentQuestionIndex] > 0 && (
+                                <div className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded-full border border-orange-300">
+                                    Attempt {questionRetries[currentQuestionIndex] + 1} of {MAX_RETRIES_PER_QUESTION + 1}
+                                </div>
+                            )}
                         </div>
 
                         {/* Question */}
@@ -424,11 +465,29 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({
                             ) : (
                                 <button
                                     onClick={handleNext}
-                                    className="game-button-frame px-4 sm:px-6 py-2 sm:py-3 text-white text-sm sm:text-base font-bold rounded-full shadow-lg hover:scale-105 transition-all duration-300 game-glow"
+                                    className={`px-4 sm:px-6 py-2 sm:py-3 text-white text-sm sm:text-base font-bold rounded-full shadow-lg hover:scale-105 transition-all duration-300 ${
+                                        !isCorrect && questionRetries[currentQuestionIndex] < MAX_RETRIES_PER_QUESTION
+                                            ? "bg-orange-600 hover:bg-orange-700 border-2 border-orange-800"
+                                            : "game-button-frame game-glow"
+                                    }`}
                                 >
                                     <div className="flex items-center justify-center space-x-1 sm:space-x-2">
-                                        <span>{currentQuestionIndex < questions.length - 1 ? "➡️" : "🎉"}</span>
-                                        <span>{currentQuestionIndex < questions.length - 1 ? "Next Question" : "Complete Mission"}</span>
+                                        {!isCorrect && questionRetries[currentQuestionIndex] < MAX_RETRIES_PER_QUESTION ? (
+                                            <>
+                                                <span>🔄</span>
+                                                <span>Try Again ({MAX_RETRIES_PER_QUESTION - questionRetries[currentQuestionIndex]} left)</span>
+                                            </>
+                                        ) : !isCorrect ? (
+                                            <>
+                                                <span>❌</span>
+                                                <span>Mission Failed</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span>{currentQuestionIndex < questions.length - 1 ? "➡️" : "🎉"}</span>
+                                                <span>{currentQuestionIndex < questions.length - 1 ? "Next Question" : "Complete Mission"}</span>
+                                            </>
+                                        )}
                                     </div>
                                 </button>
                             )}
